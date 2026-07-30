@@ -50,6 +50,20 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       )
     },
     {
+      find: '../editor/input/ui/AcEdMTextEditor',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdMTextEditor.ts'
+      )
+    },
+    {
+      find: '../input/ui/AcEdMTextEditor',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdMTextEditor.ts'
+      )
+    },
+    {
       find: '../input/AcEditor',
       replacement: resolve(
         appRoot,
