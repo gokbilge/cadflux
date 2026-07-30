@@ -21,7 +21,7 @@ export async function loadCadFluxViewerComponent(): Promise<unknown> {
 
 export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> {
   const [{ AcApDocManager }, { AcEdOpenMode }] = await Promise.all([
-    import('../../cad-simple-viewer/src/app/AcApDocManager'),
+    import('./cadflux-app/AcApDocManager'),
     import('../../cad-simple-viewer/src/editor/view/AcEdOpenMode')
   ])
 
