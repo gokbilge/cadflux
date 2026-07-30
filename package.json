@@ -1,13 +1,13 @@
 {
-  "name": "mlightcad",
+  "name": "cadflux",
   "private": true,
   "version": "1.0.0",
-  "license": "MIT",
-  "author": "MLight Lee <mlight.lee@outlook.com>",
+  "license": "GPL-3.0-or-later",
+  "author": "CadFlux contributors",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mlightcad/cad-viewer"
+    "url": "https://github.com/gokbilge/cadflux"
   },
   "workspaces": [
     "packages/*"

@@ -1,4 +1,6 @@
-# CAD-Viewer
+# CadFlux
+
+CadFlux is a CadFlux distribution of the upstream CAD-Viewer project.
 
 [English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md) | [한국어](./README.ko.md) | [Español](./README.es.md) | [Português](./README.pt.md) | [Русский](./README.ru.md) | [Čeština](./README.cs.md)
 
@@ -61,8 +63,8 @@ Community Linux desktop packages:
 ### Installation
 
 ```bash
-git clone https://github.com/mlightcad/cad-viewer.git
-cd cad-viewer
+git clone https://github.com/gokbilge/cadflux.git
+cd cadflux
 pnpm install
 ```
 
@@ -422,7 +424,9 @@ Contributions are welcome! Please open issues or pull requests for bug fixes, ne
 
 ## License
 
-The cad-viewer monorepo is primarily [MIT](LICENSE) licensed.
+CadFlux is licensed under the [GNU General Public License v3.0 or later](LICENSE).
+
+CadFlux is derived from [mlightcad/cad-viewer](https://github.com/mlightcad/cad-viewer), which was originally distributed under the MIT License. See [NOTICE.md](NOTICE.md) for attribution details.
 
 DXF loading uses the built-in MIT parser in `@mlightcad/data-model`. The **default DWG loading path** in `@mlightcad/cad-simple-viewer` depends on GPL-3.0 packages (`libredwg-web` / `@mlightcad/libredwg-converter`). If you ship a closed-source product and cannot distribute GPL code to your customers, use the [**proprietary DWG parser**](./PROPRIETARY-PARSER.md) instead — it replaces that converter and lets the rest of the stack remain MIT-only.
 
