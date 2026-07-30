@@ -15,6 +15,20 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       )
     },
     {
+      find: /^(\.\.\/)+i18n$/,
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-i18n/index.ts'
+      )
+    },
+    {
+      find: /^(\.\.\/)+i18n\/AcApI18n$/,
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-i18n/AcApI18n.ts'
+      )
+    },
+    {
       find: './AcEdCommandLine',
       replacement: resolve(
         appRoot,
