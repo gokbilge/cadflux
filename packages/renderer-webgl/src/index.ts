@@ -7,6 +7,11 @@ export interface CadFluxViewerRuntime {
   execute(command: 'cpdf' | 'csvg'): Promise<void>
 }
 
+export async function loadCadFluxViewerI18n(): Promise<unknown> {
+  const module = await import('@mlightcad/cad-viewer')
+  return module.i18n
+}
+
 export async function loadCadFluxViewerComponent(): Promise<unknown> {
   const module = await import('@mlightcad/cad-viewer')
   return module.MlCadViewer

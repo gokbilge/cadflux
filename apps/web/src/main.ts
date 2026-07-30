@@ -3,11 +3,15 @@
 
 import 'element-plus/dist/index.css'
 
-import { i18n } from '@mlightcad/cad-viewer'
+import { loadCadFluxViewerI18n } from '@cadflux/renderer-webgl'
 import { createApp } from 'vue'
 
 import App from './App.vue'
 
-const app = createApp(App)
-app.use(i18n)
-app.mount('#app')
+async function bootstrap() {
+  const app = createApp(App)
+  app.use(await loadCadFluxViewerI18n())
+  app.mount('#app')
+}
+
+void bootstrap()

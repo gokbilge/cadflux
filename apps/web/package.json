@@ -15,10 +15,6 @@
     "@cadflux/file-ingest": "workspace:*",
     "@cadflux/presets": "workspace:*",
     "@cadflux/renderer-webgl": "workspace:*",
-    "@mlightcad/cad-pdf-plugin": "workspace:*",
-    "@mlightcad/cad-simple-viewer": "workspace:*",
-    "@mlightcad/cad-svg-plugin": "workspace:*",
-    "@mlightcad/cad-viewer": "workspace:*",
     "element-plus": "^2.12.0",
     "vue": "^3.4.21",
     "vue-i18n": "^11.4.4"

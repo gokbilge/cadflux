@@ -14,6 +14,15 @@
   "files": [
     "dist"
   ],
+  "dependencies": {
+    "@mlightcad/cad-pdf-plugin": "workspace:*",
+    "@mlightcad/cad-simple-viewer": "workspace:*",
+    "@mlightcad/cad-svg-plugin": "workspace:*",
+    "@mlightcad/cad-viewer": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.21"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist tsconfig.tsbuildinfo"

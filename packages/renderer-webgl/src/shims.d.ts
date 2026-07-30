@@ -5,6 +5,7 @@ declare module '@mlightcad/cad-viewer' {
   import type { Component } from 'vue'
 
   export const MlCadViewer: Component
+  export const i18n: unknown
 }
 
 declare module '@mlightcad/cad-simple-viewer' {
