@@ -8,9 +8,7 @@ export interface CadFluxViewerRuntime {
 }
 
 export async function ensureCadFluxViewerLocale(locale = 'en'): Promise<void> {
-  const { AcApI18n } = await import(
-    '../../cad-simple-viewer/src/i18n/AcApI18n'
-  )
+  const { AcApI18n } = await import('./cadflux-i18n/AcApI18n')
   AcApI18n.setCurrentLocale(locale as 'en' | 'zh' | 'tr' | 'cs')
 }
 

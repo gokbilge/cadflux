@@ -3,7 +3,6 @@
 
 export * from '../../../cad-simple-viewer/src/app/AcApAnnotation'
 export * from '../../../cad-simple-viewer/src/app/AcApContext'
-export * from '../../../cad-simple-viewer/src/app/AcApCommandServices'
 export * from '../../../cad-simple-viewer/src/app/AcApDocument'
 export * from '../../../cad-simple-viewer/src/app/AcApObjectDisplay'
 export * from './AcApDocManager'

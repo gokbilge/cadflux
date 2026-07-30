@@ -15,7 +15,7 @@ import { AcApContext } from '../../../cad-simple-viewer/src/app/AcApContext'
 import { AcApDocument } from '../../../cad-simple-viewer/src/app/AcApDocument'
 import { AcApFontLoader } from '../../../cad-simple-viewer/src/app/AcApFontLoader'
 import type { AcApOpenDatabaseOptions } from '../../../cad-simple-viewer/src/app/AcDbOpenDatabaseOptions'
-import { AcEdCommandStack, AcEdOpenMode } from '../../../cad-simple-viewer/src/editor'
+import { AcEdOpenMode } from '../../../cad-simple-viewer/src/editor/view/AcEdOpenMode'
 import { AcTrView2d } from '../../../cad-simple-viewer/src/view'
 import {
   LIBREDWG_PARSER_WORKER_FILE,
