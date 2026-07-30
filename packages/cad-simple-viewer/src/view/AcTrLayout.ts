@@ -7,7 +7,8 @@ import {
 } from '@mlightcad/three-renderer'
 import * as THREE from 'three'
 
-import { AcEdLayerInfo, AcEdSpatialQueryResultItem } from '../editor'
+import { AcEdLayerInfo } from '../editor/view/AcEdLayerInfo'
+import { AcEdSpatialQueryResultItem } from '../editor/view/AcEdSpatialQueryResult'
 import { unionSpatialQueryItems } from '../editor/view/AcEdSpatialQueryResult'
 import { AcTrHierarchicalSpatialIndex } from '../spatialIndex'
 import type { AcTrSpatialSearchOptions } from '../spatialIndex/AcTrSpatialIndex'

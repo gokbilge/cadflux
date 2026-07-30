@@ -1,8 +1,12 @@
 import {
   accmYieldForPaint,
-  AcDbProgressdEventArgs} from '@mlightcad/data-model'
+  AcDbProgressdEventArgs
+} from '@mlightcad/data-model'
 
-import { AcEdFontNotLoadedInfo, eventBus } from '../editor'
+import {
+  AcEdFontNotLoadedInfo,
+  eventBus
+} from '../editor/global/eventBus'
 import { AcApI18n } from '../i18n'
 import { AcApProgress } from './AcApProgress'
 import { isOpenFileProgressComplete } from './openFileProgress'

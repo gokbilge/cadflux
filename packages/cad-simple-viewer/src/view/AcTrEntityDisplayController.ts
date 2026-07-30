@@ -6,7 +6,7 @@ import {
   AcDbObjectId
 } from '@mlightcad/data-model'
 
-import { AcEdLayerInfo } from '../editor'
+import { AcEdLayerInfo } from '../editor/view/AcEdLayerInfo'
 import { AcTrLayer } from './AcTrLayer'
 
 type AcTrEntityDisplayCandidate = Pick<AcDbEntity, 'visibility' | 'layer'>

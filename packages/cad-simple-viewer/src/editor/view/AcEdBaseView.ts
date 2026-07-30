@@ -14,7 +14,10 @@ import {
 import { debounce } from 'lodash-es'
 
 import type { AcTrSpatialSearchOptions } from '../../spatialIndex/AcTrSpatialIndex'
-import { AcEdCorsorType, AcEdSelectionSet } from '../input'
+import {
+  AcEdCorsorType
+} from '../input/AcEdCursorManager'
+import { AcEdSelectionSet } from '../input/AcEdSelectionSet'
 import { AcEditor } from '../input/AcEditor'
 import { AcEdOsnapResolver } from '../input/AcEdOsnapResolver'
 import { AcEdHoverController } from './AcEdHoverController'

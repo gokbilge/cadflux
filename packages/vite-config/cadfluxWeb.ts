@@ -50,6 +50,20 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       )
     },
     {
+      find: '../input/AcEditor',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEditor.ts'
+      )
+    },
+    {
+      find: '../input/AcEdOsnapResolver',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdOsnapResolver.ts'
+      )
+    },
+    {
       find: '../editor/grip/AcEdGripManager',
       replacement: resolve(
         appRoot,

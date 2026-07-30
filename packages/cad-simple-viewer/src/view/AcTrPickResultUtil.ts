@@ -1,6 +1,6 @@
 import { AcGePoint2dLike } from '@mlightcad/data-model'
 
-import { AcEdSpatialQueryResultItemEx } from '../editor'
+import { AcEdSpatialQueryResultItemEx } from '../editor/view/AcEdSpatialQueryResult'
 
 export function sortPickResults(
   results: AcEdSpatialQueryResultItemEx[],

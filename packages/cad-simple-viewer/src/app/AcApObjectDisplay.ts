@@ -1,6 +1,6 @@
 import { AcDbObjectId } from '@mlightcad/data-model'
 
-import { AcEdBaseView } from '../editor'
+import { AcEdBaseView } from '../editor/view/AcEdBaseView'
 import { AcApContext } from './AcApContext'
 import { AcApDocument } from './AcApDocument'
 

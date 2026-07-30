@@ -36,19 +36,21 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 
 import { AcApDocManager, AcApSettingManager } from '../app'
+import { AcEdConditionWaiter } from '../editor/global/AcEdConditionWaiter'
+import { eventBus } from '../editor/global/eventBus'
+import { AcEdCorsorType } from '../editor/input/AcEdCursorManager'
+import { AcEdMTextEditor } from '../editor/input/ui/AcEdMTextEditor'
 import {
   AcEdBaseView,
   AcEdCalculateSizeCallback,
-  AcEdConditionWaiter,
-  AcEdCorsorType,
-  AcEdMTextEditor,
-  AcEdOpenMode,
+  AcEdViewMode
+} from '../editor/view/AcEdBaseView'
+import { AcEdOpenMode } from '../editor/view/AcEdOpenMode'
+import { resolvePointerSelectionAction } from '../editor/view/AcEdSelectionAction'
+import {
   AcEdSpatialQueryResultItem,
-  AcEdSpatialQueryResultItemEx,
-  AcEdViewMode,
-  eventBus,
-  resolvePointerSelectionAction
-} from '../editor'
+  AcEdSpatialQueryResultItemEx
+} from '../editor/view/AcEdSpatialQueryResult'
 import { AcEdGripManager } from '../editor/grip/AcEdGripManager'
 import {
   ACGI_MODEL_SPACE_BACKGROUND,

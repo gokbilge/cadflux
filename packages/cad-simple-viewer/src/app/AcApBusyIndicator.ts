@@ -1,6 +1,6 @@
 import { accmYieldForPaint } from '@mlightcad/data-model'
 
-import { eventBus } from '../editor'
+import { eventBus } from '../editor/global/eventBus'
 import { AcApProgress } from './AcApProgress'
 
 /**

@@ -5,7 +5,10 @@ import {
 } from '@mlightcad/data-model'
 import { AcTrFontLoader } from '@mlightcad/three-renderer'
 
-import { AcEdFontNotLoadedInfo, eventBus } from '../editor'
+import {
+  AcEdFontNotLoadedInfo,
+  eventBus
+} from '../editor/global/eventBus'
 
 /**
  * Font loader implementation for CAD text rendering.

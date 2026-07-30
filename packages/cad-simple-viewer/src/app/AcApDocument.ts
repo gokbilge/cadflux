@@ -7,8 +7,8 @@ import {
   log
 } from '@mlightcad/data-model'
 
-import { eventBus } from '../editor'
-import { AcEdOpenMode } from '../editor/view'
+import { eventBus } from '../editor/global/eventBus'
+import { AcEdOpenMode } from '../editor/view/AcEdOpenMode'
 import { AcApEntityService } from '../service/AcApEntityService'
 import type { AcApLayerIsoSnapshot } from '../service/AcApLayerIsoState'
 import { AcApLayerService } from '../service/AcApLayerService'

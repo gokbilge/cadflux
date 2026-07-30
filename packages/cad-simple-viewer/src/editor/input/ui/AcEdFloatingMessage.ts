@@ -5,7 +5,7 @@ import {
   AcGePoint2dLike
 } from '@mlightcad/data-model'
 
-import { AcEdBaseView } from '../../view'
+import { AcEdBaseView } from '../../view/AcEdBaseView'
 
 /**
  * AcEdFloatingMessage

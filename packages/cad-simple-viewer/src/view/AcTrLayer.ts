@@ -9,7 +9,7 @@ import {
 } from '@mlightcad/three-renderer'
 import * as THREE from 'three'
 
-import { AcEdLayerInfo } from '../editor'
+import { AcEdLayerInfo } from '../editor/view/AcEdLayerInfo'
 
 /**
  * Statistics for a CAD layer including name and batched rendering metrics.

@@ -8,7 +8,7 @@ import {
 } from '@mlightcad/three-renderer'
 import * as THREE from 'three'
 
-import { AcEdLayerInfo } from '../editor'
+import { AcEdLayerInfo } from '../editor/view/AcEdLayerInfo'
 import type { AcTrSpatialSearchOptions } from '../spatialIndex/AcTrSpatialIndex'
 import { AcTrLayer } from './AcTrLayer'
 import {

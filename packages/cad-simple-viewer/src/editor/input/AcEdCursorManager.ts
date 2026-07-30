@@ -4,7 +4,7 @@ import {
   ACGI_MODEL_SPACE_BACKGROUND,
   cursorColorForBackground
 } from '../global/AcEdUiColor'
-import { AcEdBaseView } from '../view'
+import { AcEdBaseView } from '../view/AcEdBaseView'
 
 /**
  * Enumeration of cursor types available in the CAD editor.
