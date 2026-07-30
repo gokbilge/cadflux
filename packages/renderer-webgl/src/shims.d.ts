@@ -62,8 +62,7 @@ declare module '@mlightcad/cad-simple-viewer' {
       }
     }
     instance: {
-      pluginManager: unknown
-      sendStringToExecute(command: string): Promise<void>
+      context: unknown
       destroy(): Promise<void>
     }
   }
@@ -82,10 +81,14 @@ declare module '@mlightcad/cad-simple-viewer' {
   }
 }
 
-declare module '@mlightcad/cad-svg-plugin/register' {
-  export function registerLazySvgPlugin(pluginManager: unknown): void
+declare module '@mlightcad/cad-svg-plugin/convertor' {
+  export class AcApSvgConvertor {
+    convert(context: unknown): Promise<void>
+  }
 }
 
-declare module '@mlightcad/cad-pdf-plugin/register' {
-  export function registerLazyPdfPlugin(pluginManager: unknown): void
+declare module '@mlightcad/cad-pdf-plugin/convertor' {
+  export class AcApPdfConvertor {
+    convert(context: unknown): Promise<void>
+  }
 }

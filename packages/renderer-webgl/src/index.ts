@@ -28,19 +28,17 @@ export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> 
       // Reserved hook for future CadFlux-specific viewer setup.
     },
     async execute(command: 'cpdf' | 'csvg') {
-      const pluginManager = AcApDocManager.instance.pluginManager
       if (command === 'csvg') {
-        const { registerLazySvgPlugin } = await import(
-          '@mlightcad/cad-svg-plugin/register'
+        const { AcApSvgConvertor } = await import(
+          '@mlightcad/cad-svg-plugin/convertor'
         )
-        registerLazySvgPlugin(pluginManager)
+        await new AcApSvgConvertor().convert(AcApDocManager.instance.context)
       } else {
-        const { registerLazyPdfPlugin } = await import(
-          '@mlightcad/cad-pdf-plugin/register'
+        const { AcApPdfConvertor } = await import(
+          '@mlightcad/cad-pdf-plugin/convertor'
         )
-        registerLazyPdfPlugin(pluginManager)
+        await new AcApPdfConvertor().convert(AcApDocManager.instance.context)
       }
-      await AcApDocManager.instance.sendStringToExecute(command)
     }
   }
 }

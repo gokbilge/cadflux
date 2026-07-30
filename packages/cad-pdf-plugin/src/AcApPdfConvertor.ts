@@ -1,11 +1,11 @@
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
-import {
-  AcApSettingManager,
-  resolveExportDownloadName
-} from '@mlightcad/cad-simple-viewer'
 import { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 import { jsPDF } from 'jspdf'
 import { svg2pdf } from 'svg2pdf.js'
+import {
+  readCadFluxBrowserFontMapping,
+  resolveCadFluxExportDownloadName
+} from './CadFluxBrowserExport'
 
 /**
  * Utility class for converting CAD drawings to PDF format.
@@ -19,7 +19,7 @@ export class AcApPdfConvertor {
    */
   async convert(context: AcApContext) {
     const svgString = await this.buildSvg(context)
-    const downloadName = resolveExportDownloadName(
+    const downloadName = resolveCadFluxExportDownloadName(
       context.doc.fileName || context.doc.docTitle,
       'pdf'
     )
@@ -45,7 +45,7 @@ export class AcApPdfConvertor {
     renderer.ltscale = db.ltscale
     renderer.celtscale = db.celtscale
     renderer.showLineWeight = !!db.lwdisplay
-    renderer.setFontMapping(AcApSettingManager.instance.fontMapping)
+    renderer.setFontMapping(readCadFluxBrowserFontMapping())
 
     const view = context.view as { backgroundColor?: number } | undefined
     const bg = view?.backgroundColor ?? 0xffffff

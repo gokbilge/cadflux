@@ -45,6 +45,10 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       appRoot,
       '../../packages/cad-pdf-plugin/src/register.ts'
     ),
+    '@mlightcad/cad-pdf-plugin/convertor': resolve(
+      appRoot,
+      '../../packages/cad-pdf-plugin/src/AcApPdfConvertor.ts'
+    ),
     '@mlightcad/data-model': resolve(
       appRoot,
       '../../packages/cad-simple-viewer/node_modules/@mlightcad/data-model/lib/index.js'
@@ -60,6 +64,10 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
     '@mlightcad/cad-svg-plugin/register': resolve(
       appRoot,
       '../../packages/cad-svg-plugin/src/register.ts'
+    ),
+    '@mlightcad/cad-svg-plugin/convertor': resolve(
+      appRoot,
+      '../../packages/cad-svg-plugin/src/AcApSvgConvertor.ts'
     ),
     '@mlightcad/cad-svg-plugin': resolve(
       appRoot,
@@ -78,15 +86,28 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   }
 
   if (
+    id.includes('packages/cad-svg-plugin/src/AcSvgFontMap')
+  ) {
+    return 'cad-export-fonts'
+  }
+
+  if (
     id.includes('packages/cad-svg-plugin/src/AcSvgMText') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgFontMap') ||
     id.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
     id.includes('node_modules/.pnpm/@mlightcad+mtext-parser') ||
     id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer')
   ) {
-    return 'cad-export-text'
+    return 'cad-export-mtext'
+  }
+
+  if (
+    id.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
+    id.includes('packages/cad-svg-plugin/src/CadFluxBrowserExport') ||
+    id.includes('packages/cad-pdf-plugin/src/CadFluxBrowserExport') ||
+    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer')
+  ) {
+    return 'cad-export-shape'
   }
 
   if (

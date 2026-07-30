@@ -1,10 +1,10 @@
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
-import {
-  AcApSettingManager,
-  resolveExportDownloadName
-} from '@mlightcad/cad-simple-viewer'
 
 import { AcSvgRenderer } from './AcSvgRenderer'
+import {
+  readCadFluxBrowserFontMapping,
+  resolveCadFluxExportDownloadName
+} from './CadFluxBrowserExport'
 
 /**
  * Utility class for converting CAD drawings to SVG format.
@@ -29,7 +29,7 @@ export class AcApSvgConvertor {
     }
 
     const svgContent = await renderer.exportAsync()
-    const downloadName = resolveExportDownloadName(
+    const downloadName = resolveCadFluxExportDownloadName(
       context.doc.fileName || context.doc.docTitle,
       'svg'
     )
@@ -44,7 +44,7 @@ export class AcApSvgConvertor {
     renderer.ltscale = db.ltscale
     renderer.celtscale = db.celtscale
     renderer.showLineWeight = !!db.lwdisplay
-    renderer.setFontMapping(AcApSettingManager.instance.fontMapping)
+    renderer.setFontMapping(readCadFluxBrowserFontMapping())
 
     const view = context.view as { backgroundColor?: number } | undefined
     const bg = view?.backgroundColor ?? 0xffffff
