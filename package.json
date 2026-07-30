@@ -10,15 +10,18 @@
     "url": "https://github.com/gokbilge/cadflux"
   },
   "workspaces": [
+    "apps/*",
     "packages/*"
   ],
   "packageManager": "pnpm@10.33.4",
   "scripts": {
     "analyze": "nx run-many -t analyze",
     "build": "nx run-many -t build",
+    "build:cadflux": "pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/web build",
     "clean": "nx run-many -t clean",
     "copy:workers": "pnpm -r --filter \"./packages/**\" run copy:workers",
     "dev": "nx run @mlightcad/cad-viewer-example:dev",
+    "dev:cadflux:web": "pnpm --filter @cadflux/web dev",
     "dev:simple": "nx run @mlightcad/cad-simple-viewer-example:dev",
     "docs:build": "typedoc --skipErrorChecking",
     "docs:site:prepare": "node tools/prepare-docs-site.mjs",

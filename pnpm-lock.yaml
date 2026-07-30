@@ -110,6 +110,82 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(vite@6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3))
 
+  apps/cli:
+    dependencies:
+      '@cadflux/batch-engine':
+        specifier: workspace:*
+        version: link:../../packages/batch-engine
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@cadflux/diagnostics':
+        specifier: workspace:*
+        version: link:../../packages/diagnostics
+      '@cadflux/file-ingest':
+        specifier: workspace:*
+        version: link:../../packages/file-ingest
+      '@cadflux/presets':
+        specifier: workspace:*
+        version: link:../../packages/presets
+      '@cadflux/renderer-pdf':
+        specifier: workspace:*
+        version: link:../../packages/renderer-pdf
+      '@cadflux/renderer-svg':
+        specifier: workspace:*
+        version: link:../../packages/renderer-svg
+      commander:
+        specifier: ^12.1.0
+        version: 12.1.0
+      playwright:
+        specifier: ^1.49.1
+        version: 1.59.1
+
+  apps/web:
+    dependencies:
+      '@cadflux/file-ingest':
+        specifier: workspace:*
+        version: link:../../packages/file-ingest
+      '@cadflux/presets':
+        specifier: workspace:*
+        version: link:../../packages/presets
+      '@mlightcad/cad-pdf-plugin':
+        specifier: workspace:*
+        version: link:../../packages/cad-pdf-plugin
+      '@mlightcad/cad-simple-viewer':
+        specifier: workspace:*
+        version: link:../../packages/cad-simple-viewer
+      '@mlightcad/cad-svg-plugin':
+        specifier: workspace:*
+        version: link:../../packages/cad-svg-plugin
+      '@mlightcad/cad-viewer':
+        specifier: workspace:*
+        version: link:../../packages/cad-viewer
+      element-plus:
+        specifier: ^2.12.0
+        version: 2.13.6(typescript@5.9.3)(vue@3.5.31(typescript@5.9.3))
+      vue:
+        specifier: ^3.4.21
+        version: 3.5.31(typescript@5.9.3)
+      vue-i18n:
+        specifier: ^11.4.4
+        version: 11.4.4(vue@3.5.31(typescript@5.9.3))
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^6.0.8
+        version: 6.0.8(vite@6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3))(vue@3.5.31(typescript@5.9.3))
+      vite:
+        specifier: ^6.4.3
+        version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3)
+      vue-tsc:
+        specifier: ^2.1.6
+        version: 2.2.12(typescript@5.9.3)
+
+  packages/batch-engine:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/cad-agent-plugin:
     dependencies:
       '@ai-sdk/anthropic':
@@ -471,6 +547,14 @@ importers:
         specifier: ^2.1.6
         version: 2.2.12(typescript@5.9.3)
 
+  packages/core: {}
+
+  packages/diagnostics:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/examples:
     devDependencies:
       '@mlightcad/cad-simple-viewer-example':
@@ -488,6 +572,65 @@ importers:
       serve:
         specifier: ^14.2.4
         version: 14.2.6
+
+  packages/file-ingest:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/presets:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/renderer-pdf:
+    dependencies:
+      '@mlightcad/cad-pdf-plugin':
+        specifier: workspace:*
+        version: link:../cad-pdf-plugin
+      '@mlightcad/cad-simple-viewer':
+        specifier: workspace:*
+        version: link:../cad-simple-viewer
+      '@mlightcad/cad-svg-plugin':
+        specifier: workspace:*
+        version: link:../cad-svg-plugin
+      '@mlightcad/data-model':
+        specifier: ^1.12.1
+        version: 1.12.1
+      jspdf:
+        specifier: ^4.2.1
+        version: 4.2.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.59.1
+    devDependencies:
+      svg2pdf.js:
+        specifier: ^2.7.0
+        version: 2.7.0(jspdf@4.2.1)
+      vite:
+        specifier: ^6.4.3
+        version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3)
+
+  packages/renderer-svg:
+    dependencies:
+      '@mlightcad/cad-simple-viewer':
+        specifier: workspace:*
+        version: link:../cad-simple-viewer
+      '@mlightcad/cad-svg-plugin':
+        specifier: workspace:*
+        version: link:../cad-svg-plugin
+      '@mlightcad/data-model':
+        specifier: ^1.12.1
+        version: 1.12.1
+      playwright:
+        specifier: ^1.49.1
+        version: 1.59.1
+    devDependencies:
+      vite:
+        specifier: ^6.4.3
+        version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3)
 
   packages/three-renderer:
     dependencies:

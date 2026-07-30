@@ -1,0 +1,25 @@
+{
+  "name": "@cadflux/cli",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "bin": {
+    "cadflux": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cadflux/batch-engine": "workspace:*",
+    "@cadflux/core": "workspace:*",
+    "@cadflux/diagnostics": "workspace:*",
+    "@cadflux/file-ingest": "workspace:*",
+    "@cadflux/presets": "workspace:*",
+    "@cadflux/renderer-pdf": "workspace:*",
+    "@cadflux/renderer-svg": "workspace:*",
+    "commander": "^12.1.0",
+    "playwright": "^1.49.1"
+  }
+}

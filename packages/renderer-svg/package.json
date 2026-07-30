@@ -1,0 +1,31 @@
+{
+  "name": "@cadflux/renderer-svg",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/node.js",
+  "types": "./dist/node.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    }
+  },
+  "files": [
+    "dist",
+    "dist-runner"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
+    "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@mlightcad/cad-simple-viewer": "workspace:*",
+    "@mlightcad/cad-svg-plugin": "workspace:*",
+    "@mlightcad/data-model": "^1.12.1",
+    "playwright": "^1.49.1"
+  },
+  "devDependencies": {
+    "vite": "^6.4.3"
+  }
+}

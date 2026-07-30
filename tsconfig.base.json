@@ -20,10 +20,26 @@
     "skipLibCheck": true,
     "downlevelIteration": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@cadflux/core": ["packages/core/src/index.ts"],
+      "@cadflux/batch-engine": ["packages/batch-engine/src/index.ts"],
+      "@cadflux/diagnostics": ["packages/diagnostics/src/index.ts"],
+      "@cadflux/file-ingest": ["packages/file-ingest/src/index.ts"],
+      "@cadflux/file-ingest/node": ["packages/file-ingest/src/node.ts"],
+      "@cadflux/presets": ["packages/presets/src/index.ts"],
+      "@cadflux/renderer-svg": ["packages/renderer-svg/src/index.ts"],
+      "@cadflux/renderer-pdf": ["packages/renderer-pdf/src/index.ts"],
+      "@mlightcad/cad-viewer": ["packages/cad-viewer/src/index.ts"],
+      "@mlightcad/cad-simple-viewer": ["packages/cad-simple-viewer/src/index.ts"],
+      "@mlightcad/cad-svg-plugin": ["packages/cad-svg-plugin/src/index.ts"],
+      "@mlightcad/cad-svg-plugin/register": ["packages/cad-svg-plugin/src/register.ts"],
+      "@mlightcad/cad-pdf-plugin": ["packages/cad-pdf-plugin/src/index.ts"],
+      "@mlightcad/cad-pdf-plugin/register": ["packages/cad-pdf-plugin/src/register.ts"]
+    }
   },
   "ts-node": {
     "esm": true,
   },
 }
- 
