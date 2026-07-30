@@ -15,10 +15,10 @@
     "dist"
   ],
   "dependencies": {
+    "@mlightcad/data-model": "^1.12.1",
     "@mlightcad/cad-pdf-plugin": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
-    "@mlightcad/cad-svg-plugin": "workspace:*",
-    "@mlightcad/cad-viewer": "workspace:*"
+    "@mlightcad/cad-svg-plugin": "workspace:*"
   },
   "peerDependencies": {
     "vue": "^3.4.21"

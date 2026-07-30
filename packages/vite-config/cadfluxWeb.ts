@@ -45,6 +45,10 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       appRoot,
       '../../packages/cad-pdf-plugin/src/register.ts'
     ),
+    '@mlightcad/data-model': resolve(
+      appRoot,
+      '../../packages/cad-simple-viewer/node_modules/@mlightcad/data-model/lib/index.js'
+    ),
     '@mlightcad/cad-pdf-plugin': resolve(
       appRoot,
       '../../packages/cad-pdf-plugin/src/index.ts'
@@ -61,10 +65,6 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       appRoot,
       '../../packages/cad-svg-plugin/src/index.ts'
     ),
-    '@mlightcad/cad-viewer': resolve(
-      appRoot,
-      '../../packages/cad-viewer/src/index.ts'
-    ),
     '@mlightcad/three-renderer': resolve(
       appRoot,
       '../../packages/three-renderer/src/index.ts'
@@ -73,10 +73,7 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
 }
 
 export function cadfluxWebManualChunks(id: string): string | undefined {
-  if (
-    id.includes('node_modules/vue') ||
-    id.includes('node_modules/vue-i18n')
-  ) {
+  if (id.includes('node_modules/vue')) {
     return 'vendor-vue'
   }
 

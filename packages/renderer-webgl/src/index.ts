@@ -7,14 +7,14 @@ export interface CadFluxViewerRuntime {
   execute(command: 'cpdf' | 'csvg'): Promise<void>
 }
 
-export async function loadCadFluxViewerI18n(): Promise<unknown> {
-  const module = await import('@mlightcad/cad-viewer')
-  return module.i18n
+export async function ensureCadFluxViewerLocale(locale = 'en'): Promise<void> {
+  const module = await import('@mlightcad/cad-simple-viewer')
+  module.AcApI18n.setCurrentLocale(locale as 'en' | 'zh' | 'tr' | 'cs')
 }
 
 export async function loadCadFluxViewerComponent(): Promise<unknown> {
-  const module = await import('@mlightcad/cad-viewer')
-  return module.MlCadViewer
+  const module = await import('./CadFluxWebViewer')
+  return module.CadFluxWebViewer
 }
 
 export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> {
