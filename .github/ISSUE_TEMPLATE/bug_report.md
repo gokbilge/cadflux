@@ -23,10 +23,11 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Platform (please complete the following information):**
+ - Surface: [e.g. web, cli]
+ - OS: [e.g. Windows 11, macOS 15, Ubuntu 24.04]
+ - Browser or shell: [e.g. Chrome 140, Firefox 129, PowerShell 7.5, bash]
+ - Version: [e.g. app version, commit, package version]
 
 **Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6]
