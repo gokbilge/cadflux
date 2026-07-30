@@ -15,6 +15,34 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       )
     },
     {
+      find: './AcEdCommandLine',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdCommandLine.ts'
+      )
+    },
+    {
+      find: '../ui/AcEdCommandLine',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdCommandLine.ts'
+      )
+    },
+    {
+      find: './AcEdViewKeyHandler',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdViewKeyHandler.ts'
+      )
+    },
+    {
+      find: '../editor/grip/AcEdGripManager',
+      replacement: resolve(
+        appRoot,
+        '../../packages/renderer-webgl/src/cadflux-editor/AcEdGripManager.ts'
+      )
+    },
+    {
       find: '@cadflux/config',
       replacement: resolve(appRoot, '../../packages/config/src/index.ts')
     },

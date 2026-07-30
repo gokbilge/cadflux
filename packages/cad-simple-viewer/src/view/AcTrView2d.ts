@@ -41,7 +41,6 @@ import {
   AcEdCalculateSizeCallback,
   AcEdConditionWaiter,
   AcEdCorsorType,
-  AcEdGripManager,
   AcEdMTextEditor,
   AcEdOpenMode,
   AcEdSpatialQueryResultItem,
@@ -50,6 +49,7 @@ import {
   eventBus,
   resolvePointerSelectionAction
 } from '../editor'
+import { AcEdGripManager } from '../editor/grip/AcEdGripManager'
 import {
   ACGI_MODEL_SPACE_BACKGROUND,
   isModelSpaceDatabase,
