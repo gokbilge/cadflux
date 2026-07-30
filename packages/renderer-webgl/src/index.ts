@@ -8,8 +8,10 @@ export interface CadFluxViewerRuntime {
 }
 
 export async function ensureCadFluxViewerLocale(locale = 'en'): Promise<void> {
-  const module = await import('@mlightcad/cad-simple-viewer')
-  module.AcApI18n.setCurrentLocale(locale as 'en' | 'zh' | 'tr' | 'cs')
+  const { AcApI18n } = await import(
+    '../../cad-simple-viewer/src/i18n/AcApI18n'
+  )
+  AcApI18n.setCurrentLocale(locale as 'en' | 'zh' | 'tr' | 'cs')
 }
 
 export async function loadCadFluxViewerComponent(): Promise<unknown> {
@@ -18,9 +20,10 @@ export async function loadCadFluxViewerComponent(): Promise<unknown> {
 }
 
 export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> {
-  const simpleViewerModule = await import('@mlightcad/cad-simple-viewer')
-
-  const { AcApDocManager, AcEdOpenMode } = simpleViewerModule
+  const [{ AcApDocManager }, { AcEdOpenMode }] = await Promise.all([
+    import('../../cad-simple-viewer/src/app/AcApDocManager'),
+    import('../../cad-simple-viewer/src/editor/view/AcEdOpenMode')
+  ])
 
   return {
     readMode: AcEdOpenMode.Read,

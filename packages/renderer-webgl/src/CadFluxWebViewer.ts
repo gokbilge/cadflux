@@ -3,11 +3,9 @@
 // @ts-nocheck
 
 import { acdbHostApplicationServices } from '@mlightcad/data-model'
-import {
-  AcApDocManager,
-  AcApI18n,
-  type AcApLayerStoreChangedEventArgs
-} from '@mlightcad/cad-simple-viewer'
+import { AcApDocManager } from '../../cad-simple-viewer/src/app/AcApDocManager'
+import { AcApI18n } from '../../cad-simple-viewer/src/i18n/AcApI18n'
+import type { AcApLayerStoreChangedEventArgs } from '../../cad-simple-viewer/src/service/AcApLayerStore'
 import {
   defineComponent,
   h,
@@ -17,6 +15,8 @@ import {
   watch,
   type PropType
 } from 'vue'
+
+type CadFluxDocManager = InstanceType<typeof AcApDocManager>
 
 interface LayoutOption {
   name: string
@@ -33,7 +33,7 @@ interface LayerOption {
   isLocked: boolean
 }
 
-function readLayouts(docManager: InstanceType<typeof AcApDocManager>): LayoutOption[] {
+function readLayouts(docManager: CadFluxDocManager): LayoutOption[] {
   const db = docManager.curDocument.database
   const layouts: LayoutOption[] = []
   for (const layout of db.objects.layout.newIterator()) {
@@ -52,7 +52,7 @@ function readCurrentLayoutId(layouts: LayoutOption[]): string {
   return layouts.find(layout => layout.isActive)?.blockTableRecordId ?? ''
 }
 
-function readLayers(docManager: InstanceType<typeof AcApDocManager>): {
+function readLayers(docManager: CadFluxDocManager): {
   currentLayerName: string
   layers: LayerOption[]
 } {
@@ -99,7 +99,7 @@ export const CadFluxWebViewer = defineComponent({
     const activeLayoutId = ref('')
     const currentLayerName = ref('')
     const layers = ref<LayerOption[]>([])
-    let docManager: InstanceType<typeof AcApDocManager> | null = null
+    let docManager: CadFluxDocManager | null = null
 
     const syncLayouts = () => {
       if (!docManager) {
