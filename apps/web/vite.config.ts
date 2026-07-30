@@ -34,6 +34,10 @@ export default defineConfig({
         __dirname,
         '../../packages/presets/src/index.ts'
       ),
+      '@cadflux/renderer-webgl': resolve(
+        __dirname,
+        '../../packages/renderer-webgl/src/index.ts'
+      ),
       '@mlightcad/cad-agent-plugin/register': resolve(
         __dirname,
         './src/shims/cad-agent-plugin-register.ts'
@@ -70,6 +74,30 @@ export default defineConfig({
         __dirname,
         '../../packages/three-renderer/src/index.ts'
       )
+    }
+  }
+  ,
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (
+            id.includes('node_modules/vue') ||
+            id.includes('node_modules/vue-i18n')
+          ) {
+            return 'vendor-vue'
+          }
+          if (
+            id.includes('packages/cad-pdf-plugin') ||
+            id.includes('packages/cad-svg-plugin') ||
+            id.includes('node_modules/jspdf') ||
+            id.includes('node_modules/svg2pdf.js')
+          ) {
+            return 'cad-export'
+          }
+          return undefined
+        }
+      }
     }
   }
 })

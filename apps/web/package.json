@@ -14,6 +14,7 @@
     "@cadflux/drawing-model": "workspace:*",
     "@cadflux/file-ingest": "workspace:*",
     "@cadflux/presets": "workspace:*",
+    "@cadflux/renderer-webgl": "workspace:*",
     "@mlightcad/cad-pdf-plugin": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
     "@mlightcad/cad-svg-plugin": "workspace:*",

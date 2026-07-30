@@ -84,7 +84,8 @@
           </div>
         </div>
 
-        <MlCadViewer
+        <CadViewerComponent
+          v-if="viewerRuntime != null"
           :key="viewerKey"
           locale="en"
           :local-file="activeFile"
@@ -92,6 +93,7 @@
           :base-url="baseUrl"
           @create="onViewerCreate"
         />
+        <div v-else class="viewer-loading">Loading viewer…</div>
       </div>
     </main>
   </div>
@@ -105,15 +107,12 @@ import { CADFLUX_WEB_BASE_URL } from '@cadflux/config'
 import { createDrawingHandle } from '@cadflux/drawing-model'
 import { browserFilesToInputs } from '@cadflux/file-ingest'
 import { CADFLUX_PRESETS } from '@cadflux/presets'
-import { registerLazyPdfPlugin } from '@mlightcad/cad-pdf-plugin/register'
 import {
-  AcApDocManager,
-  type AcApPluginManager,
-  AcEdOpenMode
-} from '@mlightcad/cad-simple-viewer'
-import { registerLazySvgPlugin } from '@mlightcad/cad-svg-plugin/register'
-import { MlCadViewer } from '@mlightcad/cad-viewer'
-import { computed, onMounted, ref, watch } from 'vue'
+  loadCadFluxViewerComponent,
+  loadCadFluxViewerRuntime,
+  type CadFluxViewerRuntime
+} from '@cadflux/renderer-webgl'
+import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
 
 interface QueueItem {
   key: string
@@ -122,14 +121,17 @@ interface QueueItem {
 }
 
 const baseUrl = CADFLUX_WEB_BASE_URL
-const openMode = AcEdOpenMode.Read
 const presets = CADFLUX_PRESETS
+const CadViewerComponent = defineAsyncComponent(
+  () => loadCadFluxViewerComponent() as Promise<any>
+)
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const directoryInput = ref<HTMLInputElement | null>(null)
 const queue = ref<QueueItem[]>([])
 const activeKey = ref<string | null>(null)
 const selectedPresetId = ref<string>(presets[0]?.id ?? 'a4-fit-pdf')
+const viewerRuntime = shallowRef<CadFluxViewerRuntime | null>(null)
 
 const activeItem = computed(() =>
   queue.value.find(item => item.key === activeKey.value) ?? null
@@ -144,8 +146,10 @@ const viewerKey = computed(
       ? 'empty'
       : `${activeItem.value.key}:${selectedPresetId.value}`
 )
+const openMode = computed(() => viewerRuntime.value?.readMode)
 
 onMounted(async () => {
+  viewerRuntime.value = await loadCadFluxViewerRuntime()
   const stored = await loadPreference('selectedPresetId')
   if (typeof stored === 'string' && presets.some(preset => preset.id === stored)) {
     selectedPresetId.value = stored
@@ -200,21 +204,19 @@ function selectItem(key: string) {
 }
 
 function onViewerCreate() {
-  const pluginManager = AcApDocManager.instance.pluginManager
-  registerCadFluxExportPlugins(pluginManager)
+  viewerRuntime.value?.viewerCreated()
 }
 
 function exportSvg() {
-  void AcApDocManager.instance.sendStringToExecute('csvg')
+  if (viewerRuntime.value) {
+    void viewerRuntime.value.execute('csvg')
+  }
 }
 
 function exportPdf() {
-  void AcApDocManager.instance.sendStringToExecute('cpdf')
-}
-
-function registerCadFluxExportPlugins(pluginManager: AcApPluginManager) {
-  registerLazySvgPlugin(pluginManager)
-  registerLazyPdfPlugin(pluginManager)
+  if (viewerRuntime.value) {
+    void viewerRuntime.value.execute('cpdf')
+  }
 }
 
 function dedupeQueue(items: QueueItem[]): QueueItem[] {
@@ -378,6 +380,12 @@ select {
 .viewer-area {
   display: grid;
   grid-template-rows: auto 1fr;
+}
+
+.viewer-loading {
+  display: grid;
+  place-items: center;
+  color: rgba(31, 42, 38, 0.72);
 }
 
 .toolbar {

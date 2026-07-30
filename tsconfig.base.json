@@ -34,6 +34,7 @@
       "@cadflux/file-ingest/node": ["packages/file-ingest/src/node.ts"],
       "@cadflux/plot-engine": ["packages/plot-engine/src/index.ts"],
       "@cadflux/presets": ["packages/presets/src/index.ts"],
+      "@cadflux/renderer-webgl": ["packages/renderer-webgl/src/index.ts"],
       "@cadflux/renderer-svg": ["packages/renderer-svg/src/index.ts"],
       "@cadflux/renderer-pdf": ["packages/renderer-pdf/src/index.ts"],
       "@mlightcad/cad-viewer": ["packages/cad-viewer/src/index.ts"],
