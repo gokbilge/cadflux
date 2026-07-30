@@ -1,10 +1,5 @@
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
-
-import { AcSvgRenderer } from './AcSvgRenderer'
-import {
-  readCadFluxBrowserFontMapping,
-  resolveCadFluxExportDownloadName
-} from './CadFluxBrowserExport'
+import type { AcSvgRenderer } from './AcSvgRenderer'
 
 /**
  * Utility class for converting CAD drawings to SVG format.
@@ -17,6 +12,11 @@ export class AcApSvgConvertor {
    * Converts the current CAD drawing to SVG format and initiates download.
    */
   async convert(context: AcApContext) {
+    const [{ AcSvgRenderer }, exportModule] = await Promise.all([
+      import('./AcSvgRenderer'),
+      import('./CadFluxBrowserExport')
+    ])
+
     AcSvgRenderer.prepareExport()
 
     const entities =
@@ -29,7 +29,7 @@ export class AcApSvgConvertor {
     }
 
     const svgContent = await renderer.exportAsync()
-    const downloadName = resolveCadFluxExportDownloadName(
+    const downloadName = exportModule.resolveCadFluxExportDownloadName(
       context.doc.fileName || context.doc.docTitle,
       'svg'
     )
@@ -44,12 +44,31 @@ export class AcApSvgConvertor {
     renderer.ltscale = db.ltscale
     renderer.celtscale = db.celtscale
     renderer.showLineWeight = !!db.lwdisplay
-    renderer.setFontMapping(readCadFluxBrowserFontMapping())
+    renderer.setFontMapping(this.readCadFluxBrowserFontMapping())
 
     const view = context.view as { backgroundColor?: number } | undefined
     const bg = view?.backgroundColor ?? 0xffffff
     renderer.currentBackgroundColor = bg
     renderer.changeForeground(bg === 0 ? 0xffffff : 0x000000)
+  }
+
+  private readCadFluxBrowserFontMapping() {
+    const storageKey = 'cadflux.web.fontMapping'
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return {}
+    }
+
+    try {
+      const raw = window.localStorage.getItem(storageKey)
+      if (!raw) {
+        return {}
+      }
+
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {}
+    }
   }
 
   private createFileAndDownloadIt(svgContent: string, downloadName: string) {

@@ -1,11 +1,5 @@
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
-import { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
-import { jsPDF } from 'jspdf'
-import { svg2pdf } from 'svg2pdf.js'
-import {
-  readCadFluxBrowserFontMapping,
-  resolveCadFluxExportDownloadName
-} from './CadFluxBrowserExport'
+import type { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 
 /**
  * Utility class for converting CAD drawings to PDF format.
@@ -19,6 +13,9 @@ export class AcApPdfConvertor {
    */
   async convert(context: AcApContext) {
     const svgString = await this.buildSvg(context)
+    const { resolveCadFluxExportDownloadName } = await import(
+      './CadFluxBrowserExport'
+    )
     const downloadName = resolveCadFluxExportDownloadName(
       context.doc.fileName || context.doc.docTitle,
       'pdf'
@@ -27,6 +24,7 @@ export class AcApPdfConvertor {
   }
 
   private async buildSvg(context: AcApContext): Promise<string> {
+    const { AcSvgRenderer } = await import('@mlightcad/cad-svg-plugin')
     AcSvgRenderer.prepareExport()
 
     const entities =
@@ -45,7 +43,7 @@ export class AcApPdfConvertor {
     renderer.ltscale = db.ltscale
     renderer.celtscale = db.celtscale
     renderer.showLineWeight = !!db.lwdisplay
-    renderer.setFontMapping(readCadFluxBrowserFontMapping())
+    renderer.setFontMapping(this.readCadFluxBrowserFontMapping())
 
     const view = context.view as { backgroundColor?: number } | undefined
     const bg = view?.backgroundColor ?? 0xffffff
@@ -54,6 +52,10 @@ export class AcApPdfConvertor {
   }
 
   private async downloadAsPdf(svgString: string, downloadName: string) {
+    const [{ jsPDF }, { svg2pdf }] = await Promise.all([
+      import('jspdf'),
+      import('svg2pdf.js')
+    ])
     const parser = new DOMParser()
     const svgDoc = parser.parseFromString(svgString, 'image/svg+xml')
     const svgEl = svgDoc.documentElement as unknown as SVGSVGElement
@@ -78,5 +80,24 @@ export class AcApPdfConvertor {
     })
 
     pdf.save(downloadName)
+  }
+
+  private readCadFluxBrowserFontMapping() {
+    const storageKey = 'cadflux.web.fontMapping'
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return {}
+    }
+
+    try {
+      const raw = window.localStorage.getItem(storageKey)
+      if (!raw) {
+        return {}
+      }
+
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {}
+    }
   }
 }
