@@ -78,12 +78,20 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   }
 
   if (
-    id.includes('packages/cad-pdf-plugin') ||
     id.includes('packages/cad-svg-plugin') ||
+    id.includes('packages/renderer-svg') ||
+    id.includes('node_modules/dompurify')
+  ) {
+    return 'cad-export-svg'
+  }
+
+  if (
+    id.includes('packages/cad-pdf-plugin') ||
+    id.includes('packages/renderer-pdf') ||
     id.includes('node_modules/jspdf') ||
     id.includes('node_modules/svg2pdf.js')
   ) {
-    return 'cad-export'
+    return 'cad-export-pdf'
   }
 
   return undefined
