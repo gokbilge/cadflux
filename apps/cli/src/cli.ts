@@ -6,17 +6,22 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { CadFluxBatchEngine } from '@cadflux/batch-engine'
+import { CADFLUX_DEFAULT_FLAGS } from '@cadflux/config'
 import {
   createCadFluxRuntime,
   type CadFluxConversionRequest,
   type CadFluxConversionResult,
   type CadFluxConverter,
+  type CadFluxInspection,
   type CadFluxFormat,
   type CadFluxInputSource,
   type CadFluxProfile
 } from '@cadflux/core'
 import { resultsToCsv, resultsToHtml, resultsToJson } from '@cadflux/diagnostics'
+import { inspectDwgInput } from '@cadflux/dwg-adapter'
+import { inspectDxfInput } from '@cadflux/dxf-adapter'
 import { collectNodeInputs } from '@cadflux/file-ingest/node'
+import { resolveArtifactOutputPath } from '@cadflux/plot-engine'
 import { CADFLUX_PRESETS, getCadFluxPreset, validateCadFluxProfile } from '@cadflux/presets'
 import { exportPdfFile } from '@cadflux/renderer-pdf'
 import { exportSvgFile } from '@cadflux/renderer-svg'
@@ -28,17 +33,17 @@ const CADFLUX_CLI_VERSION = '0.1.0'
 const program = new Command()
 
 class NodeCadFluxConverter implements CadFluxConverter {
-  async inspect(input: CadFluxInputSource) {
-    const detectedFormat: 'dwg' | 'dxf' | 'unknown' =
-      input.extension === '.dwg'
-        ? 'dwg'
-        : input.extension === '.dxf'
-          ? 'dxf'
-          : 'unknown'
+  async inspect(input: CadFluxInputSource): Promise<CadFluxInspection> {
+    if (input.extension === '.dwg') {
+      return inspectDwgInput(input)
+    }
+    if (input.extension === '.dxf') {
+      return inspectDxfInput(input)
+    }
     return {
       input,
-      detectedFormat,
-      warnings: []
+      detectedFormat: 'unknown',
+      warnings: ['Unsupported extension']
     }
   }
 
@@ -49,24 +54,16 @@ class NodeCadFluxConverter implements CadFluxConverter {
     const warnings: string[] = []
     const artifacts = []
     try {
-      const relativeDir =
-        request.preserveTree && request.input.relativePath
-          ? path.dirname(request.input.relativePath)
-          : ''
-      const targetDir = path.join(request.outputDirectory, relativeDir)
+      const exampleOutputPath = resolveArtifactOutputPath(request, 'pdf')
+      const targetDir = path.dirname(exampleOutputPath)
       await mkdir(targetDir, { recursive: true })
-
-      const baseName = path.basename(
-        request.input.name,
-        path.extname(request.input.name)
-      )
       const inputPath = request.input.absolutePath
       if (!inputPath) {
         throw new Error('CLI conversion requires an absolute input path.')
       }
 
       for (const format of request.profile.formats) {
-        const outputPath = path.join(targetDir, `${baseName}.${format}`)
+        const outputPath = resolveArtifactOutputPath(request, format)
         if (format === 'pdf') {
           await exportPdfFile(inputPath, outputPath)
         } else {
@@ -227,7 +224,8 @@ program.command('doctor').action(async () => {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
-    chromiumExecutable: chromium.executablePath()
+    chromiumExecutable: chromium.executablePath(),
+    featureFlags: CADFLUX_DEFAULT_FLAGS
   }
   console.log(JSON.stringify(info, null, 2))
 })

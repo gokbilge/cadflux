@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cadflux/config": "workspace:*",
+    "@cadflux/drawing-model": "workspace:*",
     "@cadflux/file-ingest": "workspace:*",
     "@cadflux/presets": "workspace:*",
     "@mlightcad/cad-pdf-plugin": "workspace:*",

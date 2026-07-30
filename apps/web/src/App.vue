@@ -101,6 +101,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
+import { CADFLUX_WEB_BASE_URL } from '@cadflux/config'
+import { createDrawingHandle } from '@cadflux/drawing-model'
 import { browserFilesToInputs } from '@cadflux/file-ingest'
 import { CADFLUX_PRESETS } from '@cadflux/presets'
 import { registerLazyPdfPlugin } from '@mlightcad/cad-pdf-plugin/register'
@@ -119,7 +121,7 @@ interface QueueItem {
   relativePath: string
 }
 
-const baseUrl = 'https://cdn.jsdelivr.net/gh/mlightcad/cad-data@main/'
+const baseUrl = CADFLUX_WEB_BASE_URL
 const openMode = AcEdOpenMode.Read
 const presets = CADFLUX_PRESETS
 
@@ -183,7 +185,7 @@ function onDirectoryChange(event: Event) {
 function addFiles(files: File[]) {
   const inputs = browserFilesToInputs(files)
   const nextItems = inputs.map(input => ({
-    key: `${input.relativePath}:${input.lastModifiedMs ?? 0}`,
+    key: createDrawingHandle(input).id,
     file: input.browserFile as File,
     relativePath: input.relativePath ?? input.name
   }))
