@@ -78,36 +78,22 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvg') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgMText') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgFontMap') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
     id.includes('node_modules/.pnpm/@mlightcad+mtext-parser') ||
-    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer') ||
+    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer')
+  ) {
+    return 'cad-export-text'
+  }
+
+  if (
+    id.includes('packages/cad-svg-plugin/src/AcSvg') ||
     id.includes('node_modules/dompurify')
   ) {
     return 'cad-export-core'
-  }
-
-  if (
-    id.includes('packages/cad-svg-plugin') ||
-    id.includes('packages/renderer-svg') ||
-    id.includes('AcApConvertToSvgCmd') ||
-    id.includes('AcApSvgConvertor') ||
-    id.includes('AcApSvgPlugin') ||
-    id.includes('createSvgPlugin')
-  ) {
-    return 'cad-export-svg'
-  }
-
-  if (
-    id.includes('packages/cad-pdf-plugin') ||
-    id.includes('packages/renderer-pdf') ||
-    id.includes('AcApConvertToPdfCmd') ||
-    id.includes('AcApPdfConvertor') ||
-    id.includes('AcApPdfPlugin') ||
-    id.includes('createPdfPlugin') ||
-    id.includes('node_modules/jspdf') ||
-    id.includes('node_modules/svg2pdf.js')
-  ) {
-    return 'cad-export-pdf'
   }
 
   return undefined

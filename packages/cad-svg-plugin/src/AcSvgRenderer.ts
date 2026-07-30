@@ -29,9 +29,7 @@ import { AcSvgGroup } from './AcSvgGroup'
 import { AcSvgImage } from './AcSvgImage'
 import { AcSvgLine } from './AcSvgLine'
 import { AcSvgLineSegments } from './AcSvgLineSegments'
-import { AcSvgMText } from './AcSvgMText'
 import { AcSvgPoint } from './AcSvgPoint'
-import { AcSvgShape } from './AcSvgShape'
 import { AcSvgStyleContext, AcSvgStyleUtil } from './AcSvgStyleUtil'
 
 export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
@@ -56,13 +54,13 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
   private _currentBackgroundColor = 0x000000
   private _foregroundColor = 0x000000
   private _showLineWeight = false
-  private _pendingImages: Promise<void>[]
+  private _pendingTasks: Promise<void>[]
 
   constructor() {
     this._entities = []
     this._bbox = new AcGeBox2d()
     this._fontMapping = {}
-    this._pendingImages = []
+    this._pendingTasks = []
     this._subEntityTraits = {
       color: new AcCmColor(),
       lineType: {
@@ -256,14 +254,13 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
     const mappedFont = this._fontMapping[style.font] ?? style.font
     const resolvedStyle: AcGiTextStyle =
       mappedFont !== style.font ? { ...style, font: mappedFont } : style
-    return this.pushEntity(
-      new AcSvgMText(
-        mtext,
-        resolvedStyle,
-        this._subEntityTraits,
-        this.styleContext
-      )
+    const traits = { ...this._subEntityTraits }
+    const ctx = this.styleContext
+    const pending = import('./AcSvgMText').then(({ AcSvgMText }) =>
+      this.pushEntity(new AcSvgMText(mtext, resolvedStyle, traits, ctx))
     )
+    this._pendingTasks.push(pending.then(() => undefined))
+    return _tempEntity
   }
 
   /**
@@ -273,14 +270,13 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
     const mappedFont = this._fontMapping[style.font] ?? style.font
     const resolvedStyle: AcGiTextStyle =
       mappedFont !== style.font ? { ...style, font: mappedFont } : style
-    return this.pushEntity(
-      new AcSvgShape(
-        shape,
-        resolvedStyle,
-        this._subEntityTraits,
-        this.styleContext
-      )
+    const traits = { ...this._subEntityTraits }
+    const ctx = this.styleContext
+    const pending = import('./AcSvgShape').then(({ AcSvgShape }) =>
+      this.pushEntity(new AcSvgShape(shape, resolvedStyle, traits, ctx))
     )
+    this._pendingTasks.push(pending.then(() => undefined))
+    return _tempEntity
   }
 
   /**
@@ -292,7 +288,7 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
     const pending = AcSvgImage.fromBlob(blob, style, traits, ctx).then(entity =>
       this.pushEntity(entity)
     )
-    this._pendingImages.push(pending.then(() => undefined))
+    this._pendingTasks.push(pending.then(() => undefined))
     return _tempEntity
   }
 
@@ -300,7 +296,7 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
    * Exports accumulated SVG markup. Awaits any pending raster images first.
    */
   async exportAsync(): Promise<string> {
-    await Promise.all(this._pendingImages)
+    await Promise.all(this._pendingTasks)
     return this.export()
   }
 
