@@ -78,9 +78,21 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   }
 
   if (
+    id.includes('packages/cad-svg-plugin/src/AcSvg') ||
+    id.includes('node_modules/.pnpm/@mlightcad+mtext-parser') ||
+    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer') ||
+    id.includes('node_modules/dompurify')
+  ) {
+    return 'cad-export-core'
+  }
+
+  if (
     id.includes('packages/cad-svg-plugin') ||
     id.includes('packages/renderer-svg') ||
-    id.includes('node_modules/dompurify')
+    id.includes('AcApConvertToSvgCmd') ||
+    id.includes('AcApSvgConvertor') ||
+    id.includes('AcApSvgPlugin') ||
+    id.includes('createSvgPlugin')
   ) {
     return 'cad-export-svg'
   }
@@ -88,6 +100,10 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   if (
     id.includes('packages/cad-pdf-plugin') ||
     id.includes('packages/renderer-pdf') ||
+    id.includes('AcApConvertToPdfCmd') ||
+    id.includes('AcApPdfConvertor') ||
+    id.includes('AcApPdfPlugin') ||
+    id.includes('createPdfPlugin') ||
     id.includes('node_modules/jspdf') ||
     id.includes('node_modules/svg2pdf.js')
   ) {

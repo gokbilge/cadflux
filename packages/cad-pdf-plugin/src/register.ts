@@ -24,7 +24,7 @@ export function registerLazyPdfPlugin(pluginManager: AcApPluginManager): void {
     name: PDF_PLUGIN_NAME,
     triggers: [...PDF_PLUGIN_TRIGGERS],
     loader: async () => {
-      const { createPdfPlugin } = await import('@mlightcad/cad-pdf-plugin')
+      const { createPdfPlugin } = await import('./createPdfPlugin')
       return createPdfPlugin()
     }
   })

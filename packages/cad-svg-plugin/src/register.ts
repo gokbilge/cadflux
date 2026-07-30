@@ -23,7 +23,7 @@ export function registerLazySvgPlugin(pluginManager: AcApPluginManager): void {
     name: SVG_PLUGIN_NAME,
     triggers: [...SVG_PLUGIN_TRIGGERS],
     loader: async () => {
-      const { createSvgPlugin } = await import('@mlightcad/cad-svg-plugin')
+      const { createSvgPlugin } = await import('./createSvgPlugin')
       return createSvgPlugin()
     }
   })
