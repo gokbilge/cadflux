@@ -1,6 +1,6 @@
 import { readCadFluxBrowserFontMapping } from '@cadflux/core'
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
-import type { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
+import type { AcSvgRenderer } from '@mlightcad/cad-svg-plugin/renderer'
 
 export interface CadFluxPdfExportResult {
   downloadName: string
@@ -40,7 +40,7 @@ export class AcApPdfConvertor {
   }
 
   private async buildSvg(context: AcApContext): Promise<string> {
-    const { AcSvgRenderer } = await import('@mlightcad/cad-svg-plugin')
+    const { AcSvgRenderer } = await import('@mlightcad/cad-svg-plugin/renderer')
     AcSvgRenderer.prepareExport()
 
     const entities =

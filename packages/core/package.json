@@ -9,6 +9,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./browserBridge": {
+      "types": "./dist/browserBridge.d.ts",
+      "import": "./dist/browserBridge.js"
+    },
+    "./checksum": {
+      "types": "./dist/checksum.d.ts",
+      "import": "./dist/checksum.js"
     }
   },
   "files": [

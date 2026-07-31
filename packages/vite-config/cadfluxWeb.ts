@@ -303,3 +303,56 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
 
   return undefined
 }
+
+export function cadfluxRunnerManualChunks(id: string): string | undefined {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('node_modules/vue')) {
+    return 'vendor-vue'
+  }
+
+  if (normalizedId.includes('/node_modules/.pnpm/three@') || normalizedId.includes('/node_modules/three/')) {
+    return 'vendor-three'
+  }
+
+  if (normalizedId.includes('/node_modules/.pnpm/html2canvas@')) {
+    return 'vendor-html2canvas'
+  }
+
+  if (normalizedId.includes('/node_modules/.pnpm/jspdf@') || normalizedId.includes('/node_modules/.pnpm/svg2pdf.js@')) {
+    return 'vendor-pdf'
+  }
+
+  if (
+    normalizedId.includes('/node_modules/.pnpm/@mlightcad+mtext-parser') ||
+    normalizedId.includes('/node_modules/.pnpm/@mlightcad+mtext-renderer') ||
+    normalizedId.includes('@mlightcad/mtext-renderer/dist/index.js')
+  ) {
+    return 'cad-runtime-mtext'
+  }
+
+  if (
+    normalizedId.includes('/packages/cad-simple-viewer/') ||
+    normalizedId.includes('/packages/three-renderer/')
+  ) {
+    return 'cad-runtime-viewer'
+  }
+
+  if (
+    normalizedId.includes('/packages/cad-svg-plugin/') ||
+    normalizedId.includes('/packages/cad-pdf-plugin/')
+  ) {
+    return 'cad-runtime-export'
+  }
+
+  if (
+    normalizedId.includes('/@mlightcad/common/') ||
+    normalizedId.includes('/@mlightcad/geometry-engine/') ||
+    normalizedId.includes('/@mlightcad/graphic-interface/') ||
+    normalizedId.includes('/@mlightcad/data-model/')
+  ) {
+    return 'cad-runtime-model'
+  }
+
+  return undefined
+}

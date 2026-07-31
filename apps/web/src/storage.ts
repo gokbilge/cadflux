@@ -51,6 +51,7 @@ export interface WebAppSettings {
   workspacePersistenceEnabled: boolean
   persistOutputHandle: boolean
   preferredOutputStrategy: 'filesystem' | 'zip'
+  collisionPolicy: 'replace' | 'rename'
 }
 
 interface CadFluxWebDbSchema {

@@ -1,7 +1,6 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-docs
 dist
 dist-runner
 lib
@@ -47,3 +46,4 @@ Thumbs.db
 .nx/cache
 .nx/workspace-data
 artifacts/
+data/

@@ -75,7 +75,12 @@ export function createLibEntryFileName(
   format: string,
   entryName = 'index'
 ): string {
-  const base = entryName === 'register' ? `${packageId}-register` : packageId
+  const base =
+    entryName === 'index'
+      ? packageId
+      : entryName === 'register'
+        ? `${packageId}-register`
+        : `${packageId}-${entryName}`
   return format === 'es' ? `${base}.js` : `${base}.umd.cjs`
 }
 

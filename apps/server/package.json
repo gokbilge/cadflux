@@ -1,0 +1,39 @@
+{
+  "name": "@cadflux/server",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/apps/server/src/index.js",
+  "types": "./dist/apps/server/src/index.d.ts",
+  "bin": {
+    "cadflux-server": "./dist/apps/server/src/index.js"
+  },
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "dev": "tsx watch src/index.ts serve",
+    "start": "node dist/apps/server/src/index.js serve"
+  },
+  "dependencies": {
+    "@cadflux/auth": "workspace:*",
+    "@cadflux/batch-engine": "workspace:*",
+    "@cadflux/core": "workspace:*",
+    "@cadflux/contracts": "workspace:*",
+    "@cadflux/database": "workspace:*",
+    "@cadflux/dwg-adapter": "workspace:*",
+    "@cadflux/presets": "workspace:*",
+    "@cadflux/plot-engine": "workspace:*",
+    "@cadflux/renderer-pdf": "workspace:*",
+    "@cadflux/renderer-svg": "workspace:*",
+    "@cadflux/storage": "workspace:*",
+    "@cadflux/dxf-adapter": "workspace:*",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/multipart": "^10.1.0",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/static": "^10.1.2",
+    "@fastify/swagger": "^9.8.1",
+    "@sinclair/typebox": "^0.34.52",
+    "fflate": "^0.8.2",
+    "fastify": "^5.11.0"
+  }
+}

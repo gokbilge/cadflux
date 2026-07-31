@@ -5,7 +5,38 @@
     "rootDir": "./src",
     "outDir": "./lib",
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@cadflux/core": [
+        "../core/dist/index.d.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin": [
+        "./src/index.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/command": [
+        "./src/AcApConvertToPdfCmd.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/convertor": [
+        "./src/AcApPdfConvertor.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/factory": [
+        "./src/createPdfPlugin.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/import-command": [
+        "./src/AcApImportPdfCmd.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/import-convertor": [
+        "./src/AcApPdfImportConvertor.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/plugin": [
+        "./src/AcApPdfPlugin.ts"
+      ],
+      "@mlightcad/cad-pdf-plugin/register": [
+        "./src/register.ts"
+      ],
+      "@mlightcad/cad-svg-plugin/renderer": [
+        "../cad-svg-plugin/lib/AcSvgRenderer.d.ts"
+      ]
+    }
   },
   "include": [
     "src"

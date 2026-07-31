@@ -12,6 +12,7 @@
   "dependencies": {
     "@cadflux/batch-engine": "workspace:*",
     "@cadflux/config": "workspace:*",
+    "@cadflux/contracts": "workspace:*",
     "@cadflux/drawing-model": "workspace:*",
     "@cadflux/file-ingest": "workspace:*",
     "@cadflux/presets": "workspace:*",

@@ -4,8 +4,7 @@
 import { zipSync, strToU8 } from 'fflate'
 
 import {
-  createBatchReportArtifacts,
-  type CadFluxBatchReport as WebBatchReport
+  createBatchReportArtifacts
 } from '@cadflux/batch-engine'
 import type { CadFluxFormat } from '@cadflux/core'
 
@@ -18,6 +17,8 @@ export interface WebBatchArtifact {
   blob: Blob
 }
 
+export type WebBatchCollisionPolicy = 'replace' | 'rename'
+
 export async function createZipBundle(
   fileName: string,
   artifacts: WebBatchArtifact[],
@@ -26,18 +27,27 @@ export async function createZipBundle(
     json: string
     csv: string
     html: string
-  }
+  },
+  collisionPolicy: WebBatchCollisionPolicy = 'replace'
 ): Promise<{ fileName: string; blob: Blob }> {
-  const zipEntries: Record<string, Uint8Array> = {
-    'manifest.json': strToU8(reportFiles.manifest),
-    'batch-report.json': strToU8(reportFiles.json),
-    'batch-report.csv': strToU8(reportFiles.csv),
-    'batch-report.html': strToU8(reportFiles.html)
+  const zipEntries: Record<string, Uint8Array> = {}
+  const assignZipEntry = (relativePath: string, bytes: Uint8Array) => {
+    const resolvedPath =
+      collisionPolicy === 'rename'
+        ? ensureUniqueRelativePath(relativePath, zipEntries)
+        : relativePath
+    zipEntries[resolvedPath] = bytes
   }
 
+  assignZipEntry('manifest.json', strToU8(reportFiles.manifest))
+  assignZipEntry('batch-report.json', strToU8(reportFiles.json))
+  assignZipEntry('batch-report.csv', strToU8(reportFiles.csv))
+  assignZipEntry('batch-report.html', strToU8(reportFiles.html))
+
   for (const artifact of artifacts) {
-    zipEntries[artifact.relativeOutputPath] = new Uint8Array(
-      await artifact.blob.arrayBuffer()
+    assignZipEntry(
+      artifact.relativeOutputPath,
+      new Uint8Array(await artifact.blob.arrayBuffer())
     )
   }
 
@@ -58,46 +68,53 @@ export async function writeArtifactsToDirectory(
     json: string
     csv: string
     html: string
-  }
+  },
+  collisionPolicy: WebBatchCollisionPolicy = 'replace'
 ): Promise<void> {
   for (const artifact of artifacts) {
     await writeFileToDirectory(
       rootHandle,
       artifact.relativeOutputPath,
-      artifact.blob
+      artifact.blob,
+      collisionPolicy
     )
   }
 
   await writeFileToDirectory(
     rootHandle,
     'manifest.json',
-    new Blob([reportFiles.manifest], { type: 'application/json' })
+    new Blob([reportFiles.manifest], { type: 'application/json' }),
+    collisionPolicy
   )
   await writeFileToDirectory(
     rootHandle,
     'batch-report.json',
-    new Blob([reportFiles.json], { type: 'application/json' })
+    new Blob([reportFiles.json], { type: 'application/json' }),
+    collisionPolicy
   )
   await writeFileToDirectory(
     rootHandle,
     'batch-report.csv',
-    new Blob([reportFiles.csv], { type: 'text/csv;charset=utf-8' })
+    new Blob([reportFiles.csv], { type: 'text/csv;charset=utf-8' }),
+    collisionPolicy
   )
   await writeFileToDirectory(
     rootHandle,
     'batch-report.html',
-    new Blob([reportFiles.html], { type: 'text/html;charset=utf-8' })
+    new Blob([reportFiles.html], { type: 'text/html;charset=utf-8' }),
+    collisionPolicy
   )
 }
 
 async function writeFileToDirectory(
   rootHandle: FileSystemDirectoryHandle,
   relativePath: string,
-  blob: Blob
+  blob: Blob,
+  collisionPolicy: WebBatchCollisionPolicy
 ): Promise<void> {
   const parts = relativePath.split('/').filter(Boolean)
-  const fileName = parts.pop()
-  if (!fileName) {
+  const requestedFileName = parts.pop()
+  if (!requestedFileName) {
     return
   }
 
@@ -108,10 +125,79 @@ async function writeFileToDirectory(
     })
   }
 
+  const fileName =
+    collisionPolicy === 'rename'
+      ? await resolveAvailableFileName(currentHandle, requestedFileName)
+      : requestedFileName
   const fileHandle = await currentHandle.getFileHandle(fileName, { create: true })
   const writable = await fileHandle.createWritable()
   await writable.write(blob)
   await writable.close()
+}
+
+function ensureUniqueRelativePath(
+  requestedPath: string,
+  entries: Record<string, Uint8Array>
+): string {
+  if (!(requestedPath in entries)) {
+    return requestedPath
+  }
+
+  const segments = requestedPath.split('/')
+  const fileName = segments.pop() ?? requestedPath
+  const candidateBasePath = segments.join('/')
+  const extensionIndex = fileName.lastIndexOf('.')
+  const baseName =
+    extensionIndex > 0 ? fileName.slice(0, extensionIndex) : fileName
+  const extension = extensionIndex > 0 ? fileName.slice(extensionIndex) : ''
+
+  let counter = 2
+  while (true) {
+    const candidateName = `${baseName} (${counter})${extension}`
+    const candidatePath = [...segments, candidateName].filter(Boolean).join('/')
+    if (!(candidatePath in entries)) {
+      return candidateBasePath ? candidatePath : candidateName
+    }
+    counter += 1
+  }
+}
+
+async function resolveAvailableFileName(
+  directoryHandle: FileSystemDirectoryHandle,
+  requestedFileName: string
+): Promise<string> {
+  if (!(await fileExists(directoryHandle, requestedFileName))) {
+    return requestedFileName
+  }
+
+  const extensionIndex = requestedFileName.lastIndexOf('.')
+  const baseName =
+    extensionIndex > 0
+      ? requestedFileName.slice(0, extensionIndex)
+      : requestedFileName
+  const extension =
+    extensionIndex > 0 ? requestedFileName.slice(extensionIndex) : ''
+
+  let counter = 2
+  while (true) {
+    const candidateName = `${baseName} (${counter})${extension}`
+    if (!(await fileExists(directoryHandle, candidateName))) {
+      return candidateName
+    }
+    counter += 1
+  }
+}
+
+async function fileExists(
+  directoryHandle: FileSystemDirectoryHandle,
+  fileName: string
+): Promise<boolean> {
+  try {
+    await directoryHandle.getFileHandle(fileName)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export function downloadBlob(blob: Blob, fileName: string): void {
