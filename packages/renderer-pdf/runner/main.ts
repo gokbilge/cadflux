@@ -8,10 +8,7 @@ import {
   LIBREDWG_PARSER_WORKER_FILE,
   MTEXT_RENDERER_WORKER_FILE
 } from '@mlightcad/cad-simple-viewer'
-import { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 import { accmYieldForPaint } from '@mlightcad/data-model'
-import { jsPDF } from 'jspdf'
-import { svg2pdf } from 'svg2pdf.js'
 
 declare global {
   interface Window {
@@ -43,6 +40,11 @@ async function ensureViewer(): Promise<void> {
 
 window.exportCadToPdf = async (fileName, bytes) => {
   await ensureViewer()
+  const [{ AcSvgRenderer }, { jsPDF }, { svg2pdf }] = await Promise.all([
+    import('@mlightcad/cad-svg-plugin/renderer'),
+    import('jspdf'),
+    import('svg2pdf.js')
+  ])
   const docManager = AcApDocManager.instance
   const buffer = bytes.buffer.slice(
     bytes.byteOffset,

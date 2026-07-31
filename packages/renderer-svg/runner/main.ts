@@ -8,7 +8,6 @@ import {
   LIBREDWG_PARSER_WORKER_FILE,
   MTEXT_RENDERER_WORKER_FILE
 } from '@mlightcad/cad-simple-viewer'
-import { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 import { accmYieldForPaint } from '@mlightcad/data-model'
 
 declare global {
@@ -41,6 +40,7 @@ async function ensureViewer(): Promise<void> {
 
 window.exportCadToSvg = async (fileName, bytes) => {
   await ensureViewer()
+  const { AcSvgRenderer } = await import('@mlightcad/cad-svg-plugin/renderer')
   const docManager = AcApDocManager.instance
   const buffer = bytes.buffer.slice(
     bytes.byteOffset,

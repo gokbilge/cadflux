@@ -34,3 +34,27 @@ Important current constraints:
 - The CLI now supports the core server-backed job lifecycle: login, create, upload, start, pause, resume, retry, cancel, inspect, and download reports.
 - Legacy direct local conversion commands still remain for compatibility and are not the preferred production path.
 - PDF/SVG rendering still depends on the existing renderer packages.
+- Default CadFlux builds now separate library compilation from browser runner bundling so normal app/server iteration does not always rebuild the heavy export runners.
+
+Published plugin API migration note:
+
+- The root export surface for `@mlightcad/cad-svg-plugin` was intentionally reduced.
+- The root export surface for `@mlightcad/cad-pdf-plugin` was intentionally reduced.
+- Consumers must now import heavy/plugin-internal symbols from explicit subpaths.
+
+Old to new import examples:
+
+- `@mlightcad/cad-svg-plugin`
+  - `AcSvgRenderer` -> `@mlightcad/cad-svg-plugin/renderer`
+  - `AcApConvertToSvgCmd` -> `@mlightcad/cad-svg-plugin/command`
+  - `AcApSvgConvertor` -> `@mlightcad/cad-svg-plugin/convertor`
+  - `createSvgPlugin` -> `@mlightcad/cad-svg-plugin`
+  - `SVG_PLUGIN_NAME` / `SVG_PLUGIN_TRIGGERS` -> `@mlightcad/cad-svg-plugin/register`
+
+- `@mlightcad/cad-pdf-plugin`
+  - `AcApConvertToPdfCmd` -> `@mlightcad/cad-pdf-plugin/command`
+  - `AcApPdfConvertor` -> `@mlightcad/cad-pdf-plugin/convertor`
+  - `AcApImportPdfCmd` -> `@mlightcad/cad-pdf-plugin/import-command`
+  - `AcApPdfImportConvertor` -> `@mlightcad/cad-pdf-plugin/import-convertor`
+  - `createPdfPlugin` -> `@mlightcad/cad-pdf-plugin`
+  - `PDF_PLUGIN_NAME` / `PDF_PLUGIN_TRIGGERS` -> `@mlightcad/cad-pdf-plugin/register`

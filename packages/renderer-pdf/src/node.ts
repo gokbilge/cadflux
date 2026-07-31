@@ -81,7 +81,7 @@ export async function exportPdfFile(
 
   if (!existsSync(path.join(runnerDir, 'index.html'))) {
     throw new Error(
-      'PDF runner is not built. Run "pnpm --filter @cadflux/renderer-pdf build".'
+      'PDF runner is not built. Run "pnpm --filter @cadflux/renderer-pdf build:runner" or "pnpm build:conversion-runners".'
     )
   }
 

@@ -16,7 +16,12 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        register: resolve(__dirname, 'src/register.ts')
+        command: resolve(__dirname, 'src/AcApConvertToSvgCmd.ts'),
+        convertor: resolve(__dirname, 'src/AcApSvgConvertor.ts'),
+        factory: resolve(__dirname, 'src/createSvgPlugin.ts'),
+        plugin: resolve(__dirname, 'src/AcApSvgPlugin.ts'),
+        register: resolve(__dirname, 'src/register.ts'),
+        renderer: resolve(__dirname, 'src/AcSvgRenderer.ts')
       },
       name: pluginId,
       fileName: (format, entryName) =>

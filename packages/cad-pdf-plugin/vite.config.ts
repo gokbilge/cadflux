@@ -16,6 +16,12 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
+        command: resolve(__dirname, 'src/AcApConvertToPdfCmd.ts'),
+        convertor: resolve(__dirname, 'src/AcApPdfConvertor.ts'),
+        factory: resolve(__dirname, 'src/createPdfPlugin.ts'),
+        'import-command': resolve(__dirname, 'src/AcApImportPdfCmd.ts'),
+        'import-convertor': resolve(__dirname, 'src/AcApPdfImportConvertor.ts'),
+        plugin: resolve(__dirname, 'src/AcApPdfPlugin.ts'),
         register: resolve(__dirname, 'src/register.ts')
       },
       name: pluginId,

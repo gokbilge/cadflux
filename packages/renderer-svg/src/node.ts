@@ -81,7 +81,7 @@ export async function exportSvgFile(
 
   if (!existsSync(path.join(runnerDir, 'index.html'))) {
     throw new Error(
-      'SVG runner is not built. Run "pnpm --filter @cadflux/renderer-svg build".'
+      'SVG runner is not built. Run "pnpm --filter @cadflux/renderer-svg build:runner" or "pnpm build:conversion-runners".'
     )
   }
 

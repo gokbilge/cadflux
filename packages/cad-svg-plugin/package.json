@@ -19,8 +19,23 @@
   "types": "./lib/index.d.ts",
   "typesVersions": {
     "*": {
+      "command": [
+        "lib/AcApConvertToSvgCmd.d.ts"
+      ],
+      "convertor": [
+        "lib/AcApSvgConvertor.d.ts"
+      ],
+      "factory": [
+        "lib/createSvgPlugin.d.ts"
+      ],
+      "plugin": [
+        "lib/AcApSvgPlugin.d.ts"
+      ],
       "register": [
         "lib/register.d.ts"
+      ],
+      "renderer": [
+        "lib/AcSvgRenderer.d.ts"
       ]
     }
   },
@@ -30,10 +45,35 @@
       "import": "./dist/cad-svg-plugin.js",
       "require": "./dist/cad-svg-plugin.umd.cjs"
     },
+    "./command": {
+      "types": "./lib/AcApConvertToSvgCmd.d.ts",
+      "import": "./dist/cad-svg-plugin-command.js",
+      "require": "./dist/cad-svg-plugin-command.umd.cjs"
+    },
+    "./convertor": {
+      "types": "./lib/AcApSvgConvertor.d.ts",
+      "import": "./dist/cad-svg-plugin-convertor.js",
+      "require": "./dist/cad-svg-plugin-convertor.umd.cjs"
+    },
+    "./factory": {
+      "types": "./lib/createSvgPlugin.d.ts",
+      "import": "./dist/cad-svg-plugin-factory.js",
+      "require": "./dist/cad-svg-plugin-factory.umd.cjs"
+    },
+    "./plugin": {
+      "types": "./lib/AcApSvgPlugin.d.ts",
+      "import": "./dist/cad-svg-plugin-plugin.js",
+      "require": "./dist/cad-svg-plugin-plugin.umd.cjs"
+    },
     "./register": {
       "types": "./lib/register.d.ts",
       "import": "./dist/cad-svg-plugin-register.js",
       "require": "./dist/cad-svg-plugin-register.umd.cjs"
+    },
+    "./renderer": {
+      "types": "./lib/AcSvgRenderer.d.ts",
+      "import": "./dist/cad-svg-plugin-renderer.js",
+      "require": "./dist/cad-svg-plugin-renderer.umd.cjs"
     }
   },
   "scripts": {

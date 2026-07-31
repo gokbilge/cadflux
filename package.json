@@ -17,7 +17,9 @@
   "scripts": {
     "analyze": "nx run-many -t analyze",
     "build": "nx run-many -t build",
-    "build:cadflux": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/server build && pnpm --filter @cadflux/web build",
+    "build:cadflux": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build:lib && pnpm --filter @cadflux/renderer-pdf build:lib && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/server build && pnpm --filter @cadflux/web build",
+    "build:cadflux:full": "pnpm run build:cadflux && pnpm run build:conversion-runners",
+    "build:conversion-runners": "pnpm --filter @cadflux/renderer-svg build:runner && pnpm --filter @cadflux/renderer-pdf build:runner",
     "build:server": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/server build",
     "clean": "nx run-many -t clean",
     "copy:workers": "pnpm -r --filter \"./packages/**\" run copy:workers",

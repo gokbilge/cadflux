@@ -1,11 +1,9 @@
 /**
- * SVG export plugin and SVG rendering engine for cad-simple-viewer.
+ * Minimal root entry for the SVG export plugin package.
+ *
+ * Heavy surfaces now require explicit subpath imports.
  *
  * @packageDocumentation
  */
 
-export * from './AcSvgRenderer'
-export { AcApConvertToSvgCmd } from './AcApConvertToSvgCmd'
-export { AcApSvgConvertor } from './AcApSvgConvertor'
 export { createSvgPlugin } from './createSvgPlugin'
-export { SVG_PLUGIN_NAME, SVG_PLUGIN_TRIGGERS } from './register'
