@@ -8,15 +8,7 @@
     "outDir": "dist",
     "tsBuildInfoFile": "tsconfig.tsbuildinfo",
     "lib": ["ES2022", "DOM"],
-    "paths": {
-      "@mlightcad/data-model": [
-        "../cad-simple-viewer/node_modules/@mlightcad/data-model/lib/index.d.ts"
-      ],
-      "@mlightcad/cad-simple-viewer": ["src/shims.d.ts"],
-      "@mlightcad/cad-svg-plugin/register": ["src/shims.d.ts"],
-      "@mlightcad/cad-pdf-plugin/register": ["src/shims.d.ts"],
-      "vue": ["../cad-viewer/node_modules/vue/dist/vue.d.ts"]
-    }
+    "paths": {}
   },
   "include": ["src/**/*.ts"]
 }

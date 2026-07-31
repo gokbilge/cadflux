@@ -4,11 +4,8 @@
     "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "./lib",
-    "paths": {
-      "@mlightcad/cad-html-plugin": [
-        "./src/index.ts"
-      ]
-    }
+    "baseUrl": ".",
+    "paths": {}
   },
   "include": [
     "src"

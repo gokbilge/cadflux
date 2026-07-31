@@ -74,14 +74,14 @@ export class AcEdHoverController {
    * This prevents excessive spatial queries while the mouse is moving
    * continuously.
    */
-  private hoverTimer: NodeJS.Timeout | null = null
+  private hoverTimer: ReturnType<typeof setTimeout> | null = null
 
   /**
    * Timer used to detect a pause over a hovered entity.
    *
    * Once triggered, a formal hover event is dispatched.
    */
-  private pauseTimer: NodeJS.Timeout | null = null
+  private pauseTimer: ReturnType<typeof setTimeout> | null = null
 
   /**
    * Object id of the entity currently considered hovered.

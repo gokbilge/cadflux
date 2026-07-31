@@ -112,7 +112,7 @@
               <el-switch
                 v-else-if="row.type === 'boolean'"
                 :model-value="row.accessor.get()"
-                @change="(v: boolean) => onPropertyChange(row, v)"
+                @change="onBooleanPropertyChange(row, $event)"
               />
 
               <el-input-number
@@ -123,15 +123,7 @@
                 :max="row.__max"
                 :step="1"
                 :precision="0"
-                @change="
-                  (v: number) => {
-                    if (row.__isArrayIndex) {
-                      row.accessor.set?.(v)
-                    } else {
-                      onPropertyChange(row, v)
-                    }
-                  }
-                "
+                @change="onIntPropertyChange(row, $event)"
               />
 
               <el-input-number
@@ -140,7 +132,7 @@
                 :model-value="row.accessor.get()"
                 :step="0.1"
                 :precision="3"
-                @change="(v: number) => onPropertyChange(row, v)"
+                @change="onFloatPropertyChange(row, $event)"
               />
 
               <el-input
@@ -251,6 +243,36 @@ type MlDisplayGroupRow = MlDisplayRowBase & {
 }
 
 type MlDisplayRow = MlDisplayGroupRow | MlDisplayPropertyRow
+
+function onBooleanPropertyChange(
+  row: MlDisplayPropertyRow,
+  value: string | number | boolean
+) {
+  if (typeof value === 'boolean') {
+    onPropertyChange(row, value)
+  }
+}
+
+function onIntPropertyChange(
+  row: MlDisplayPropertyRow,
+  value: number | undefined
+) {
+  if (value == null) return
+  if (row.__isArrayIndex) {
+    row.accessor.set?.(value)
+    return
+  }
+  onPropertyChange(row, value)
+}
+
+function onFloatPropertyChange(
+  row: MlDisplayPropertyRow,
+  value: number | undefined
+) {
+  if (value != null) {
+    onPropertyChange(row, value)
+  }
+}
 
 /* ================= helpers ================= */
 

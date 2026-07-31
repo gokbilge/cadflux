@@ -43,6 +43,7 @@
     "lint:fix": "eslint --fix --quiet src/"
   },
   "devDependencies": {
+    "@cadflux/core": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
     "@mlightcad/cad-svg-plugin": "workspace:*",
     "@mlightcad/data-model": "^1.12.1",
@@ -51,6 +52,7 @@
     "svg2pdf.js": "^2.7.0"
   },
   "peerDependencies": {
+    "@cadflux/core": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
     "@mlightcad/data-model": "^1.12.1",
     "@mlightcad/cad-svg-plugin": "workspace:*"

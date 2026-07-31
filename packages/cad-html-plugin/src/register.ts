@@ -24,7 +24,7 @@ export function registerLazyHtmlPlugin(pluginManager: AcApPluginManager): void {
     name: HTML_PLUGIN_NAME,
     triggers: [...HTML_PLUGIN_TRIGGERS],
     loader: async () => {
-      const { createHtmlPlugin } = await import('@mlightcad/cad-html-plugin')
+      const { createHtmlPlugin } = await import('./index')
       return createHtmlPlugin()
     }
   })

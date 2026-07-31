@@ -304,6 +304,9 @@ importers:
 
   packages/cad-pdf-plugin:
     devDependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
       '@mlightcad/cad-simple-viewer':
         specifier: workspace:*
         version: link:../cad-simple-viewer
@@ -690,6 +693,15 @@ importers:
       '@mlightcad/data-model':
         specifier: ^1.12.1
         version: 1.12.1
+      '@mlightcad/libredwg-converter':
+        specifier: ^3.12.1
+        version: 3.12.1(@mlightcad/data-model@1.12.1)
+      '@mlightcad/mtext-renderer':
+        specifier: ^0.12.1
+        version: 0.12.1(three@0.172.0)
+      '@mlightcad/three-renderer':
+        specifier: workspace:*
+        version: link:../three-renderer
       vue:
         specifier: ^3.4.21
         version: 3.5.31(typescript@5.9.3)

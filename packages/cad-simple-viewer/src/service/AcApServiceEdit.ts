@@ -8,6 +8,10 @@ export const LAYER_EDIT_LABEL = 'Layer'
 /** Default undo label for entity edits outside commands. */
 export const ENTITY_EDIT_LABEL = 'Entity'
 
+const isProductionBuild =
+  (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+    ?.NODE_ENV === 'production'
+
 /**
  * Runs a database mutation with undo support when not already inside a command transaction.
  *
@@ -29,7 +33,7 @@ export function acapRunServiceEdit<T>(
   }
 
   if (typeof db.runDatabaseEdit !== 'function') {
-    if (process.env.NODE_ENV !== 'production') {
+    if (!isProductionBuild) {
       console.warn(
         `[cad-simple-viewer] acapRunServiceEdit("${label}"): database.runDatabaseEdit is unavailable; mutation ran without undo support.`
       )

@@ -32,7 +32,7 @@ import {
 } from '@mlightcad/three-renderer'
 import { AcTrMatrixUtil } from '@mlightcad/three-renderer'
 import * as THREE from 'three'
-import Stats from 'three/examples/jsm/libs/stats.module'
+import Stats from 'three/examples/jsm/libs/stats.module.js'
 import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 
 import { AcApDocManager, AcApSettingManager } from '../app'
@@ -58,6 +58,10 @@ import {
   AcEdSpatialQueryResultItemEx
 } from '../editor/view/AcEdSpatialQueryResult'
 import { isEffectiveSpatialQueryHit } from '../editor/view/AcEdSpatialQueryResult'
+
+const isProductionBuild =
+  (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+    ?.NODE_ENV === 'production'
 import type { AcTrSpatialSearchOptions } from '../spatialIndex/AcTrSpatialIndex'
 import { AcTrGeometryUtil } from '../util'
 import { acapRunDatabaseEdit } from '../util/AcApDatabaseEdit'
@@ -2303,7 +2307,7 @@ export class AcTrView2d extends AcEdBaseView {
     // AcDbRenderingCache.draw (and similar paths such as AcDbTable) already call
     // applyMatrix on the group, which updates wcsBbbox and wcsChildBoxes to WCS.
     // Do not multiply group.matrix here — that would double-transform spatial bounds.
-    if (process.env.NODE_ENV !== 'production') {
+    if (!isProductionBuild) {
       assertAcTrGroupWcsBboxesConsistent(group)
     }
 

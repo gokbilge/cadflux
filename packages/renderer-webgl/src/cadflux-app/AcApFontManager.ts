@@ -3,7 +3,7 @@
 
 import type { FontManager as FontManagerType } from '@mlightcad/mtext-renderer'
 
-let fontManagerPromise: Promise<FontManagerType['instance']> | undefined
+let fontManagerPromise: Promise<FontManagerType> | undefined
 
 async function getFontManagerInstance() {
   fontManagerPromise ??= import('@mlightcad/mtext-renderer').then(

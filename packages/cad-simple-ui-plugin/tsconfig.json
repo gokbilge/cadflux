@@ -4,11 +4,8 @@
     "resolveJsonModule": true,
     "rootDir": "./src",
     "outDir": "./lib",
-    "paths": {
-      "@mlightcad/cad-simple-ui-plugin": [
-        "./src/index.ts"
-      ]
-    }
+    "baseUrl": ".",
+    "paths": {}
   },
   "include": [
     "src"

@@ -32,8 +32,8 @@
         <ml-osnap-button />
         <ml-sys-var-toggle-button
           :sys-var-name="AcDbSystemVariables.ORTHOMODE"
-          :on-icon="orthoMode"
-          :off-icon="orthoMode"
+          :on-icon="orthoModeIcon"
+          :off-icon="orthoModeIcon"
           :on-tooltip="t('main.statusBar.orthoMode.on')"
           :off-tooltip="t('main.statusBar.orthoMode.off')"
           on-color="var(--el-color-primary)"
@@ -42,8 +42,8 @@
         <ml-polar-tracking-button />
         <ml-sys-var-toggle-button
           :sys-var-name="AcDbSystemVariables.LWDISPLAY"
-          :on-icon="lineWidth"
-          :off-icon="lineWidth"
+          :on-icon="lineWidthIcon"
+          :off-icon="lineWidthIcon"
           :on-tooltip="t('main.statusBar.lineWidth.on')"
           :off-tooltip="t('main.statusBar.lineWidth.off')"
           on-color="var(--el-color-primary)"
@@ -51,8 +51,8 @@
         />
         <ml-sys-var-toggle-button
           :sys-var-name="AcDbSystemVariables.DYNMODE"
-          :on-icon="dynamicInput"
-          :off-icon="dynamicInput"
+          :on-icon="dynamicInputIcon"
+          :off-icon="dynamicInputIcon"
           :on-tooltip="t('main.statusBar.dynamicInput.on')"
           :off-tooltip="t('main.statusBar.dynamicInput.off')"
           on-color="var(--el-color-primary)"
@@ -76,6 +76,7 @@ import { useI18n } from 'vue-i18n'
 import { useCurrentPos, useDocument, useIsMobile, useSettings } from '../../composable'
 import { dynamicInput, lineWidth, orthoMode } from '../../svg'
 import { MlSysVarToggleButton } from '../common'
+import type { MlIconType } from '../common/MlToggleButton.vue'
 import MlFullScreenButton from './MlFullScreenButton.vue'
 import MlLayoutTabs from './MlLayoutTabs.vue'
 import MlNotificationButton from './MlNotificationButton.vue'
@@ -101,6 +102,9 @@ const { isDocumentOpening } = useDocument()
 const { isMobile } = useIsMobile()
 const { t } = useI18n()
 const isStatusBarDisabled = computed(() => isDocumentOpening.value)
+const orthoModeIcon = orthoMode as unknown as MlIconType
+const lineWidthIcon = lineWidth as unknown as MlIconType
+const dynamicInputIcon = dynamicInput as unknown as MlIconType
 
 const layoutTabsReservedWidth = computed(() =>
   features.isShowCoordinate && !isMobile.value ? COORDINATE_RESERVED_WIDTH : 0
