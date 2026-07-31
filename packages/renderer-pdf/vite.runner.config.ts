@@ -9,6 +9,7 @@ export default defineConfig({
   base: './',
   resolve: {
     alias: {
+      '@cadflux/core': resolve(__dirname, '../core/src/index.ts'),
       '@mlightcad/cad-simple-viewer': resolve(
         __dirname,
         '../cad-simple-viewer/src/index.ts'

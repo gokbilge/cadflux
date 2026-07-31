@@ -115,15 +115,27 @@ importers:
       '@cadflux/batch-engine':
         specifier: workspace:*
         version: link:../../packages/batch-engine
+      '@cadflux/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@cadflux/core':
         specifier: workspace:*
         version: link:../../packages/core
       '@cadflux/diagnostics':
         specifier: workspace:*
         version: link:../../packages/diagnostics
+      '@cadflux/dwg-adapter':
+        specifier: workspace:*
+        version: link:../../packages/dwg-adapter
+      '@cadflux/dxf-adapter':
+        specifier: workspace:*
+        version: link:../../packages/dxf-adapter
       '@cadflux/file-ingest':
         specifier: workspace:*
         version: link:../../packages/file-ingest
+      '@cadflux/plot-engine':
+        specifier: workspace:*
+        version: link:../../packages/plot-engine
       '@cadflux/presets':
         specifier: workspace:*
         version: link:../../packages/presets
@@ -142,33 +154,27 @@ importers:
 
   apps/web:
     dependencies:
+      '@cadflux/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@cadflux/drawing-model':
+        specifier: workspace:*
+        version: link:../../packages/drawing-model
       '@cadflux/file-ingest':
         specifier: workspace:*
         version: link:../../packages/file-ingest
       '@cadflux/presets':
         specifier: workspace:*
         version: link:../../packages/presets
-      '@mlightcad/cad-pdf-plugin':
+      '@cadflux/renderer-webgl':
         specifier: workspace:*
-        version: link:../../packages/cad-pdf-plugin
-      '@mlightcad/cad-simple-viewer':
-        specifier: workspace:*
-        version: link:../../packages/cad-simple-viewer
-      '@mlightcad/cad-svg-plugin':
-        specifier: workspace:*
-        version: link:../../packages/cad-svg-plugin
-      '@mlightcad/cad-viewer':
-        specifier: workspace:*
-        version: link:../../packages/cad-viewer
+        version: link:../../packages/renderer-webgl
       element-plus:
         specifier: ^2.12.0
         version: 2.13.6(typescript@5.9.3)(vue@3.5.31(typescript@5.9.3))
       vue:
         specifier: ^3.4.21
         version: 3.5.31(typescript@5.9.3)
-      vue-i18n:
-        specifier: ^11.4.4
-        version: 11.4.4(vue@3.5.31(typescript@5.9.3))
     devDependencies:
       '@vitejs/plugin-vue':
         specifier: ^6.0.8
@@ -398,6 +404,9 @@ importers:
 
   packages/cad-svg-plugin:
     devDependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
       '@mlightcad/cad-simple-viewer':
         specifier: workspace:*
         version: link:../cad-simple-viewer
@@ -547,9 +556,29 @@ importers:
         specifier: ^2.1.6
         version: 2.2.12(typescript@5.9.3)
 
+  packages/config: {}
+
   packages/core: {}
 
   packages/diagnostics:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/drawing-model:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/dwg-adapter:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/dxf-adapter:
     dependencies:
       '@cadflux/core':
         specifier: workspace:*
@@ -574,6 +603,12 @@ importers:
         version: 14.2.6
 
   packages/file-ingest:
+    dependencies:
+      '@cadflux/core':
+        specifier: workspace:*
+        version: link:../core
+
+  packages/plot-engine:
     dependencies:
       '@cadflux/core':
         specifier: workspace:*
@@ -632,6 +667,24 @@ importers:
         specifier: ^6.4.3
         version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(yaml@2.8.3)
 
+  packages/renderer-webgl:
+    dependencies:
+      '@mlightcad/cad-pdf-plugin':
+        specifier: workspace:*
+        version: link:../cad-pdf-plugin
+      '@mlightcad/cad-simple-viewer':
+        specifier: workspace:*
+        version: link:../cad-simple-viewer
+      '@mlightcad/cad-svg-plugin':
+        specifier: workspace:*
+        version: link:../cad-svg-plugin
+      '@mlightcad/data-model':
+        specifier: ^1.12.1
+        version: 1.12.1
+      vue:
+        specifier: ^3.4.21
+        version: 3.5.31(typescript@5.9.3)
+
   packages/three-renderer:
     dependencies:
       '@velipso/polybool':
@@ -650,6 +703,8 @@ importers:
       three:
         specifier: ^0.172.0
         version: 0.172.0
+
+  packages/vite-config: {}
 
 packages:
 

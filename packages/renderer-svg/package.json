@@ -16,7 +16,7 @@
     "dist-runner"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
+    "build": "rimraf dist dist-runner tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
     "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
   },
   "dependencies": {
