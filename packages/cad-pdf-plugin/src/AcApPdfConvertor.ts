@@ -1,3 +1,4 @@
+import { readCadFluxBrowserFontMapping } from '@cadflux/core'
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
 import type { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 
@@ -43,7 +44,7 @@ export class AcApPdfConvertor {
     renderer.ltscale = db.ltscale
     renderer.celtscale = db.celtscale
     renderer.showLineWeight = !!db.lwdisplay
-    renderer.setFontMapping(this.readCadFluxBrowserFontMapping())
+    renderer.setFontMapping(readCadFluxBrowserFontMapping())
 
     const view = context.view as { backgroundColor?: number } | undefined
     const bg = view?.backgroundColor ?? 0xffffff
@@ -82,22 +83,4 @@ export class AcApPdfConvertor {
     pdf.save(downloadName)
   }
 
-  private readCadFluxBrowserFontMapping() {
-    const storageKey = 'cadflux.web.fontMapping'
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return {}
-    }
-
-    try {
-      const raw = window.localStorage.getItem(storageKey)
-      if (!raw) {
-        return {}
-      }
-
-      const parsed = JSON.parse(raw)
-      return parsed && typeof parsed === 'object' ? parsed : {}
-    } catch {
-      return {}
-    }
-  }
 }

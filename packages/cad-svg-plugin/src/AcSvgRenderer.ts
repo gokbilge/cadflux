@@ -26,7 +26,6 @@ import { AcTrEllipticalArc } from './AcSvgEllipticalArc'
 import { AcSvgEntity } from './AcSvgEntity'
 import { AcSvgExportUtil } from './AcSvgExportUtil'
 import { AcSvgGroup } from './AcSvgGroup'
-import { AcSvgImage } from './AcSvgImage'
 import { AcSvgLine } from './AcSvgLine'
 import { AcSvgLineSegments } from './AcSvgLineSegments'
 import { AcSvgPoint } from './AcSvgPoint'
@@ -285,9 +284,9 @@ export class AcSvgRenderer implements AcGiRenderer<AcSvgEntity> {
   image(blob: Blob, style: AcGiImageStyle) {
     const traits = { ...this._subEntityTraits }
     const ctx = this.styleContext
-    const pending = AcSvgImage.fromBlob(blob, style, traits, ctx).then(entity =>
-      this.pushEntity(entity)
-    )
+    const pending = import('./AcSvgImage')
+      .then(({ AcSvgImage }) => AcSvgImage.fromBlob(blob, style, traits, ctx))
+      .then(entity => this.pushEntity(entity))
     this._pendingTasks.push(pending.then(() => undefined))
     return _tempEntity
   }

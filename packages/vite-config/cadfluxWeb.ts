@@ -89,6 +89,10 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       replacement: resolve(appRoot, '../../packages/config/src/index.ts')
     },
     {
+      find: '@cadflux/core',
+      replacement: resolve(appRoot, '../../packages/core/src/index.ts')
+    },
+    {
       find: '@cadflux/drawing-model',
       replacement: resolve(appRoot, '../../packages/drawing-model/src/index.ts')
     },
@@ -192,34 +196,78 @@ export function cadfluxWebManualChunks(id: string): string | undefined {
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvgFontMap')
+    id.includes('@mlightcad/data-model') ||
+    id.includes('/data-model/lib/index.js') ||
+    id.includes('\\data-model\\lib\\index.js')
   ) {
+    return 'cad-runtime-model'
+  }
+
+  if (id.includes('packages/core/src/browserExport')) {
+    return 'cad-export-utils'
+  }
+
+  if (id.includes('packages/cad-svg-plugin/src/AcSvgFontMap')) {
     return 'cad-export-fonts'
   }
 
   if (
     id.includes('packages/cad-svg-plugin/src/AcSvgMText') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil') ||
-    id.includes('node_modules/.pnpm/@mlightcad+mtext-parser') ||
-    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer')
+    id.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil')
   ) {
     return 'cad-export-mtext'
+  }
+
+  if (id.includes('node_modules/.pnpm/@mlightcad+mtext-parser')) {
+    return 'cad-export-mtext-parser'
+  }
+
+  if (
+    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer') ||
+    id.includes('@mlightcad/mtext-renderer/dist/index.js')
+  ) {
+    return 'cad-export-mtext-renderer'
   }
 
   if (
     id.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
     id.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
     id.includes('packages/cad-svg-plugin/src/CadFluxBrowserExport') ||
-    id.includes('packages/cad-pdf-plugin/src/CadFluxBrowserExport') ||
-    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer')
+    id.includes('packages/cad-pdf-plugin/src/CadFluxBrowserExport')
   ) {
     return 'cad-export-shape'
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvg') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgImage') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgExportUtil') ||
     id.includes('node_modules/dompurify')
   ) {
+    return 'cad-export-image'
+  }
+
+  if (
+    id.includes('packages/cad-svg-plugin/src/AcSvgArea') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgCircArc') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgEllipticalArc') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgGroup') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgLine') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgLineSegments') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgPoint') ||
+    id.includes('packages/cad-svg-plugin/src/AcSvgRenderer')
+  ) {
+    return 'cad-export-geometry'
+  }
+
+  if (
+    id.includes('packages/cad-pdf-plugin/src/AcApPdfConvertor') ||
+    id.includes('node_modules/.pnpm/jspdf') ||
+    id.includes('node_modules/.pnpm/svg2pdf.js')
+  ) {
+    return 'cad-export-pdf'
+  }
+
+  if (id.includes('packages/cad-svg-plugin/src/AcSvg')) {
     return 'cad-export-core'
   }
 
