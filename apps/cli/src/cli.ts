@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
+import { createHash } from 'node:crypto'
+import { existsSync, openAsBlob } from 'node:fs'
 import {
   access,
   copyFile,
@@ -12,6 +14,7 @@ import {
   stat,
   writeFile
 } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import path from 'node:path'
 
 import {
@@ -46,6 +49,7 @@ const EXIT_CANCELLED = 130
 const EXIT_FAILURE = 1
 const EXIT_PARTIAL_FAILURE = 7
 const WATCH_TEST_MODE_ENV = 'CADFLUX_CLI_WATCH_TEST_MODE'
+const CADFLUX_SESSION_FILE = path.join(homedir(), '.cadflux-session.json')
 
 type LogFormat = 'text' | 'json'
 
@@ -69,6 +73,7 @@ interface ConvertCommandOptions extends SharedInputOptions {
   report?: string
   overwrite: 'skip' | 'replace'
   logFormat: LogFormat
+  deterministic: boolean
 }
 
 interface WatchCommandOptions {
@@ -108,6 +113,13 @@ interface WatchPaths {
   stateDirectory: string
   archiveDirectory?: string
   quarantineDirectory?: string
+}
+
+interface CliSessionState {
+  serverUrl: string
+  csrfToken: string
+  cookies: Record<string, string>
+  username?: string
 }
 
 const program = new Command()
@@ -332,15 +344,22 @@ program
   .option('--report <path>', 'Report output path')
   .option('--overwrite <mode>', 'skip|replace', 'replace')
   .option('--log-format <format>', 'text|json', 'text')
+  .option('--deterministic', 'Normalize report ordering/timestamps for reproducible report files', false)
   .action(async (inputs: string[], options: ConvertCommandOptions) => {
     const logger = createLogger(options.logFormat)
     const runtime = createCadFluxRuntime(new NodeCadFluxConverter())
-    const sources = await collectCliSources(inputs, options)
+    const sources = normalizeDeterministicSources(
+      await collectCliSources(inputs, options)
+    )
+    if (sources.length === 0) {
+      throw new Error('No supported DWG or DXF inputs were found.')
+    }
+    const workerCount = validateWorkerCount(options.workers)
     const profile = buildProfile(options)
     const outputDirectory = path.resolve(options.output)
     await mkdir(outputDirectory, { recursive: true })
 
-    const engine = new CadFluxBatchEngine<CadFluxConversionResult>(options.workers)
+    const engine = new CadFluxBatchEngine<CadFluxConversionResult>(workerCount)
     let cancelled = false
     const removeSignalHandlers = installCancellationHandlers(() => {
       cancelled = true
@@ -365,7 +384,8 @@ program
         logger.info('convert.started', {
           taskId: progress.taskId,
           completed: progress.completed,
-          total: progress.total
+          total: progress.total,
+          deterministic: options.deterministic
         })
         return
       }
@@ -383,11 +403,25 @@ program
         path.resolve(options.report),
         profile.id,
         profile.formats,
-        results
+        results,
+        {
+          deterministic: options.deterministic
+        }
       )
     }
 
     const failures = results.filter(result => result.status !== 'completed')
+    const successfulArtifacts = results.reduce(
+      (count, result) => count + result.artifacts.length,
+      0
+    )
+    logger.info('convert.completed', {
+      totalInputs: results.length,
+      successful: results.length - failures.length,
+      failed: failures.length,
+      artifacts: successfulArtifacts,
+      deterministic: options.deterministic
+    })
     if (cancelled) {
       process.exitCode = EXIT_CANCELLED
       return
@@ -426,6 +460,182 @@ program.command('doctor').action(async () => {
 
 program.command('version').action(() => {
   console.log(CADFLUX_CLI_VERSION)
+})
+
+program
+  .command('login')
+  .option('--server <url>', 'CadFlux server URL', process.env.CADFLUX_SERVER_URL ?? 'http://localhost:8080')
+  .option('--username <username>', 'Username', process.env.CADFLUX_USERNAME)
+  .option('--password <password>', 'Password')
+  .action(async (options: { server: string; username?: string; password?: string }) => {
+    if (!options.username || !options.password) {
+      throw new Error('login requires --username and --password.')
+    }
+    const response = await fetch(`${normalizeServerUrl(options.server)}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: options.username,
+        password: options.password
+      })
+    })
+    if (!response.ok) {
+      throw new Error(`Login failed with status ${response.status}.`)
+    }
+    const payload = await response.json() as { csrfToken: string }
+    const cookies = cookiesFromResponse(response)
+    await writeSessionState({
+      serverUrl: normalizeServerUrl(options.server),
+      csrfToken: payload.csrfToken,
+      cookies,
+      username: options.username
+    })
+    console.log('Logged in.')
+  })
+
+program.command('logout').action(async () => {
+  const session = await readSessionState()
+  if (session) {
+    await serverFetch(session, '/api/v1/auth/logout', {
+      method: 'POST'
+    }).catch(() => undefined)
+  }
+  await clearSessionState()
+  console.log('Logged out.')
+})
+
+const jobsCommand = program.command('jobs').description('Server-backed job commands')
+
+jobsCommand.command('list').action(async () => {
+  const session = await requireSessionState()
+  const payload = await serverFetchJson<{ jobs: Array<Record<string, unknown>> }>(session, '/api/v1/jobs')
+  console.log(JSON.stringify(payload.jobs, null, 2))
+})
+
+jobsCommand
+  .command('create')
+  .requiredOption('--name <name>', 'Job name')
+  .option('--profile <profileId>', 'Profile id')
+  .action(async (options: { name: string; profile?: string }) => {
+    const session = await requireSessionState()
+    const profilesPayload = await serverFetchJson<{ profiles: Array<{ id: string; profileJson: string }> }>(
+      session,
+      '/api/v1/profiles'
+    )
+    const profile =
+      profilesPayload.profiles.find(item => item.id === options.profile) ??
+      profilesPayload.profiles[0]
+    if (!profile) {
+      throw new Error('No server profiles available.')
+    }
+    const payload = await serverFetchJson<{ job: { id: string } }>(session, '/api/v1/jobs', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: options.name,
+        profileJson: profile.profileJson
+      })
+    })
+    console.log(payload.job.id)
+  })
+
+jobsCommand.command('status').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  const payload = await serverFetchJson<{ job: Record<string, unknown> }>(session, `/api/v1/jobs/${jobId}`)
+  console.log(JSON.stringify(payload.job, null, 2))
+})
+
+jobsCommand.command('start').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  await serverFetchJson(session, `/api/v1/jobs/${jobId}/start`, { method: 'POST' })
+  console.log(`Started ${jobId}.`)
+})
+
+jobsCommand.command('pause').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  await serverFetchJson(session, `/api/v1/jobs/${jobId}/pause`, { method: 'POST' })
+  console.log(`Paused ${jobId}.`)
+})
+
+jobsCommand.command('resume').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  await serverFetchJson(session, `/api/v1/jobs/${jobId}/resume`, { method: 'POST' })
+  console.log(`Resumed ${jobId}.`)
+})
+
+jobsCommand.command('cancel').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  await serverFetchJson(session, `/api/v1/jobs/${jobId}/cancel`, { method: 'POST' })
+  console.log(`Cancelled ${jobId}.`)
+})
+
+jobsCommand.command('retry').argument('<jobId>').action(async (jobId: string) => {
+  const session = await requireSessionState()
+  await serverFetchJson(session, `/api/v1/jobs/${jobId}/retry`, { method: 'POST' })
+  console.log(`Retried ${jobId}.`)
+})
+
+jobsCommand
+  .command('download')
+  .argument('<jobId>')
+  .option('-o, --output <path>', 'Output ZIP path')
+  .action(async (jobId: string, options: { output?: string }) => {
+    const session = await requireSessionState()
+    await serverFetchJson(session, `/api/v1/jobs/${jobId}/reports`, { method: 'POST' })
+    const reports = await serverFetchJson<{ artifacts: Array<{ id: string; type: string; relativePath: string }> }>(
+      session,
+      `/api/v1/jobs/${jobId}/reports`
+    )
+    const zipArtifact = reports.artifacts.find(item => item.type === 'zip')
+    if (!zipArtifact) {
+      throw new Error('ZIP report artifact not found.')
+    }
+    const response = await serverFetch(session, `/api/v1/artifacts/${zipArtifact.id}/download`)
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    const outputPath = path.resolve(options.output ?? path.basename(zipArtifact.relativePath))
+    await writeFile(outputPath, Buffer.from(bytes))
+    console.log(outputPath)
+  })
+
+program
+  .command('upload')
+  .argument('<paths...>')
+  .requiredOption('--job <jobId>', 'Existing draft or queued job id')
+  .option('-r, --recursive', 'Scan directories recursively', false)
+  .option('--input-list <path>', 'Read newline-delimited inputs from file')
+  .option('--include <glob>', 'Include glob pattern', collectPatterns, [])
+  .option('--exclude <glob>', 'Exclude glob pattern', collectPatterns, [])
+  .action(async (inputs: string[], options: SharedInputOptions & { job: string }) => {
+    const session = await requireSessionState()
+    const sources = await collectCliSources(inputs, options)
+    for (const source of sources) {
+      if (!source.absolutePath) {
+        continue
+      }
+      const relativePath = source.relativePath ?? source.name
+      const body = new FormData()
+      body.append('relativePath', relativePath)
+      body.append(
+        'file',
+        await openAsBlob(source.absolutePath, {
+          type: 'application/octet-stream'
+        }),
+        source.name
+      )
+      await serverFetchJson(session, `/api/v1/jobs/${options.job}/files`, {
+        method: 'POST',
+        body
+      })
+      console.log(`Uploaded ${relativePath}`)
+    }
+  })
+
+const profilesCommand = program.command('profiles').description('Server-backed profile commands')
+profilesCommand.command('list').action(async () => {
+  const session = await requireSessionState()
+  const payload = await serverFetchJson<{ profiles: Array<Record<string, unknown>> }>(session, '/api/v1/profiles')
+  console.log(JSON.stringify(payload.profiles, null, 2))
 })
 
 program
@@ -683,6 +893,104 @@ function createLogger(format: string) {
   }
 }
 
+async function readSessionState(): Promise<CliSessionState | null> {
+  if (!existsSync(CADFLUX_SESSION_FILE)) {
+    return null
+  }
+  return JSON.parse(await readFile(CADFLUX_SESSION_FILE, 'utf8')) as CliSessionState
+}
+
+async function requireSessionState(): Promise<CliSessionState> {
+  const session = await readSessionState()
+  if (!session) {
+    throw new Error('No saved CadFlux session. Run "cadflux login" first.')
+  }
+  return session
+}
+
+async function writeSessionState(session: CliSessionState): Promise<void> {
+  await writeFile(CADFLUX_SESSION_FILE, JSON.stringify(session, null, 2), {
+    encoding: 'utf8',
+    mode: 0o600
+  })
+}
+
+async function clearSessionState(): Promise<void> {
+  if (existsSync(CADFLUX_SESSION_FILE)) {
+    await rm(CADFLUX_SESSION_FILE, { force: true })
+  }
+}
+
+function normalizeServerUrl(serverUrl: string): string {
+  return serverUrl.replace(/\/+$/u, '')
+}
+
+function cookieHeader(cookies: Record<string, string>): string {
+  return Object.entries(cookies)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('; ')
+}
+
+function cookiesFromResponse(response: Response): Record<string, string> {
+  const setCookies =
+    typeof (response.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie === 'function'
+      ? (response.headers as Headers & { getSetCookie: () => string[] }).getSetCookie()
+      : (response.headers.get('set-cookie') ? [response.headers.get('set-cookie')!] : [])
+  const cookies: Record<string, string> = {}
+  for (const header of setCookies) {
+    const [firstPart] = header.split(';')
+    const equalsIndex = firstPart.indexOf('=')
+    if (equalsIndex <= 0) {
+      continue
+    }
+    const name = firstPart.slice(0, equalsIndex).trim()
+    const value = firstPart.slice(equalsIndex + 1).trim()
+    cookies[name] = value
+  }
+  return cookies
+}
+
+async function serverFetch(
+  session: CliSessionState,
+  resourcePath: string,
+  init: RequestInit = {}
+): Promise<Response> {
+  const headers = new Headers(init.headers ?? {})
+  if (session.csrfToken && !headers.has('X-CSRF-Token')) {
+    headers.set('X-CSRF-Token', session.csrfToken)
+  }
+  if (Object.keys(session.cookies).length > 0) {
+    headers.set('Cookie', cookieHeader(session.cookies))
+  }
+  if (
+    !headers.has('Content-Type') &&
+    init.body &&
+    !(init.body instanceof Buffer) &&
+    typeof init.body === 'string'
+  ) {
+    headers.set('Content-Type', 'application/json')
+  }
+  const response = await fetch(`${normalizeServerUrl(session.serverUrl)}${resourcePath}`, {
+    ...init,
+    headers
+  })
+  if (!response.ok) {
+    const body = await response.text()
+    throw new Error(body || `Request failed with status ${response.status}.`)
+  }
+  return response
+}
+
+async function serverFetchJson<T = unknown>(
+  session: CliSessionState,
+  resourcePath: string,
+  init: RequestInit = {}
+): Promise<T> {
+  const response = await serverFetch(session, resourcePath, init)
+  const text = await response.text()
+  return (text.length > 0 ? JSON.parse(text) : {}) as T
+}
+
 function writeLog(
   format: LogFormat,
   level: 'info' | 'error',
@@ -725,16 +1033,31 @@ async function writeReport(
   reportPath: string,
   presetId: string,
   formatIds: CadFluxFormat[],
-  results: CadFluxConversionResult[]
+  results: CadFluxConversionResult[],
+  options?: {
+    deterministic?: boolean
+  }
 ): Promise<void> {
   await mkdir(path.dirname(reportPath), { recursive: true })
+  const normalizedResults =
+    options?.deterministic
+      ? createDeterministicResults(results)
+      : results
+  const reportId = options?.deterministic
+    ? createDeterministicReportId(presetId, formatIds, normalizedResults)
+    : undefined
+  const createdAt = options?.deterministic
+    ? '1970-01-01T00:00:00.000Z'
+    : undefined
   const report = createBatchReportFromResults(
     {
+      id: reportId,
+      createdAt,
       presetId,
       strategy: 'filesystem',
       formatIds
     },
-    results,
+    normalizedResults,
     (_, artifact) => ({
       format: artifact.format,
       outputPath: artifact.outputPath,
@@ -879,4 +1202,72 @@ function stripKnownReportExtension(filePath: string): string {
 
 function toPortablePath(filePath: string): string {
   return filePath.split(path.sep).join('/')
+}
+
+function validateWorkerCount(value: number): number {
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error('Worker count must be a positive integer.')
+  }
+  return value
+}
+
+function normalizeDeterministicSources(
+  sources: CadFluxInputSource[]
+): CadFluxInputSource[] {
+  return [...sources].sort((left, right) => {
+    const leftKey = left.relativePath ?? left.absolutePath ?? left.name
+    const rightKey = right.relativePath ?? right.absolutePath ?? right.name
+    return leftKey.localeCompare(rightKey)
+  })
+}
+
+function createDeterministicResults(
+  results: CadFluxConversionResult[]
+): CadFluxConversionResult[] {
+  return [...results]
+    .map(result => ({
+      ...result,
+      durationMs: 0,
+      warnings: [...result.warnings].sort(),
+      artifacts: [...result.artifacts].sort((left, right) =>
+        left.outputPath.localeCompare(right.outputPath)
+      )
+    }))
+    .sort((left, right) => {
+      const leftKey =
+        left.input.relativePath ?? left.input.absolutePath ?? left.input.name
+      const rightKey =
+        right.input.relativePath ?? right.input.absolutePath ?? right.input.name
+      return leftKey.localeCompare(rightKey)
+    })
+}
+
+function createDeterministicReportId(
+  presetId: string,
+  formatIds: CadFluxFormat[],
+  results: CadFluxConversionResult[]
+): string {
+  const digest = createHash('sha256')
+    .update(
+      JSON.stringify({
+        presetId,
+        formatIds,
+        results: results.map(result => ({
+          input:
+            result.input.relativePath ??
+            result.input.absolutePath ??
+            result.input.name,
+          status: result.status,
+          warnings: result.warnings,
+          error: result.error,
+          artifacts: result.artifacts.map(artifact => ({
+            format: artifact.format,
+            outputPath: artifact.outputPath
+          }))
+        }))
+      })
+    )
+    .digest('hex')
+    .slice(0, 16)
+  return `cadflux-${digest}`
 }

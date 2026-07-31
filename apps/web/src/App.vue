@@ -1,278 +1,376 @@
 <template>
-  <div
-    class="shell"
-    @dragenter.prevent="isDragActive = true"
-    @dragover.prevent="isDragActive = true"
-    @dragleave.prevent="isDragActive = false"
-    @drop.prevent="onDrop"
-  >
-    <aside class="sidebar">
-      <div class="brand">
+  <div class="shell">
+    <main v-if="authState.status === 'loading'" class="center-panel">
+      <div class="card">
         <h1>CadFlux</h1>
-        <p>Local-first DWG/DXF viewing and browser batch export.</p>
-      </div>
-
-      <div class="actions">
-        <button class="primary" @click="openFiles">Open Files</button>
-        <button class="secondary" @click="openDirectory">Open Directory</button>
-        <button class="secondary" @click="selectOutputDirectory">
-          Pick Output Directory
-        </button>
-      </div>
-
-      <input
-        ref="fileInput"
-        class="hidden"
-        type="file"
-        accept=".dwg,.dxf"
-        multiple
-        @change="onFileChange"
-      />
-      <input
-        ref="directoryInput"
-        class="hidden"
-        type="file"
-        accept=".dwg,.dxf"
-        multiple
-        webkitdirectory
-        @change="onDirectoryChange"
-      />
-
-      <label class="field">
-        <span>Preset</span>
-        <select v-model="selectedPresetId">
-          <option v-for="preset in presets" :key="preset.id" :value="preset.id">
-            {{ preset.label }}
-          </option>
-        </select>
-      </label>
-
-      <div class="field">
-        <span>Batch formats</span>
-        <label class="checkbox-row">
-          <input v-model="batchPdfEnabled" type="checkbox" />
-          <span>PDF</span>
-        </label>
-        <label class="checkbox-row">
-          <input v-model="batchSvgEnabled" type="checkbox" />
-          <span>SVG</span>
-        </label>
-      </div>
-
-      <div class="field">
-        <span>Persistence</span>
-        <label class="checkbox-row">
-          <input v-model="workspacePersistenceEnabled" type="checkbox" />
-          <span>Persist queue metadata and reports in IndexedDB</span>
-        </label>
-        <label class="checkbox-row">
-          <input v-model="persistOutputHandle" type="checkbox" />
-          <span>Remember output directory handle where supported</span>
-        </label>
-      </div>
-
-      <div class="notice">
-        <p class="notice-title">Output strategy</p>
-        <p>
-          {{
-            supportsDirectoryOutput
-              ? outputDirectoryHandle
-                ? 'Direct filesystem output is enabled through the File System Access API.'
-                : 'This browser can write directly to a chosen output directory after permission is granted.'
-              : 'This browser cannot write directly to arbitrary local folders, so CadFlux will generate a ZIP download for batch output.'
-          }}
-        </p>
-        <p v-if="outputDirectorySummary" class="muted">
-          Output target: {{ outputDirectorySummary }}
-        </p>
-      </div>
-
-      <div class="batch-panel">
-        <div class="queue-header">
-          <h2>Batch</h2>
-          <span>{{ queue.length }}</span>
-        </div>
-        <div class="actions batch-actions">
-          <button class="primary" :disabled="!canRunBatch" @click="runBatch">
-            Run Batch
-          </button>
-          <button
-            class="secondary"
-            :disabled="!batchState.isRunning"
-            @click="togglePauseBatch"
-          >
-            {{ batchState.isPaused ? 'Resume' : 'Pause' }}
-          </button>
-          <button
-            class="secondary"
-            :disabled="!batchState.isRunning"
-            @click="cancelBatch"
-          >
-            Cancel
-          </button>
-          <button
-            class="secondary"
-            :disabled="!hasFailedItems"
-            @click="retryFailedItems"
-          >
-            Retry Failed
-          </button>
-        </div>
-        <div class="muted">
-          {{
-            batchState.isRunning
-              ? `Running ${batchState.completedCount}/${batchState.totalCount}`
-              : latestBatchSummary
-          }}
-        </div>
-      </div>
-
-      <div class="queue">
-        <div class="queue-header">
-          <h2>Queue</h2>
-          <span>{{ queue.length }}</span>
-        </div>
-        <div class="actions batch-actions">
-          <button
-            class="secondary"
-            :disabled="!hasUnavailableItems"
-            @click="removeUnavailableItems"
-          >
-            Remove Missing Sources
-          </button>
-          <button class="secondary" :disabled="queue.length === 0" @click="clearQueue">
-            Clear Queue
-          </button>
-        </div>
-        <button
-          v-for="item in queue"
-          :key="item.key"
-          class="queue-item"
-          :class="{ active: item.key === activeKey }"
-          @click="selectItem(item.key)"
-        >
-          <span>{{ item.title }}</span>
-          <small>{{ item.relativePath }}</small>
-          <small>{{ item.status }}</small>
-          <small v-if="!item.sourceAvailable" class="error-text">
-            Re-add source file to reopen
-          </small>
-          <small v-if="item.lastError" class="error-text">{{ item.lastError }}</small>
-        </button>
-      </div>
-
-      <div class="storage-panel">
-        <div class="queue-header">
-          <h2>Workspace</h2>
-          <span>{{ storageUsageSummary }}</span>
-        </div>
-        <div class="muted workspace-summary">
-          {{ reportHistory.length }} stored reports · {{ cachedZipCount }} cached ZIP bundles
-        </div>
-        <div class="actions batch-actions">
-          <button
-            class="secondary"
-            @click="downloadSelectedZip"
-            :disabled="selectedCachedZip == null"
-          >
-            Download Selected ZIP
-          </button>
-          <button
-            class="secondary"
-            @click="exportSelectedReports"
-            :disabled="selectedReport == null"
-          >
-            Export Selected Reports
-          </button>
-        </div>
-        <div class="actions batch-actions">
-          <button class="secondary" @click="clearWorkspace">Clear Workspace</button>
-          <button
-            class="secondary"
-            :disabled="selectedReport == null"
-            @click="deleteSelectedReport"
-          >
-            Delete Selected Report
-          </button>
-          <button class="secondary" @click="clearCachedOutputsOnly">
-            Clear Cached Outputs
-          </button>
-          <button class="secondary" @click="clearSavedHandlesOnly">
-            Clear Saved Handles
-          </button>
-          <button class="secondary" @click="clearReportsOnly">Clear Reports</button>
-        </div>
-        <div class="reports">
-          <div class="queue-header">
-            <h2>Reports</h2>
-            <span>{{ reportHistory.length }}</span>
-          </div>
-          <button
-            v-for="report in reportHistory"
-            :key="report.id"
-            class="queue-item"
-            :class="{ active: report.id === selectedReportId }"
-            @click="selectReport(report.id)"
-          >
-            <span>{{ report.successCount }}/{{ report.itemCount }} completed</span>
-            <small>{{ report.strategy }} · {{ report.formatIds.join(', ').toUpperCase() }}</small>
-            <small>{{ formatTimestamp(report.createdAt) }}</small>
-            <small v-if="report.failureCount > 0" class="error-text">
-              {{ report.failureCount }} failed
-            </small>
-            <small v-if="report.cachedZipOutputId" class="muted">
-              Cached ZIP available
-            </small>
-          </button>
-          <div v-if="selectedReport" class="report-detail">
-            <div class="muted">
-              Preset {{ selectedReport.presetId }} · {{ selectedReport.strategy }} output
-            </div>
-            <div class="muted">
-              {{ selectedReport.successCount }} succeeded, {{ selectedReport.failureCount }}
-              failed
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <main class="content">
-      <div v-if="isDragActive" class="drop-overlay">
-        Drop DWG or DXF files here
-      </div>
-      <div v-if="activeFile == null" class="empty-state">
-        <h2>Open a DWG or DXF file</h2>
-        <p>
-          Use file selection, drag multiple files in, pick a directory, or run a
-          browser batch job that writes to a folder or downloads a ZIP bundle.
-        </p>
-      </div>
-      <div v-else class="viewer-area">
-        <div class="toolbar">
-          <div>
-            <strong>{{ activeFile.name }}</strong>
-            <div class="muted">{{ activeRelativePath }}</div>
-          </div>
-          <div class="toolbar-actions">
-            <button class="secondary" @click="exportActive('svg')">Export SVG</button>
-            <button class="primary" @click="exportActive('pdf')">Export PDF</button>
-          </div>
-        </div>
-
-        <CadViewerComponent
-          v-if="viewerRuntime != null"
-          :key="viewerKey"
-          locale="en"
-          :local-file="activeFile"
-          :mode="openMode"
-          :base-url="baseUrl"
-          @create="onViewerCreate"
-          @document-opened="onDocumentOpened"
-        />
-        <div v-else class="viewer-loading">Loading viewer…</div>
+        <p class="muted">Connecting to the CadFlux server…</p>
       </div>
     </main>
+
+    <main v-else-if="authState.user == null" class="center-panel">
+      <form class="card login-card" @submit.prevent="login">
+        <h1>CadFlux</h1>
+        <p class="muted">Sign in to the CadFlux server to manage conversion jobs and profiles.</p>
+
+        <label class="field">
+          <span>Username</span>
+          <input v-model="loginForm.username" autocomplete="username" />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input v-model="loginForm.password" type="password" autocomplete="current-password" />
+        </label>
+
+        <p v-if="authState.error" class="error-text">{{ authState.error }}</p>
+
+        <button class="primary" :disabled="authState.status === 'submitting'">
+          {{ authState.status === 'submitting' ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </form>
+    </main>
+
+    <div v-else class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>CadFlux</h1>
+          <p class="muted">Self-hosted DWG/DXF conversion platform</p>
+        </div>
+
+        <div class="session-panel">
+          <div>{{ authState.user.username }}</div>
+          <div class="muted">{{ authState.user.role }}</div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item" :class="{ active: activeScreen === 'jobs' }" @click="activeScreen = 'jobs'">
+            Jobs
+          </button>
+          <button
+            class="nav-item"
+            :class="{ active: activeScreen === 'profiles' }"
+            @click="activeScreen = 'profiles'"
+          >
+            Profiles
+          </button>
+          <button
+            v-if="authState.user.role === 'admin'"
+            class="nav-item"
+            :class="{ active: activeScreen === 'users' }"
+            @click="activeScreen = 'users'"
+          >
+            Users
+          </button>
+        </nav>
+
+        <div class="actions">
+          <button class="secondary" @click="refreshActiveScreen">Refresh</button>
+          <button class="secondary" @click="logout">Sign out</button>
+        </div>
+      </aside>
+
+      <section class="content">
+        <header class="topbar">
+          <div>
+            <h2>{{ screenTitle }}</h2>
+            <p class="muted">{{ screenSubtitle }}</p>
+          </div>
+          <p v-if="pageError" class="error-text">{{ pageError }}</p>
+        </header>
+
+        <section v-if="activeScreen === 'jobs'" class="panel-grid">
+          <form class="card" @submit.prevent="createJob">
+            <h3>New conversion job</h3>
+
+            <label class="field">
+              <span>Name</span>
+              <input v-model="newJobForm.name" placeholder="Project package" />
+            </label>
+
+            <label class="field">
+              <span>Profile</span>
+              <select v-model="newJobForm.profileId">
+                <option v-for="profile in profiles" :key="profile.id" :value="profile.id">
+                  {{ profile.name }}
+                </option>
+              </select>
+            </label>
+
+            <button class="primary" :disabled="jobsState.loading">Create draft job</button>
+
+            <div class="divider"></div>
+
+            <label class="field">
+              <span>Select files</span>
+              <input type="file" multiple accept=".dwg,.dxf" @change="onFileInputChange" />
+            </label>
+
+            <label class="field">
+              <span>Select directory</span>
+              <input type="file" multiple webkitdirectory directory @change="onDirectoryInputChange" />
+            </label>
+
+            <div v-if="pendingUploads.length > 0" class="detail-stack">
+              <small class="muted">{{ pendingUploads.length }} file(s) queued for upload</small>
+              <div class="list compact-list">
+                <div v-for="entry in pendingUploads.slice(0, 8)" :key="entry.relativePath" class="list-item static-item">
+                  <span>{{ entry.relativePath }}</span>
+                  <small>{{ formatBytes(entry.file.size) }}</small>
+                </div>
+              </div>
+              <button
+                class="primary"
+                type="button"
+                :disabled="selectedJob == null || uploadState.running"
+                @click="uploadPendingFiles"
+              >
+                {{
+                  uploadState.running
+                    ? `Uploading ${uploadState.completed}/${uploadState.total || pendingUploads.length}`
+                    : selectedJob == null
+                      ? 'Select a job first'
+                      : 'Upload to selected job'
+                }}
+              </button>
+            </div>
+          </form>
+
+          <div class="card large-card">
+            <div class="section-header">
+              <h3>Jobs</h3>
+              <span class="muted">{{ jobs.length }}</span>
+            </div>
+
+            <div v-if="jobsState.loading" class="muted">Loading jobs…</div>
+
+            <div v-else class="list">
+              <button
+                v-for="job in jobs"
+                :key="job.id"
+                class="list-item"
+                :class="{ active: selectedJobId === job.id }"
+                @click="selectJob(job.id)"
+              >
+                <span>{{ job.name }}</span>
+                <small>{{ job.status }}</small>
+                <small>{{ Math.round(job.progressPercent) }}%</small>
+                <small>{{ formatTimestamp(job.createdAt) }}</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="card large-card">
+            <h3>Job details</h3>
+
+            <div v-if="selectedJob == null" class="muted">Select a job to inspect or change its state.</div>
+
+            <div v-else class="detail-stack">
+              <div class="detail-grid">
+                <small>ID: {{ selectedJob.id }}</small>
+                <small>Status: {{ selectedJob.status }}</small>
+                <small>Files: {{ selectedJob.totalFiles }}</small>
+                <small>Completed: {{ selectedJob.completedFiles }}</small>
+                <small>Warnings: {{ selectedJob.warningFiles }}</small>
+                <small>Failures: {{ selectedJob.failedFiles }}</small>
+              </div>
+
+              <div class="detail-stack">
+                <div class="section-header">
+                  <h4>Uploaded files</h4>
+                  <span class="muted">{{ jobFiles.length }}</span>
+                </div>
+
+                <div v-if="jobFilesState.loading" class="muted">Loading files…</div>
+                <div v-else-if="jobFiles.length === 0" class="muted">No files uploaded yet.</div>
+                <div v-else class="list compact-list">
+                  <div v-for="file in jobFiles" :key="file.id" class="list-item static-item">
+                    <span>{{ file.relativePath }}</span>
+                    <small>{{ file.format }} • {{ file.status }} • {{ formatBytes(file.sizeBytes) }}</small>
+                    <button class="danger small-button" @click="deleteJobFile(selectedJob.id, file.id)">Remove</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-stack">
+                <div class="section-header">
+                  <h4>Artifacts</h4>
+                  <span class="muted">{{ outputArtifacts.length }}</span>
+                </div>
+
+                <div v-if="artifactsState.loading" class="muted">Loading artifacts…</div>
+                <div v-else-if="outputArtifacts.length === 0" class="muted">No output artifacts yet.</div>
+                <div v-else class="list compact-list">
+                  <a
+                    v-for="artifact in outputArtifacts"
+                    :key="artifact.id"
+                    class="list-item static-item artifact-link"
+                    :href="`/api/v1/artifacts/${artifact.id}/download`"
+                  >
+                    <span>{{ artifact.relativePath }}</span>
+                    <small>{{ artifact.format }} • {{ artifact.fidelity }} • {{ formatBytes(artifact.sizeBytes) }}</small>
+                  </a>
+                </div>
+              </div>
+
+              <div class="detail-stack">
+                <div class="section-header">
+                  <h4>Reports</h4>
+                  <div class="actions">
+                    <span class="muted">{{ reportArtifacts.length }}</span>
+                    <button class="secondary small-button" @click="generateReports(selectedJob.id)">Generate</button>
+                  </div>
+                </div>
+
+                <div v-if="artifactsState.loading" class="muted">Loading reports…</div>
+                <div v-else-if="reportArtifacts.length === 0" class="muted">No reports generated yet.</div>
+                <div v-else class="list compact-list">
+                  <a
+                    v-for="artifact in reportArtifacts"
+                    :key="artifact.id"
+                    class="list-item static-item artifact-link"
+                    :href="`/api/v1/artifacts/${artifact.id}/download`"
+                  >
+                    <span>{{ artifact.relativePath }}</span>
+                    <small>{{ artifact.type }} • {{ formatBytes(artifact.sizeBytes) }}</small>
+                  </a>
+                </div>
+              </div>
+
+              <textarea :value="prettyJson(selectedJob.profileJson)" readonly class="json-box" />
+
+              <div class="actions">
+                <button class="secondary" @click="updateJobStatus(selectedJob.id, 'start')">Queue</button>
+                <button class="secondary" @click="updateJobStatus(selectedJob.id, 'pause')">Pause</button>
+                <button class="secondary" @click="updateJobStatus(selectedJob.id, 'resume')">Resume</button>
+                <button class="secondary" @click="updateJobStatus(selectedJob.id, 'retry')">Retry</button>
+                <button class="secondary" @click="updateJobStatus(selectedJob.id, 'cancel')">Cancel</button>
+                <button class="danger" @click="deleteJob(selectedJob.id)">Delete</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section v-else-if="activeScreen === 'profiles'" class="panel-grid">
+          <form class="card" @submit.prevent="createProfile">
+            <h3>New profile</h3>
+
+            <label class="field">
+              <span>Name</span>
+              <input v-model="newProfileForm.name" />
+            </label>
+
+            <label class="field">
+              <span>Description</span>
+              <input v-model="newProfileForm.description" />
+            </label>
+
+            <label class="field">
+              <span>Profile JSON</span>
+              <textarea v-model="newProfileForm.profileJson" class="json-box" />
+            </label>
+
+            <button class="primary" :disabled="profilesState.loading">Save profile</button>
+          </form>
+
+          <div class="card large-card">
+            <div class="section-header">
+              <h3>Profiles</h3>
+              <span class="muted">{{ profiles.length }}</span>
+            </div>
+
+            <div v-if="profilesState.loading" class="muted">Loading profiles…</div>
+
+            <div v-else class="list">
+              <button
+                v-for="profile in profiles"
+                :key="profile.id"
+                class="list-item"
+                :class="{ active: selectedProfileId === profile.id }"
+                @click="selectedProfileId = profile.id"
+              >
+                <span>{{ profile.name }}</span>
+                <small>{{ profile.isSystem ? 'system' : 'user' }}</small>
+                <small>{{ formatTimestamp(profile.updatedAt) }}</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="card large-card">
+            <h3>Profile details</h3>
+
+            <div v-if="selectedProfile == null" class="muted">Select a profile to inspect its JSON.</div>
+
+            <div v-else class="detail-stack">
+              <div class="detail-grid">
+                <small>ID: {{ selectedProfile.id }}</small>
+                <small>{{ selectedProfile.description || 'No description' }}</small>
+              </div>
+
+              <textarea :value="prettyJson(selectedProfile.profileJson)" readonly class="json-box" />
+
+              <button v-if="!selectedProfile.isSystem" class="danger" @click="deleteProfile(selectedProfile.id)">
+                Delete profile
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section v-else class="panel-grid">
+          <form class="card" @submit.prevent="createUser">
+            <h3>Create user</h3>
+
+            <label class="field">
+              <span>Username</span>
+              <input v-model="newUserForm.username" />
+            </label>
+
+            <label class="field">
+              <span>Password</span>
+              <input v-model="newUserForm.password" type="password" />
+            </label>
+
+            <label class="field">
+              <span>Role</span>
+              <select v-model="newUserForm.role">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
+            </label>
+
+            <button class="primary" :disabled="usersState.loading">Create user</button>
+          </form>
+
+          <div class="card large-card">
+            <div class="section-header">
+              <h3>Users</h3>
+              <span class="muted">{{ users.length }}</span>
+            </div>
+
+            <div v-if="usersState.loading" class="muted">Loading users…</div>
+
+            <div v-else class="list">
+              <div v-for="user in users" :key="user.id" class="user-row">
+                <div>
+                  <div>{{ user.username }}</div>
+                  <small class="muted">{{ user.role }}</small>
+                </div>
+                <div class="actions">
+                  <button class="secondary" @click="toggleUserActive(user)">
+                    {{ user.isActive ? 'Disable' : 'Enable' }}
+                  </button>
+                  <button class="secondary" @click="toggleUserRole(user)">
+                    Make {{ user.role === 'admin' ? 'user' : 'admin' }}
+                  </button>
+                  <button class="danger" :disabled="user.id === authState.user.id" @click="deleteUser(user.id)">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -280,887 +378,695 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import { computed, defineAsyncComponent, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 
-import {
-  createZipBundle,
-  createBatchReportArtifacts,
-  downloadBlob,
-  formatBytes,
-  writeArtifactsToDirectory,
-  type WebBatchArtifact,
-  type WebBatchReport
-} from './batch'
-import {
-  clearCachedOutputs,
-  clearPersistedQueue,
-  clearSavedHandles,
-  clearStoredReports,
-  deleteCachedOutput,
-  deleteStoredReport,
-  estimateBrowserStorage,
-  getCachedOutput,
-  listStoredReports,
-  loadAppSettings,
-  loadOutputDirectoryHandle,
-  loadPersistedQueue,
-  pruneStoredReports,
-  saveAppSettings,
-  saveCachedOutput,
-  saveOutputDirectoryHandle,
-  savePersistedQueue,
-  saveStoredReport,
-  type PersistedQueueItem,
-  type WebAppSettings,
-  type WebBatchReportRecord
-} from './storage'
-import { CADFLUX_WEB_BASE_URL } from '@cadflux/config'
-import { type CadFluxFormat, type CadFluxProfile } from '@cadflux/core'
-import { createDrawingHandle } from '@cadflux/drawing-model'
-import { browserFilesToInputs } from '@cadflux/file-ingest'
-import { CADFLUX_PRESETS } from '@cadflux/presets'
-import {
-  loadCadFluxViewerComponent,
-  loadCadFluxViewerRuntime,
-  type CadFluxViewerRuntime
-} from '@cadflux/renderer-webgl'
+import type {
+  AuthResponse,
+  JobDto,
+  JobFileDto,
+  JobFileListResponse,
+  JobListResponse,
+  ProfileDto,
+  ProfileListResponse,
+  UserDto,
+  UserListResponse
+} from '@cadflux/contracts'
 
-interface WindowWithDirectoryPicker extends Window {
-  showDirectoryPicker?: (options?: {
-    mode?: 'read' | 'readwrite'
-  }) => Promise<FileSystemDirectoryHandle>
-}
+type Screen = 'jobs' | 'profiles' | 'users'
 
-interface QueueItem {
-  key: string
-  title: string
-  file: File | null
+interface JobArtifactDto {
+  id: string
+  jobId: string
+  jobFileId?: string
+  type: string
+  format: string
   relativePath: string
   sizeBytes: number
-  lastModifiedMs: number
-  sourceAvailable: boolean
-  status: 'idle' | 'running' | 'completed' | 'failed' | 'cancelled'
-  attempts: number
-  lastError?: string
-  artifacts: Array<{
-    format: CadFluxFormat
-    relativeOutputPath: string
-    sizeBytes: number
-  }>
+  checksum: string
+  mimeType: string
+  fidelity: string
+  createdAt: string
 }
 
-interface StoredDocumentOpenedEvent {
-  fileName: string
-  success: boolean
-}
-
-interface BatchState {
-  isRunning: boolean
-  isPaused: boolean
-  cancelRequested: boolean
-  completedCount: number
-  totalCount: number
-}
-
-const baseUrl = CADFLUX_WEB_BASE_URL
-const presets = CADFLUX_PRESETS
-const CadViewerComponent = defineAsyncComponent(
-  () => loadCadFluxViewerComponent() as Promise<any>
-)
-
-const DEFAULT_SETTINGS: WebAppSettings = {
-  selectedPresetId: presets[0]?.id ?? 'a4-fit-pdf',
-  batchFormats: ['pdf'],
-  workspacePersistenceEnabled: true,
-  persistOutputHandle: false,
-  preferredOutputStrategy: 'zip'
-}
-const MAX_STORED_REPORTS = 20
-
-const fileInput = ref<HTMLInputElement | null>(null)
-const directoryInput = ref<HTMLInputElement | null>(null)
-const queue = ref<QueueItem[]>([])
-const activeKey = ref<string | null>(null)
-const selectedPresetId = ref<string>(DEFAULT_SETTINGS.selectedPresetId)
-const viewerRuntime = shallowRef<CadFluxViewerRuntime | null>(null)
-const batchPdfEnabled = ref(true)
-const batchSvgEnabled = ref(false)
-const workspacePersistenceEnabled = ref(DEFAULT_SETTINGS.workspacePersistenceEnabled)
-const persistOutputHandle = ref(DEFAULT_SETTINGS.persistOutputHandle)
-const isDragActive = ref(false)
-const latestReport = ref<WebBatchReportRecord | null>(null)
-const reportHistory = ref<WebBatchReportRecord[]>([])
-const selectedReportId = ref<string | null>(null)
-const selectedCachedZip = ref<{ fileName: string; blob: Blob } | null>(null)
-const outputDirectoryHandle = shallowRef<FileSystemDirectoryHandle | null>(null)
-const storageUsage = ref({ usageBytes: 0, quotaBytes: 0 })
-const batchState = ref<BatchState>({
-  isRunning: false,
-  isPaused: false,
-  cancelRequested: false,
-  completedCount: 0,
-  totalCount: 0
+const authState = reactive({
+  status: 'loading' as 'loading' | 'idle' | 'submitting',
+  user: null as UserDto | null,
+  csrfToken: '',
+  error: ''
 })
 
-let pendingDocumentOpen:
-  | {
-      key: string
-      resolve: (value: boolean) => void
-    }
-  | null = null
+const activeScreen = ref<Screen>('jobs')
+const pageError = ref('')
 
-const activeItem = computed(() =>
-  queue.value.find(item => item.key === activeKey.value) ?? null
-)
-const activeFile = computed(() => activeItem.value?.file ?? null)
-const activeRelativePath = computed(
-  () => activeItem.value?.relativePath ?? 'No active file'
-)
-const viewerKey = computed(
-  () =>
-    activeItem.value == null
-      ? 'empty'
-      : `${activeItem.value.key}:${selectedPresetId.value}`
-)
-const openMode = computed(() => viewerRuntime.value?.readMode)
-const selectedProfile = computed<CadFluxProfile | null>(
-  () => presets.find(preset => preset.id === selectedPresetId.value) ?? null
-)
-const selectedBatchFormats = computed<CadFluxFormat[]>(() => {
-  const formats: CadFluxFormat[] = []
-  if (batchPdfEnabled.value) {
-    formats.push('pdf')
-  }
-  if (batchSvgEnabled.value) {
-    formats.push('svg')
-  }
-  return formats
+const jobsState = reactive({ loading: false })
+const jobFilesState = reactive({ loading: false })
+const artifactsState = reactive({ loading: false })
+const profilesState = reactive({ loading: false })
+const usersState = reactive({ loading: false })
+const uploadState = reactive({ running: false, completed: 0, total: 0 })
+
+const jobs = ref<JobDto[]>([])
+const jobFiles = ref<JobFileDto[]>([])
+const jobArtifacts = ref<JobArtifactDto[]>([])
+const profiles = ref<ProfileDto[]>([])
+const users = ref<UserDto[]>([])
+const pendingUploads = ref<Array<{ file: File; relativePath: string }>>([])
+
+const selectedJobId = ref<string | null>(null)
+const selectedProfileId = ref<string | null>(null)
+const jobEvents = ref<EventSource | null>(null)
+
+const loginForm = reactive({ username: '', password: '' })
+const newJobForm = reactive({ name: '', profileId: '' })
+const newProfileForm = reactive({
+  name: '',
+  description: '',
+  profileJson: JSON.stringify(
+    {
+      id: 'custom',
+      label: 'Custom',
+      paper: 'A4',
+      orientation: 'auto',
+      scale: 'fit',
+      color: 'color',
+      formats: ['pdf']
+    },
+    null,
+    2
+  )
 })
-const supportsDirectoryOutput = computed(
-  () => typeof window !== 'undefined' && 'showDirectoryPicker' in window
-)
-const outputDirectorySummary = computed(() =>
-  outputDirectoryHandle.value?.name ? outputDirectoryHandle.value.name : ''
-)
-const canRunBatch = computed(
-  () =>
-    !batchState.value.isRunning &&
-    queue.value.some(item => item.sourceAvailable) &&
-    selectedBatchFormats.value.length > 0 &&
-    viewerRuntime.value != null
-)
-const hasFailedItems = computed(() =>
-  queue.value.some(item => item.status === 'failed')
-)
-const hasUnavailableItems = computed(() =>
-  queue.value.some(item => !item.sourceAvailable)
-)
-const selectedReport = computed(
-  () =>
-    reportHistory.value.find(report => report.id === selectedReportId.value) ??
-    latestReport.value
-)
-const cachedZipCount = computed(
-  () => reportHistory.value.filter(report => report.cachedZipOutputId).length
-)
-const latestBatchSummary = computed(() => {
-  if (!latestReport.value) {
-    return 'No batch run yet.'
-  }
-  return `${latestReport.value.successCount}/${latestReport.value.itemCount} completed on ${new Date(
-    latestReport.value.createdAt
-  ).toLocaleString()}`
+const newUserForm = reactive({
+  username: '',
+  password: '',
+  role: 'user' as 'admin' | 'user'
 })
-const storageUsageSummary = computed(() =>
-  storageUsage.value.quotaBytes > 0
-    ? `${formatBytes(storageUsage.value.usageBytes)} / ${formatBytes(
-        storageUsage.value.quotaBytes
-      )}`
-    : formatBytes(storageUsage.value.usageBytes)
+
+const selectedJob = computed(() => jobs.value.find(job => job.id === selectedJobId.value) ?? null)
+const selectedProfile = computed(
+  () => profiles.value.find(profile => profile.id === selectedProfileId.value) ?? null
+)
+const outputArtifacts = computed(() =>
+  jobArtifacts.value.filter(artifact => artifact.type === 'pdf' || artifact.type === 'svg')
+)
+const reportArtifacts = computed(() =>
+  jobArtifacts.value.filter(artifact => ['json_report', 'csv_report', 'html_report', 'manifest', 'zip'].includes(artifact.type))
+)
+
+const screenTitle = computed(() => (activeScreen.value === 'jobs' ? 'Jobs' : activeScreen.value === 'profiles' ? 'Profiles' : 'Users'))
+const screenSubtitle = computed(() =>
+  activeScreen.value === 'jobs'
+    ? 'Create draft jobs and control conversion state.'
+    : activeScreen.value === 'profiles'
+      ? 'Inspect system presets and maintain personal plot profiles.'
+      : 'Admin-only user management.'
 )
 
 onMounted(async () => {
-  viewerRuntime.value = await loadCadFluxViewerRuntime()
-  const settings = (await loadAppSettings()) ?? DEFAULT_SETTINGS
-  selectedPresetId.value = settings.selectedPresetId
-  batchPdfEnabled.value = settings.batchFormats.includes('pdf')
-  batchSvgEnabled.value = settings.batchFormats.includes('svg')
-  workspacePersistenceEnabled.value = settings.workspacePersistenceEnabled
-  persistOutputHandle.value = settings.persistOutputHandle
-
-  const restoredQueue = await loadPersistedQueue()
-  if (restoredQueue.length > 0) {
-    queue.value = restoredQueue.map(fromPersistedQueueItem)
-    activeKey.value = queue.value[0]?.key ?? null
+  await fetchSession()
+  if (authState.user) {
+    await refreshAll()
+    connectJobEvents()
   }
-
-  await refreshStoredReports()
-
-  if (settings.persistOutputHandle) {
-    outputDirectoryHandle.value = await loadOutputDirectoryHandle()
-  }
-
-  await refreshStorageEstimate()
 })
 
-watch(
-  [
-    selectedPresetId,
-    batchPdfEnabled,
-    batchSvgEnabled,
-    workspacePersistenceEnabled,
-    persistOutputHandle
-  ],
-  async () => {
-    const settings: WebAppSettings = {
-      selectedPresetId: selectedPresetId.value,
-      batchFormats: selectedBatchFormats.value,
-      workspacePersistenceEnabled: workspacePersistenceEnabled.value,
-      persistOutputHandle: persistOutputHandle.value,
-      preferredOutputStrategy: outputDirectoryHandle.value ? 'filesystem' : 'zip'
-    }
-    await saveAppSettings(settings)
+onBeforeUnmount(() => {
+  disconnectJobEvents()
+})
 
-    if (!workspacePersistenceEnabled.value) {
-      await clearPersistedQueue()
-    } else {
-      await persistQueueMetadata()
-    }
-
-    if (persistOutputHandle.value) {
-      await saveOutputDirectoryHandle(outputDirectoryHandle.value)
-    } else {
-      await saveOutputDirectoryHandle(null)
-    }
-  },
-  { deep: true }
-)
-
-watch(
-  queue,
-  () => {
-    void persistQueueMetadata()
-  },
-  { deep: true }
-)
-
-function openFiles() {
-  fileInput.value?.click()
-}
-
-async function openDirectory() {
-  const pickerWindow = window as WindowWithDirectoryPicker
-  if (
-    supportsDirectoryOutput.value &&
-    typeof pickerWindow.showDirectoryPicker === 'function'
-  ) {
-    try {
-      const handle = await pickerWindow.showDirectoryPicker({ mode: 'read' })
-      const files = await collectFilesFromDirectoryHandle(handle)
-      addFiles(files)
-      return
-    } catch {
-      // User cancelled or browser rejected access. Fall back below.
-    }
-  }
-
-  directoryInput.value?.click()
-}
-
-async function selectOutputDirectory() {
-  const pickerWindow = window as WindowWithDirectoryPicker
-  if (typeof pickerWindow.showDirectoryPicker !== 'function') {
-    return
-  }
-
+async function fetchSession() {
   try {
-    const handle = await pickerWindow.showDirectoryPicker({
-      mode: 'readwrite'
-    })
-    outputDirectoryHandle.value = handle
-    if (persistOutputHandle.value) {
-      await saveOutputDirectoryHandle(handle)
+    const response = await fetch('/api/v1/auth/me', { credentials: 'include' })
+    if (!response.ok) {
+      authState.status = 'idle'
+      authState.user = null
+      authState.csrfToken = ''
+      return
     }
+    const payload = (await response.json()) as AuthResponse
+    authState.user = payload.user
+    authState.csrfToken = payload.csrfToken
+    authState.status = 'idle'
   } catch {
-    // ignore cancel
+    authState.status = 'idle'
+    authState.error = 'Could not reach the CadFlux server.'
   }
 }
 
-function onFileChange(event: Event) {
-  const files = (event.target as HTMLInputElement).files
-  if (!files) {
-    return
-  }
-  addFiles(Array.from(files))
-  ;(event.target as HTMLInputElement).value = ''
-}
-
-function onDirectoryChange(event: Event) {
-  const files = (event.target as HTMLInputElement).files
-  if (!files) {
-    return
-  }
-  addFiles(Array.from(files))
-  ;(event.target as HTMLInputElement).value = ''
-}
-
-function onDrop(event: DragEvent) {
-  isDragActive.value = false
-  const files = event.dataTransfer?.files
-  if (!files?.length) {
-    return
-  }
-  addFiles(Array.from(files))
-}
-
-function addFiles(files: File[]) {
-  const inputs = browserFilesToInputs(files)
-  const nextItems = inputs.map(input => ({
-    key: createDrawingHandle(input).id,
-    title: input.name,
-    file: input.browserFile as File,
-    relativePath: input.relativePath ?? input.name,
-    sizeBytes: input.sizeBytes ?? 0,
-    lastModifiedMs: input.lastModifiedMs ?? 0,
-    sourceAvailable: true,
-    status: 'idle' as const,
-    attempts: 0,
-    artifacts: []
-  }))
-  queue.value = dedupeQueue([...queue.value, ...nextItems])
-  if (!activeKey.value && queue.value[0]) {
-    activeKey.value = queue.value[0].key
-  }
-}
-
-function selectItem(key: string) {
-  activeKey.value = key
-}
-
-function onViewerCreate() {
-  viewerRuntime.value?.viewerCreated()
-}
-
-function onDocumentOpened(event: StoredDocumentOpenedEvent) {
-  if (pendingDocumentOpen && activeItem.value?.key === pendingDocumentOpen.key) {
-    pendingDocumentOpen.resolve(event.success)
-    pendingDocumentOpen = null
-  }
-}
-
-async function exportActive(format: CadFluxFormat) {
-  if (!viewerRuntime.value || !activeItem.value?.sourceAvailable) {
-    return
-  }
-  await viewerRuntime.value.execute(format === 'pdf' ? 'cpdf' : 'csvg')
-}
-
-async function runBatch() {
-  await runBatchForItems(queue.value.filter(item => item.sourceAvailable))
-}
-
-async function retryFailedItems() {
-  await runBatchForItems(
-    queue.value.filter(
-      item => item.sourceAvailable && item.status === 'failed'
-    )
-  )
-}
-
-async function runBatchForItems(items: QueueItem[]) {
-  if (!viewerRuntime.value || items.length === 0 || selectedProfile.value == null) {
-    return
-  }
-
-  batchState.value = {
-    isRunning: true,
-    isPaused: false,
-    cancelRequested: false,
-    completedCount: 0,
-    totalCount: items.length
-  }
-
-  const artifactsForZip: WebBatchArtifact[] = []
-  const batchItems = items.map(item => item.key)
-  const outputStrategy =
-    supportsDirectoryOutput.value && outputDirectoryHandle.value != null
-      ? 'filesystem'
-      : 'zip'
-
-  for (const item of queue.value) {
-    if (batchItems.includes(item.key)) {
-      item.status = 'idle'
-      item.lastError = undefined
-      item.artifacts = []
-    }
-  }
-
-  for (const item of items) {
-    if (batchState.value.cancelRequested) {
-      item.status = 'cancelled'
-      continue
-    }
-
-    while (batchState.value.isPaused && !batchState.value.cancelRequested) {
-      await delay(150)
-    }
-
-    item.status = 'running'
-    item.attempts += 1
-    item.lastError = undefined
-    item.artifacts = []
-
-    const ready = await ensureViewerLoadedForItem(item)
-    if (!ready || !viewerRuntime.value) {
-      item.status = 'failed'
-      item.lastError = 'Failed to open drawing in the browser viewer.'
-      batchState.value.completedCount += 1
-      continue
-    }
-
-    try {
-      for (const format of selectedBatchFormats.value) {
-        const exportResult = await viewerRuntime.value.exportCurrent(
-          format === 'pdf' ? 'cpdf' : 'csvg'
-        )
-        const relativeOutputPath = resolveOutputPath(item.relativePath, exportResult.downloadName)
-        item.artifacts.push({
-          format: exportResult.format,
-          relativeOutputPath,
-          sizeBytes: exportResult.blob.size
-        })
-
-        artifactsForZip.push({
-          format: exportResult.format,
-          downloadName: exportResult.downloadName,
-          relativeOutputPath,
-          blob: exportResult.blob
-        })
-      }
-
-      item.status = 'completed'
-    } catch (error) {
-      item.status = 'failed'
-      item.lastError = error instanceof Error ? error.message : String(error)
-    } finally {
-      batchState.value.completedCount += 1
-    }
-  }
-
-  const report = createReport(outputStrategy)
-  const reportArtifacts = createBatchReportArtifacts(report)
-  if (
-    outputStrategy === 'filesystem' &&
-    outputDirectoryHandle.value != null &&
-    artifactsForZip.length > 0
-  ) {
-    await writeArtifactsToDirectory(
-      outputDirectoryHandle.value,
-      artifactsForZip,
-      reportArtifacts
-    )
-  }
-
-  const cachedZipOutputId =
-    outputStrategy === 'zip'
-      ? await finalizeZipOutput(artifactsForZip, reportArtifacts, report.id)
-      : undefined
-
-  const record: WebBatchReportRecord = {
-    id: report.id,
-    createdAt: report.createdAt,
-    presetId: report.presetId,
-    strategy: report.strategy,
-    formatIds: report.formatIds,
-    itemCount: report.items.length,
-    successCount: report.items.filter(item => item.status === 'completed').length,
-    failureCount: report.items.filter(item => item.status === 'failed').length,
-    manifestJson: reportArtifacts.manifest,
-    reportJson: reportArtifacts.json,
-    reportCsv: reportArtifacts.csv,
-    reportHtml: reportArtifacts.html,
-    cachedZipOutputId
-  }
-  latestReport.value = record
-  if (workspacePersistenceEnabled.value) {
-    await saveStoredReport(record)
-    await pruneStoredReports(MAX_STORED_REPORTS)
-  }
-  await refreshStoredReports(record.id)
-
-  batchState.value = {
-    isRunning: false,
-    isPaused: false,
-    cancelRequested: false,
-    completedCount: batchState.value.completedCount,
-    totalCount: batchState.value.totalCount
-  }
-  await persistQueueMetadata()
-  await refreshStorageEstimate()
-}
-
-function togglePauseBatch() {
-  batchState.value.isPaused = !batchState.value.isPaused
-}
-
-function cancelBatch() {
-  batchState.value.cancelRequested = true
-}
-
-async function downloadLatestZip() {
-  if (selectedCachedZip.value) {
-    downloadBlob(selectedCachedZip.value.blob, selectedCachedZip.value.fileName)
-  }
-}
-
-function exportLatestReports() {
-  if (!selectedReport.value) {
-    return
-  }
-
-  downloadBlob(
-    new Blob([selectedReport.value.reportJson], {
-      type: 'application/json'
-    }),
-    `cadflux-report-${selectedReport.value.id}.json`
-  )
-  downloadBlob(
-    new Blob([selectedReport.value.reportCsv], {
-      type: 'text/csv;charset=utf-8'
-    }),
-    `cadflux-report-${selectedReport.value.id}.csv`
-  )
-  downloadBlob(
-    new Blob([selectedReport.value.reportHtml], {
-      type: 'text/html;charset=utf-8'
-    }),
-    `cadflux-report-${selectedReport.value.id}.html`
-  )
-  downloadBlob(
-    new Blob([selectedReport.value.manifestJson], {
-      type: 'application/json'
-    }),
-    `cadflux-manifest-${selectedReport.value.id}.json`
-  )
-}
-
-async function clearWorkspace() {
-  queue.value = []
-  activeKey.value = null
-  latestReport.value = null
-  reportHistory.value = []
-  selectedReportId.value = null
-  selectedCachedZip.value = null
-  outputDirectoryHandle.value = null
-  await clearPersistedQueue()
-  await clearStoredReports()
-  await clearCachedOutputs()
-  await clearSavedHandles()
-  await refreshStorageEstimate()
-}
-
-async function clearCachedOutputsOnly() {
-  selectedCachedZip.value = null
-  await clearCachedOutputs()
-  await refreshStoredReports(selectedReportId.value)
-  await refreshStorageEstimate()
-}
-
-async function clearSavedHandlesOnly() {
-  outputDirectoryHandle.value = null
-  await clearSavedHandles()
-  await refreshStorageEstimate()
-}
-
-async function clearReportsOnly() {
-  latestReport.value = null
-  reportHistory.value = []
-  selectedReportId.value = null
-  selectedCachedZip.value = null
-  await clearStoredReports()
-  await refreshStorageEstimate()
-}
-
-async function deleteSelectedReport() {
-  if (!selectedReport.value) {
-    return
-  }
-
-  if (selectedReport.value.cachedZipOutputId) {
-    await deleteCachedOutput(selectedReport.value.cachedZipOutputId)
-  }
-  await deleteStoredReport(selectedReport.value.id)
-  await refreshStoredReports()
-  await refreshStorageEstimate()
-}
-
-function clearQueue() {
-  queue.value = []
-  activeKey.value = null
-}
-
-function removeUnavailableItems() {
-  queue.value = queue.value.filter(item => item.sourceAvailable)
-  if (!activeKey.value || !queue.value.some(item => item.key === activeKey.value)) {
-    activeKey.value = queue.value[0]?.key ?? null
-  }
-}
-
-async function ensureViewerLoadedForItem(item: QueueItem): Promise<boolean> {
-  if (activeKey.value !== item.key) {
-    activeKey.value = item.key
-  }
-  if (!item.file) {
-    return false
-  }
-
-  return new Promise<boolean>(resolve => {
-    pendingDocumentOpen = {
-      key: item.key,
-      resolve
-    }
-    if (activeItem.value?.key === item.key && activeFile.value === item.file) {
-      window.setTimeout(() => {
-        if (pendingDocumentOpen?.key === item.key) {
-          pendingDocumentOpen.resolve(true)
-          pendingDocumentOpen = null
-        }
-      }, 150)
-    }
-  })
-}
-
-function createReport(strategy: 'filesystem' | 'zip'): WebBatchReport {
-  return {
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-    presetId: selectedPresetId.value,
-    strategy,
-    formatIds: selectedBatchFormats.value,
-    items: queue.value
-      .filter(item => item.attempts > 0)
-      .map(item => ({
-        title: item.title,
-        relativePath: item.relativePath,
-        status:
-          item.status === 'running' || item.status === 'idle'
-            ? 'cancelled'
-            : item.status,
-        attempts: item.attempts,
-        error: item.lastError,
-        artifacts: item.artifacts.map(artifact => ({ ...artifact }))
-      }))
-  }
-}
-
-async function finalizeZipOutput(
-  artifacts: WebBatchArtifact[],
-  reportArtifacts: {
-    manifest: string
-    json: string
-    csv: string
-    html: string
-  },
-  reportId: string
-): Promise<string | undefined> {
-  const zip = await createZipBundle('cadflux-output.zip', artifacts, reportArtifacts)
-  selectedCachedZip.value = zip
-
-  if (workspacePersistenceEnabled.value) {
-    const outputId = `zip:${reportId}`
-    await saveCachedOutput({
-      id: outputId,
-      fileName: zip.fileName,
-      createdAt: new Date().toISOString(),
-      blob: zip.blob
+async function login() {
+  authState.error = ''
+  authState.status = 'submitting'
+  try {
+    const response = await fetch('/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(loginForm)
     })
-    return outputId
+    if (!response.ok) {
+      authState.error = 'Invalid credentials.'
+      authState.status = 'idle'
+      return
+    }
+    const payload = (await response.json()) as AuthResponse
+    authState.user = payload.user
+    authState.csrfToken = payload.csrfToken
+    authState.status = 'idle'
+    loginForm.password = ''
+    await refreshAll()
+    connectJobEvents()
+  } catch {
+    authState.error = 'Login failed.'
+    authState.status = 'idle'
   }
-
-  downloadBlob(zip.blob, zip.fileName)
-  return undefined
 }
 
-async function persistQueueMetadata() {
-  if (!workspacePersistenceEnabled.value) {
+async function logout() {
+  await apiFetch('/api/v1/auth/logout', { method: 'POST' })
+  disconnectJobEvents()
+  authState.user = null
+  authState.csrfToken = ''
+  jobs.value = []
+  jobFiles.value = []
+  jobArtifacts.value = []
+  profiles.value = []
+  users.value = []
+}
+
+async function refreshActiveScreen() {
+  pageError.value = ''
+  if (activeScreen.value === 'jobs') {
+    await loadJobs()
+  } else if (activeScreen.value === 'profiles') {
+    await loadProfiles()
+  } else {
+    await loadUsers()
+  }
+}
+
+async function refreshAll() {
+  await Promise.all([loadJobs(), loadProfiles(), authState.user?.role === 'admin' ? loadUsers() : Promise.resolve()])
+}
+
+async function loadJobs() {
+  jobsState.loading = true
+  try {
+    const payload = (await apiFetch('/api/v1/jobs')) as JobListResponse
+    jobs.value = payload.jobs
+    if (!selectedJobId.value) {
+      selectedJobId.value = jobs.value[0]?.id ?? null
+    }
+    if (selectedJobId.value && !jobs.value.some(job => job.id === selectedJobId.value)) {
+      selectedJobId.value = jobs.value[0]?.id ?? null
+    }
+    await Promise.all([loadJobFilesForSelectedJob(), loadArtifactsForSelectedJob()])
+    connectJobEvents()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    jobsState.loading = false
+  }
+}
+
+async function loadProfiles() {
+  profilesState.loading = true
+  try {
+    const payload = (await apiFetch('/api/v1/profiles')) as ProfileListResponse
+    profiles.value = payload.profiles
+    if (!newJobForm.profileId) {
+      newJobForm.profileId = profiles.value[0]?.id ?? ''
+    }
+    if (!selectedProfileId.value) {
+      selectedProfileId.value = profiles.value[0]?.id ?? null
+    }
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    profilesState.loading = false
+  }
+}
+
+async function loadUsers() {
+  if (authState.user?.role !== 'admin') {
     return
   }
-  await savePersistedQueue(queue.value.map(toPersistedQueueItem))
+  usersState.loading = true
+  try {
+    const payload = (await apiFetch('/api/v1/admin/users')) as UserListResponse
+    users.value = payload.users
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    usersState.loading = false
+  }
 }
 
-async function refreshStorageEstimate() {
-  storageUsage.value = await estimateBrowserStorage()
-}
-
-async function refreshStoredReports(preferredReportId?: string | null) {
-  reportHistory.value = await listStoredReports()
-  latestReport.value = reportHistory.value[0] ?? null
-
-  const nextReportId =
-    preferredReportId && reportHistory.value.some(report => report.id === preferredReportId)
-      ? preferredReportId
-      : latestReport.value?.id ?? null
-  selectedReportId.value = nextReportId
-  await loadSelectedCachedZip()
-}
-
-function selectReport(reportId: string) {
-  selectedReportId.value = reportId
-  void loadSelectedCachedZip()
-}
-
-async function loadSelectedCachedZip() {
-  selectedCachedZip.value = null
-  if (!selectedReport.value?.cachedZipOutputId) {
+async function createJob() {
+  const profile = profiles.value.find(item => item.id === newJobForm.profileId)
+  if (!profile) {
+    pageError.value = 'Select a profile first.'
     return
   }
+  try {
+    await apiFetch('/api/v1/jobs', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: newJobForm.name.trim() || 'Untitled job',
+        profileJson: profile.profileJson
+      })
+    })
+    newJobForm.name = ''
+    await loadJobs()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
 
-  const cached = await getCachedOutput(selectedReport.value.cachedZipOutputId)
-  if (!cached) {
+async function updateJobStatus(jobId: string, action: 'start' | 'pause' | 'resume' | 'cancel' | 'retry') {
+  try {
+    await apiFetch(`/api/v1/jobs/${jobId}/${action}`, { method: 'POST' })
+    await loadJobs()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function deleteJob(jobId: string) {
+  try {
+    await apiFetch(`/api/v1/jobs/${jobId}`, { method: 'DELETE' })
+    if (selectedJobId.value === jobId) {
+      disconnectJobEvents()
+      selectedJobId.value = null
+      jobFiles.value = []
+      jobArtifacts.value = []
+    }
+    await loadJobs()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function generateReports(jobId: string) {
+  try {
+    await apiFetch(`/api/v1/jobs/${jobId}/reports`, { method: 'POST' })
+    await loadArtifacts(jobId)
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function createProfile() {
+  try {
+    await apiFetch('/api/v1/profiles', { method: 'POST', body: JSON.stringify(newProfileForm) })
+    newProfileForm.name = ''
+    newProfileForm.description = ''
+    await loadProfiles()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function deleteProfile(profileId: string) {
+  try {
+    await apiFetch(`/api/v1/profiles/${profileId}`, { method: 'DELETE' })
+    if (selectedProfileId.value === profileId) {
+      selectedProfileId.value = null
+    }
+    await loadProfiles()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function createUser() {
+  try {
+    await apiFetch('/api/v1/admin/users', { method: 'POST', body: JSON.stringify(newUserForm) })
+    newUserForm.username = ''
+    newUserForm.password = ''
+    newUserForm.role = 'user'
+    await loadUsers()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function toggleUserActive(user: UserDto) {
+  try {
+    await apiFetch(`/api/v1/admin/users/${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive: !user.isActive })
+    })
+    await loadUsers()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function toggleUserRole(user: UserDto) {
+  try {
+    await apiFetch(`/api/v1/admin/users/${user.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role: user.role === 'admin' ? 'user' : 'admin' })
+    })
+    await loadUsers()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+async function deleteUser(userId: string) {
+  try {
+    await apiFetch(`/api/v1/admin/users/${userId}`, { method: 'DELETE' })
+    await loadUsers()
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+function selectJob(jobId: string) {
+  selectedJobId.value = jobId
+  void Promise.all([loadJobFiles(jobId), loadArtifacts(jobId)])
+  connectJobEvents()
+}
+
+async function loadJobFilesForSelectedJob() {
+  if (!selectedJobId.value) {
+    jobFiles.value = []
     return
   }
+  await loadJobFiles(selectedJobId.value)
+}
 
-  selectedCachedZip.value = {
-    fileName: cached.fileName,
-    blob: cached.blob
+async function loadJobFiles(jobId: string) {
+  jobFilesState.loading = true
+  try {
+    const payload = (await apiFetch(`/api/v1/jobs/${jobId}/files`)) as JobFileListResponse
+    if (selectedJobId.value === jobId) {
+      jobFiles.value = payload.files
+    }
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    jobFilesState.loading = false
   }
 }
 
-function downloadSelectedZip() {
-  downloadLatestZip()
+async function loadArtifactsForSelectedJob() {
+  if (!selectedJobId.value) {
+    jobArtifacts.value = []
+    return
+  }
+  await loadArtifacts(selectedJobId.value)
 }
 
-function exportSelectedReports() {
-  exportLatestReports()
+async function loadArtifacts(jobId: string) {
+  artifactsState.loading = true
+  try {
+    const payload = (await apiFetch(`/api/v1/jobs/${jobId}/artifacts`)) as { artifacts: JobArtifactDto[] }
+    if (selectedJobId.value === jobId) {
+      jobArtifacts.value = payload.artifacts
+    }
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    artifactsState.loading = false
+  }
 }
 
-function formatTimestamp(value: string): string {
+function onFileInputChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  appendPendingFiles(Array.from(input.files ?? []))
+  input.value = ''
+}
+
+function onDirectoryInputChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  appendPendingFiles(Array.from(input.files ?? []))
+  input.value = ''
+}
+
+function appendPendingFiles(files: File[]) {
+  const nextEntries = files
+    .filter(file => /\.(dwg|dxf)$/i.test(file.name))
+    .map(file => ({ file, relativePath: getRelativePath(file) }))
+  const byPath = new Map(pendingUploads.value.map(entry => [entry.relativePath, entry]))
+  for (const entry of nextEntries) {
+    byPath.set(entry.relativePath, entry)
+  }
+  pendingUploads.value = Array.from(byPath.values()).sort((a, b) => a.relativePath.localeCompare(b.relativePath))
+}
+
+async function uploadPendingFiles() {
+  if (!selectedJobId.value) {
+    pageError.value = 'Select a job before uploading files.'
+    return
+  }
+  if (pendingUploads.value.length === 0) {
+    return
+  }
+  uploadState.running = true
+  uploadState.completed = 0
+  uploadState.total = pendingUploads.value.length
+  pageError.value = ''
+  try {
+    for (const entry of pendingUploads.value) {
+      const formData = new FormData()
+      formData.append('relativePath', entry.relativePath)
+      formData.append('file', entry.file, entry.file.name)
+      await apiUpload(`/api/v1/jobs/${selectedJobId.value}/files`, formData)
+      uploadState.completed += 1
+    }
+    pendingUploads.value = []
+    await loadJobs()
+    await Promise.all([loadJobFilesForSelectedJob(), loadArtifactsForSelectedJob()])
+  } catch (error) {
+    pageError.value = toMessage(error)
+  } finally {
+    uploadState.running = false
+  }
+}
+
+async function deleteJobFile(jobId: string, fileId: string) {
+  try {
+    await apiFetch(`/api/v1/jobs/${jobId}/files/${fileId}`, { method: 'DELETE' })
+    await Promise.all([loadJobs(), loadJobFiles(jobId), loadArtifacts(jobId)])
+  } catch (error) {
+    pageError.value = toMessage(error)
+  }
+}
+
+function connectJobEvents() {
+  disconnectJobEvents()
+  if (!selectedJobId.value || authState.user == null) {
+    return
+  }
+  const source = new EventSource(`/api/v1/jobs/${selectedJobId.value}/events`, { withCredentials: true })
+  const refresh = () => {
+    if (!selectedJobId.value) {
+      return
+    }
+    void Promise.all([loadJobs(), loadJobFilesForSelectedJob(), loadArtifactsForSelectedJob()])
+  }
+  for (const eventName of [
+    'job.queued',
+    'job.started',
+    'job.progress',
+    'job.paused',
+    'job.resumed',
+    'job.cancel.requested',
+    'job.cancelled',
+    'job.completed',
+    'job.failed',
+    'file.started',
+    'file.progress',
+    'file.warning',
+    'file.completed',
+    'file.failed',
+    'artifact.created'
+  ]) {
+    source.addEventListener(eventName, refresh)
+  }
+  source.onerror = () => {
+    // EventSource will reconnect automatically.
+  }
+  jobEvents.value = source
+}
+
+function disconnectJobEvents() {
+  if (jobEvents.value) {
+    jobEvents.value.close()
+    jobEvents.value = null
+  }
+}
+
+async function apiFetch(input: string, init: RequestInit = {}) {
+  const response = await fetch(input, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': authState.csrfToken,
+      ...(init.headers ?? {})
+    },
+    credentials: 'include'
+  })
+  if (!response.ok) {
+    const payload = (await safeJson(response)) as { error?: { message?: string } } | undefined
+    throw new Error(payload?.error?.message ?? `Request failed with ${response.status}`)
+  }
+  return safeJson(response)
+}
+
+async function apiUpload(input: string, body: FormData) {
+  const response = await fetch(input, {
+    method: 'POST',
+    body,
+    headers: {
+      'X-CSRF-Token': authState.csrfToken
+    },
+    credentials: 'include'
+  })
+  if (!response.ok) {
+    const payload = (await safeJson(response)) as { error?: { message?: string } } | undefined
+    throw new Error(payload?.error?.message ?? `Upload failed with ${response.status}`)
+  }
+  return safeJson(response)
+}
+
+async function safeJson(response: Response) {
+  const text = await response.text()
+  return text.length > 0 ? JSON.parse(text) : {}
+}
+
+function prettyJson(raw: string) {
+  try {
+    return JSON.stringify(JSON.parse(raw), null, 2)
+  } catch {
+    return raw
+  }
+}
+
+function formatTimestamp(value: string) {
   return new Date(value).toLocaleString()
 }
 
-function toPersistedQueueItem(item: QueueItem): PersistedQueueItem {
-  return {
-    key: item.key,
-    title: item.title,
-    relativePath: item.relativePath,
-    sizeBytes: item.sizeBytes,
-    lastModifiedMs: item.lastModifiedMs,
-    sourceAvailable: item.sourceAvailable,
-    status: item.status,
-    attempts: item.attempts,
-    lastError: item.lastError,
-    artifacts: item.artifacts.map(artifact => ({ ...artifact }))
+function formatBytes(value: number) {
+  if (value < 1024) {
+    return `${value} B`
   }
-}
-
-function fromPersistedQueueItem(item: PersistedQueueItem): QueueItem {
-  return {
-    key: item.key,
-    title: item.title,
-    file: null,
-    relativePath: item.relativePath,
-    sizeBytes: item.sizeBytes,
-    lastModifiedMs: item.lastModifiedMs,
-    sourceAvailable: false,
-    status: item.status,
-    attempts: item.attempts,
-    lastError: item.lastError,
-    artifacts: item.artifacts.map(artifact => ({ ...artifact }))
+  if (value < 1024 * 1024) {
+    return `${(value / 1024).toFixed(1)} KB`
   }
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function dedupeQueue(items: QueueItem[]): QueueItem[] {
-  const deduped = new Map<string, QueueItem>()
-  for (const item of items) {
-    deduped.set(item.key, item)
-  }
-  return Array.from(deduped.values())
+function getRelativePath(file: File) {
+  const candidate = 'webkitRelativePath' in file ? String(file.webkitRelativePath || '') : ''
+  return candidate.trim().length > 0 ? candidate : file.name
 }
 
-function resolveOutputPath(relativeInputPath: string, downloadName: string) {
-  const normalized = relativeInputPath.replaceAll('\\', '/')
-  const segments = normalized.split('/')
-  segments.pop()
-  return [...segments, downloadName].filter(Boolean).join('/')
-}
-
-async function collectFilesFromDirectoryHandle(
-  handle: FileSystemDirectoryHandle,
-  prefix = ''
-): Promise<File[]> {
-  const files: File[] = []
-
-  for await (const [, entry] of (handle as unknown as {
-    entries: () => AsyncIterable<[string, FileSystemHandle]>
-  }).entries()) {
-    if (entry.kind === 'file') {
-      const file = await (entry as FileSystemFileHandle).getFile()
-      const relativePath = prefix ? `${prefix}/${file.name}` : file.name
-      Object.defineProperty(file, 'webkitRelativePath', {
-        configurable: true,
-        enumerable: true,
-        value: relativePath
-      })
-      files.push(file)
-      continue
-    }
-
-    files.push(
-      ...(await collectFilesFromDirectoryHandle(
-        entry as FileSystemDirectoryHandle,
-        prefix ? `${prefix}/${entry.name}` : entry.name
-      ))
-    )
-  }
-
-  return files
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise(resolve => window.setTimeout(resolve, ms))
+function toMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error)
 }
 </script>
 
 <style scoped>
 .shell {
-  display: grid;
-  grid-template-columns: 360px 1fr;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f3efe7 0%, #e1dbcf 100%);
+  background: linear-gradient(180deg, #f4f0e8 0%, #e5ddd2 100%);
   color: #1f2a26;
+}
+
+.center-panel {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
 }
 
 .sidebar {
   padding: 24px;
-  border-right: 1px solid rgba(31, 42, 38, 0.12);
-  background: rgba(255, 251, 243, 0.92);
-  backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(31, 42, 38, 0.1);
+  background: rgba(255, 251, 243, 0.94);
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+.content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar h2,
 .brand h1,
-.queue-header h2,
-.empty-state h2 {
+.card h3,
+.login-card h1 {
   margin: 0;
   font-family: Georgia, 'Times New Roman', serif;
 }
 
-.actions,
-.toolbar-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+.panel-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr 1fr;
+  gap: 16px;
 }
 
-.primary,
-.secondary,
-select {
+.card {
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(31, 42, 38, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.large-card {
+  min-height: 320px;
+}
+
+.divider {
+  height: 1px;
+  background: rgba(31, 42, 38, 0.08);
+}
+
+.login-card {
+  width: min(420px, 100%);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  border-radius: 14px;
+  border: 1px solid rgba(31, 42, 38, 0.14);
+  padding: 10px 12px;
+  background: #fff;
+}
+
+button {
   border-radius: 999px;
   border: 1px solid rgba(31, 42, 38, 0.12);
   padding: 10px 16px;
-  font: inherit;
 }
 
 .primary {
@@ -1173,135 +1079,104 @@ select {
   color: #1f2a26;
 }
 
-.hidden {
-  display: none;
+.danger {
+  background: #8b2f2f;
+  color: #fff;
 }
 
-.field {
+.nav {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.checkbox-row {
+.nav-item {
+  text-align: left;
+  background: #fff;
+}
+
+.nav-item.active {
+  background: #1f6a53;
+  color: #fff;
+}
+
+.actions {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.92rem;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.notice,
-.batch-panel,
-.storage-panel {
-  padding: 14px;
-  border-radius: 18px;
-  background: #f8f4ed;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.workspace-summary,
-.report-detail {
-  margin-top: 8px;
-}
-
-.reports {
+.list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 12px;
 }
 
-.notice-title {
-  margin: 0 0 6px;
-  font-weight: 600;
+.list-item,
+.user-row {
+  border: 1px solid rgba(31, 42, 38, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  background: #fff;
 }
 
-.queue {
+.list-item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 0;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+}
+
+.list-item.active {
+  border-color: #1f6a53;
+  box-shadow: 0 0 0 2px rgba(31, 106, 83, 0.12);
+}
+
+.static-item {
+  width: 100%;
+}
+
+.compact-list {
+  max-height: 240px;
   overflow: auto;
 }
 
-.queue-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.small-button {
+  padding: 6px 10px;
+  border-radius: 10px;
 }
 
-.queue-item {
-  text-align: left;
-  border: 1px solid rgba(31, 42, 38, 0.12);
-  border-radius: 16px;
-  padding: 12px;
-  background: #fff;
+.user-row,
+.section-header,
+.detail-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.detail-grid {
+  flex-wrap: wrap;
+}
+
+.detail-stack {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
 }
 
-.queue-item.active {
-  border-color: #1f6a53;
-  box-shadow: 0 0 0 2px rgba(31, 106, 83, 0.15);
+.json-box {
+  min-height: 220px;
+  font-family: Consolas, 'Courier New', monospace;
+  resize: vertical;
 }
 
-.batch-actions {
-  margin-top: 8px;
+.artifact-link {
+  color: inherit;
+  text-decoration: none;
 }
 
-.content {
-  min-width: 0;
-  position: relative;
-}
-
-.drop-overlay {
-  position: absolute;
-  inset: 16px;
-  border: 2px dashed #1f6a53;
-  border-radius: 24px;
-  background: rgba(31, 106, 83, 0.08);
-  display: grid;
-  place-items: center;
-  z-index: 10;
-  font-size: 1.2rem;
-}
-
-.empty-state,
-.viewer-area {
-  height: 100vh;
-}
-
-.empty-state {
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 24px;
-}
-
-.viewer-area {
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
-.viewer-loading {
-  display: grid;
-  place-items: center;
-  color: rgba(31, 42, 38, 0.72);
-}
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.6);
-  border-bottom: 1px solid rgba(31, 42, 38, 0.08);
-}
-
-.muted,
-.queue-item small {
+.muted {
   color: rgba(31, 42, 38, 0.68);
 }
 
@@ -1309,14 +1184,15 @@ select {
   color: #8b2f2f;
 }
 
-@media (max-width: 1080px) {
-  .shell {
+@media (max-width: 1200px) {
+  .panel-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .sidebar {
-    border-right: 0;
-    border-bottom: 1px solid rgba(31, 42, 38, 0.12);
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 1fr;
   }
 }
 </style>

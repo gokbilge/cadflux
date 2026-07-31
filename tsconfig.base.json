@@ -23,7 +23,11 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
+      "@cadflux/auth": ["packages/auth/src/index.ts"],
       "@cadflux/core": ["packages/core/src/index.ts"],
+      "@cadflux/contracts": ["packages/contracts/src/index.ts"],
+      "@cadflux/database": ["packages/database/src/index.ts"],
+      "@cadflux/storage": ["packages/storage/src/index.ts"],
       "@cadflux/batch-engine": ["packages/batch-engine/src/index.ts"],
       "@cadflux/diagnostics": ["packages/diagnostics/src/index.ts"],
       "@cadflux/config": ["packages/config/src/index.ts"],

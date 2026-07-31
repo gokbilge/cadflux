@@ -17,11 +17,13 @@
   "scripts": {
     "analyze": "nx run-many -t analyze",
     "build": "nx run-many -t build",
-    "build:cadflux": "pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/web build",
+    "build:cadflux": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/server build && pnpm --filter @cadflux/web build",
+    "build:server": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/server build",
     "clean": "nx run-many -t clean",
     "copy:workers": "pnpm -r --filter \"./packages/**\" run copy:workers",
     "dev": "nx run @mlightcad/cad-viewer-example:dev",
     "dev:cadflux:web": "pnpm --filter @cadflux/web dev",
+    "dev:cadflux:server": "pnpm --filter @cadflux/server dev",
     "dev:simple": "nx run @mlightcad/cad-simple-viewer-example:dev",
     "docs:build": "typedoc --skipErrorChecking",
     "docs:site:prepare": "node tools/prepare-docs-site.mjs",
@@ -41,8 +43,10 @@
     "sync:versions": "node tools/sync-versions.mjs",
     "sync:versions:check": "node tools/sync-versions.mjs --check",
     "serve": "nx run @mlightcad/cad-viewer-examples:serve",
-    "test": "jest",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:integration": "node tools/test-cadflux-server.mjs",
     "test:e2e": "pnpm --filter @mlightcad/cad-viewer-example test:e2e",
+    "doctor:server": "node apps/server/dist/apps/server/src/index.js doctor",
     "use:dwg-converter": "node tools/use-dwg-converter.mjs"
   },
   "engines": {
@@ -54,6 +58,7 @@
     "@eslint/js": "^9.9.1",
     "@intlify/eslint-plugin-vue-i18n": "^3.0.0",
     "@nx/js": "20.0.4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.0.0",
@@ -88,5 +93,16 @@
     "*.md": [
       "prettier --config ./.prettierrc.js --write"
     ]
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/multipart": "^10.1.0",
+    "@fastify/rate-limit": "^11.2.0",
+    "@fastify/static": "^10.1.2",
+    "@fastify/swagger": "^9.8.1",
+    "@sinclair/typebox": "^0.34.52",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.2",
+    "fastify": "^5.11.0"
   }
 }
