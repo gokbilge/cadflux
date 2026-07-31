@@ -132,6 +132,18 @@
           <h2>Queue</h2>
           <span>{{ queue.length }}</span>
         </div>
+        <div class="actions batch-actions">
+          <button
+            class="secondary"
+            :disabled="!hasUnavailableItems"
+            @click="removeUnavailableItems"
+          >
+            Remove Missing Sources
+          </button>
+          <button class="secondary" :disabled="queue.length === 0" @click="clearQueue">
+            Clear Queue
+          </button>
+        </div>
         <button
           v-for="item in queue"
           :key="item.key"
@@ -154,16 +166,34 @@
           <h2>Workspace</h2>
           <span>{{ storageUsageSummary }}</span>
         </div>
+        <div class="muted workspace-summary">
+          {{ reportHistory.length }} stored reports · {{ cachedZipCount }} cached ZIP bundles
+        </div>
         <div class="actions batch-actions">
-          <button class="secondary" @click="downloadLatestZip" :disabled="latestCachedZip == null">
-            Download Latest ZIP
+          <button
+            class="secondary"
+            @click="downloadSelectedZip"
+            :disabled="selectedCachedZip == null"
+          >
+            Download Selected ZIP
           </button>
-          <button class="secondary" @click="exportLatestReports" :disabled="latestReport == null">
-            Export Reports
+          <button
+            class="secondary"
+            @click="exportSelectedReports"
+            :disabled="selectedReport == null"
+          >
+            Export Selected Reports
           </button>
         </div>
         <div class="actions batch-actions">
           <button class="secondary" @click="clearWorkspace">Clear Workspace</button>
+          <button
+            class="secondary"
+            :disabled="selectedReport == null"
+            @click="deleteSelectedReport"
+          >
+            Delete Selected Report
+          </button>
           <button class="secondary" @click="clearCachedOutputsOnly">
             Clear Cached Outputs
           </button>
@@ -171,6 +201,38 @@
             Clear Saved Handles
           </button>
           <button class="secondary" @click="clearReportsOnly">Clear Reports</button>
+        </div>
+        <div class="reports">
+          <div class="queue-header">
+            <h2>Reports</h2>
+            <span>{{ reportHistory.length }}</span>
+          </div>
+          <button
+            v-for="report in reportHistory"
+            :key="report.id"
+            class="queue-item"
+            :class="{ active: report.id === selectedReportId }"
+            @click="selectReport(report.id)"
+          >
+            <span>{{ report.successCount }}/{{ report.itemCount }} completed</span>
+            <small>{{ report.strategy }} · {{ report.formatIds.join(', ').toUpperCase() }}</small>
+            <small>{{ formatTimestamp(report.createdAt) }}</small>
+            <small v-if="report.failureCount > 0" class="error-text">
+              {{ report.failureCount }} failed
+            </small>
+            <small v-if="report.cachedZipOutputId" class="muted">
+              Cached ZIP available
+            </small>
+          </button>
+          <div v-if="selectedReport" class="report-detail">
+            <div class="muted">
+              Preset {{ selectedReport.presetId }} · {{ selectedReport.strategy }} output
+            </div>
+            <div class="muted">
+              {{ selectedReport.successCount }} succeeded, {{ selectedReport.failureCount }}
+              failed
+            </div>
+          </div>
         </div>
       </div>
     </aside>
@@ -234,12 +296,15 @@ import {
   clearPersistedQueue,
   clearSavedHandles,
   clearStoredReports,
+  deleteCachedOutput,
+  deleteStoredReport,
   estimateBrowserStorage,
   getCachedOutput,
   listStoredReports,
   loadAppSettings,
   loadOutputDirectoryHandle,
   loadPersistedQueue,
+  pruneStoredReports,
   saveAppSettings,
   saveCachedOutput,
   saveOutputDirectoryHandle,
@@ -310,6 +375,7 @@ const DEFAULT_SETTINGS: WebAppSettings = {
   persistOutputHandle: false,
   preferredOutputStrategy: 'zip'
 }
+const MAX_STORED_REPORTS = 20
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const directoryInput = ref<HTMLInputElement | null>(null)
@@ -323,7 +389,9 @@ const workspacePersistenceEnabled = ref(DEFAULT_SETTINGS.workspacePersistenceEna
 const persistOutputHandle = ref(DEFAULT_SETTINGS.persistOutputHandle)
 const isDragActive = ref(false)
 const latestReport = ref<WebBatchReportRecord | null>(null)
-const latestCachedZip = ref<{ fileName: string; blob: Blob } | null>(null)
+const reportHistory = ref<WebBatchReportRecord[]>([])
+const selectedReportId = ref<string | null>(null)
+const selectedCachedZip = ref<{ fileName: string; blob: Blob } | null>(null)
 const outputDirectoryHandle = shallowRef<FileSystemDirectoryHandle | null>(null)
 const storageUsage = ref({ usageBytes: 0, quotaBytes: 0 })
 const batchState = ref<BatchState>({
@@ -384,6 +452,17 @@ const canRunBatch = computed(
 const hasFailedItems = computed(() =>
   queue.value.some(item => item.status === 'failed')
 )
+const hasUnavailableItems = computed(() =>
+  queue.value.some(item => !item.sourceAvailable)
+)
+const selectedReport = computed(
+  () =>
+    reportHistory.value.find(report => report.id === selectedReportId.value) ??
+    latestReport.value
+)
+const cachedZipCount = computed(
+  () => reportHistory.value.filter(report => report.cachedZipOutputId).length
+)
 const latestBatchSummary = computed(() => {
   if (!latestReport.value) {
     return 'No batch run yet.'
@@ -415,17 +494,7 @@ onMounted(async () => {
     activeKey.value = queue.value[0]?.key ?? null
   }
 
-  const reports = await listStoredReports()
-  latestReport.value = reports[0] ?? null
-  if (latestReport.value?.cachedZipOutputId) {
-    const cached = await getCachedOutput(latestReport.value.cachedZipOutputId)
-    if (cached) {
-      latestCachedZip.value = {
-        fileName: cached.fileName,
-        blob: cached.blob
-      }
-    }
-  }
+  await refreshStoredReports()
 
   if (settings.persistOutputHandle) {
     outputDirectoryHandle.value = await loadOutputDirectoryHandle()
@@ -713,10 +782,11 @@ async function runBatchForItems(items: QueueItem[]) {
     cachedZipOutputId
   }
   latestReport.value = record
-
   if (workspacePersistenceEnabled.value) {
     await saveStoredReport(record)
+    await pruneStoredReports(MAX_STORED_REPORTS)
   }
+  await refreshStoredReports(record.id)
 
   batchState.value = {
     isRunning: false,
@@ -738,39 +808,39 @@ function cancelBatch() {
 }
 
 async function downloadLatestZip() {
-  if (latestCachedZip.value) {
-    downloadBlob(latestCachedZip.value.blob, latestCachedZip.value.fileName)
+  if (selectedCachedZip.value) {
+    downloadBlob(selectedCachedZip.value.blob, selectedCachedZip.value.fileName)
   }
 }
 
 function exportLatestReports() {
-  if (!latestReport.value) {
+  if (!selectedReport.value) {
     return
   }
 
   downloadBlob(
-    new Blob([latestReport.value.reportJson], {
+    new Blob([selectedReport.value.reportJson], {
       type: 'application/json'
     }),
-    `cadflux-report-${latestReport.value.id}.json`
+    `cadflux-report-${selectedReport.value.id}.json`
   )
   downloadBlob(
-    new Blob([latestReport.value.reportCsv], {
+    new Blob([selectedReport.value.reportCsv], {
       type: 'text/csv;charset=utf-8'
     }),
-    `cadflux-report-${latestReport.value.id}.csv`
+    `cadflux-report-${selectedReport.value.id}.csv`
   )
   downloadBlob(
-    new Blob([latestReport.value.reportHtml], {
+    new Blob([selectedReport.value.reportHtml], {
       type: 'text/html;charset=utf-8'
     }),
-    `cadflux-report-${latestReport.value.id}.html`
+    `cadflux-report-${selectedReport.value.id}.html`
   )
   downloadBlob(
-    new Blob([latestReport.value.manifestJson], {
+    new Blob([selectedReport.value.manifestJson], {
       type: 'application/json'
     }),
-    `cadflux-manifest-${latestReport.value.id}.json`
+    `cadflux-manifest-${selectedReport.value.id}.json`
   )
 }
 
@@ -778,7 +848,9 @@ async function clearWorkspace() {
   queue.value = []
   activeKey.value = null
   latestReport.value = null
-  latestCachedZip.value = null
+  reportHistory.value = []
+  selectedReportId.value = null
+  selectedCachedZip.value = null
   outputDirectoryHandle.value = null
   await clearPersistedQueue()
   await clearStoredReports()
@@ -788,8 +860,9 @@ async function clearWorkspace() {
 }
 
 async function clearCachedOutputsOnly() {
-  latestCachedZip.value = null
+  selectedCachedZip.value = null
   await clearCachedOutputs()
+  await refreshStoredReports(selectedReportId.value)
   await refreshStorageEstimate()
 }
 
@@ -801,8 +874,36 @@ async function clearSavedHandlesOnly() {
 
 async function clearReportsOnly() {
   latestReport.value = null
+  reportHistory.value = []
+  selectedReportId.value = null
+  selectedCachedZip.value = null
   await clearStoredReports()
   await refreshStorageEstimate()
+}
+
+async function deleteSelectedReport() {
+  if (!selectedReport.value) {
+    return
+  }
+
+  if (selectedReport.value.cachedZipOutputId) {
+    await deleteCachedOutput(selectedReport.value.cachedZipOutputId)
+  }
+  await deleteStoredReport(selectedReport.value.id)
+  await refreshStoredReports()
+  await refreshStorageEstimate()
+}
+
+function clearQueue() {
+  queue.value = []
+  activeKey.value = null
+}
+
+function removeUnavailableItems() {
+  queue.value = queue.value.filter(item => item.sourceAvailable)
+  if (!activeKey.value || !queue.value.some(item => item.key === activeKey.value)) {
+    activeKey.value = queue.value[0]?.key ?? null
+  }
 }
 
 async function ensureViewerLoadedForItem(item: QueueItem): Promise<boolean> {
@@ -863,7 +964,7 @@ async function finalizeZipOutput(
   reportId: string
 ): Promise<string | undefined> {
   const zip = await createZipBundle('cadflux-output.zip', artifacts, reportArtifacts)
-  latestCachedZip.value = zip
+  selectedCachedZip.value = zip
 
   if (workspacePersistenceEnabled.value) {
     const outputId = `zip:${reportId}`
@@ -889,6 +990,52 @@ async function persistQueueMetadata() {
 
 async function refreshStorageEstimate() {
   storageUsage.value = await estimateBrowserStorage()
+}
+
+async function refreshStoredReports(preferredReportId?: string | null) {
+  reportHistory.value = await listStoredReports()
+  latestReport.value = reportHistory.value[0] ?? null
+
+  const nextReportId =
+    preferredReportId && reportHistory.value.some(report => report.id === preferredReportId)
+      ? preferredReportId
+      : latestReport.value?.id ?? null
+  selectedReportId.value = nextReportId
+  await loadSelectedCachedZip()
+}
+
+function selectReport(reportId: string) {
+  selectedReportId.value = reportId
+  void loadSelectedCachedZip()
+}
+
+async function loadSelectedCachedZip() {
+  selectedCachedZip.value = null
+  if (!selectedReport.value?.cachedZipOutputId) {
+    return
+  }
+
+  const cached = await getCachedOutput(selectedReport.value.cachedZipOutputId)
+  if (!cached) {
+    return
+  }
+
+  selectedCachedZip.value = {
+    fileName: cached.fileName,
+    blob: cached.blob
+  }
+}
+
+function downloadSelectedZip() {
+  downloadLatestZip()
+}
+
+function exportSelectedReports() {
+  exportLatestReports()
+}
+
+function formatTimestamp(value: string): string {
+  return new Date(value).toLocaleString()
 }
 
 function toPersistedQueueItem(item: QueueItem): PersistedQueueItem {
@@ -1051,6 +1198,18 @@ select {
   background: #f8f4ed;
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.workspace-summary,
+.report-detail {
+  margin-top: 8px;
+}
+
+.reports {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 .notice-title {

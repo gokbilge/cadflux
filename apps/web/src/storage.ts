@@ -136,6 +136,11 @@ export async function saveStoredReport(record: WebBatchReportRecord): Promise<vo
   await db.put('reports', record)
 }
 
+export async function deleteStoredReport(id: string): Promise<void> {
+  const db = await openCadFluxDb()
+  await db.delete('reports', id)
+}
+
 export async function clearStoredReports(): Promise<void> {
   const db = await openCadFluxDb()
   await db.clear('reports')
@@ -153,9 +158,34 @@ export async function getCachedOutput(
   return ((await db.get('outputs', id)) as WebCachedOutputRecord | undefined) ?? null
 }
 
+export async function deleteCachedOutput(id: string): Promise<void> {
+  const db = await openCadFluxDb()
+  await db.delete('outputs', id)
+}
+
 export async function clearCachedOutputs(): Promise<void> {
   const db = await openCadFluxDb()
   await db.clear('outputs')
+}
+
+export async function pruneStoredReports(maxCount: number): Promise<void> {
+  const reports = await listStoredReports()
+  if (reports.length <= maxCount) {
+    return
+  }
+
+  const staleReports = reports.slice(maxCount)
+  const db = await openCadFluxDb()
+  const transaction = db.transaction(['reports', 'outputs'], 'readwrite')
+
+  for (const report of staleReports) {
+    await transaction.objectStore('reports').delete(report.id)
+    if (report.cachedZipOutputId) {
+      await transaction.objectStore('outputs').delete(report.cachedZipOutputId)
+    }
+  }
+
+  await transaction.done
 }
 
 export async function saveOutputDirectoryHandle(

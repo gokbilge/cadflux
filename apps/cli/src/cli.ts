@@ -4,9 +4,12 @@
 
 import {
   access,
+  copyFile,
   mkdir,
   readFile,
   rename,
+  rm,
+  stat,
   writeFile
 } from 'node:fs/promises'
 import path from 'node:path'
@@ -42,6 +45,7 @@ const EXIT_SUCCESS = 0
 const EXIT_CANCELLED = 130
 const EXIT_FAILURE = 1
 const EXIT_PARTIAL_FAILURE = 7
+const WATCH_TEST_MODE_ENV = 'CADFLUX_CLI_WATCH_TEST_MODE'
 
 type LogFormat = 'text' | 'json'
 
@@ -87,6 +91,7 @@ interface WatchLedgerEntry {
   status: 'completed' | 'failed'
   attempts: number
   lastProcessedAt: string
+  nextEligibleAt?: string
   error?: string
 }
 
@@ -95,6 +100,14 @@ interface WatchPendingEntry {
   stableSinceMs: number
   attempts: number
   nextEligibleAtMs: number
+}
+
+interface WatchPaths {
+  inputDirectory: string
+  outputDirectory: string
+  stateDirectory: string
+  archiveDirectory?: string
+  quarantineDirectory?: string
 }
 
 const program = new Command()
@@ -164,6 +177,74 @@ class NodeCadFluxConverter implements CadFluxConverter {
         durationMs: Date.now() - startedAt,
         error: error instanceof Error ? error.message : String(error)
       }
+    }
+  }
+}
+
+class TestWatchCadFluxConverter implements CadFluxConverter {
+  private readonly attempts = new Map<string, number>()
+
+  async inspect(input: CadFluxInputSource): Promise<CadFluxInspection> {
+    return {
+      input,
+      detectedFormat: input.extension === '.dwg' ? 'dwg' : input.extension === '.dxf' ? 'dxf' : 'unknown',
+      warnings: ['Test watch runtime']
+    }
+  }
+
+  async convert(
+    request: CadFluxConversionRequest
+  ): Promise<CadFluxConversionResult> {
+    const startedAt = Date.now()
+    const inputPath = request.input.absolutePath
+    if (!inputPath) {
+      throw new Error('CLI conversion requires an absolute input path.')
+    }
+
+    const basename = path.basename(inputPath).toLowerCase()
+    const attempt = (this.attempts.get(inputPath) ?? 0) + 1
+    this.attempts.set(inputPath, attempt)
+
+    if (basename.includes('fail-always')) {
+      return {
+        input: request.input,
+        status: 'failed',
+        artifacts: [],
+        warnings: ['Test watch runtime forced permanent failure'],
+        durationMs: Date.now() - startedAt,
+        error: 'forced permanent failure'
+      }
+    }
+
+    if (basename.includes('fail-once') && attempt === 1) {
+      return {
+        input: request.input,
+        status: 'failed',
+        artifacts: [],
+        warnings: ['Test watch runtime forced transient failure'],
+        durationMs: Date.now() - startedAt,
+        error: 'forced transient failure'
+      }
+    }
+
+    const artifacts = []
+    for (const format of request.profile.formats) {
+      const outputPath = resolveArtifactOutputPath(request, format)
+      await mkdir(path.dirname(outputPath), { recursive: true })
+      await writeFile(
+        outputPath,
+        `test artifact for ${path.basename(inputPath)} (${format})`,
+        'utf8'
+      )
+      artifacts.push({ format, outputPath })
+    }
+
+    return {
+      input: request.input,
+      status: 'completed',
+      artifacts,
+      warnings: ['Test watch runtime'],
+      durationMs: Date.now() - startedAt
     }
   }
 }
@@ -364,19 +445,43 @@ program
   .option('--quarantine-failures <directory>', 'Move permanently failing source files after retries')
   .action(async (inputDirectory: string, options: WatchCommandOptions) => {
     const logger = createLogger(options.logFormat)
-    const runtime = createCadFluxRuntime(new NodeCadFluxConverter())
+    const runtime = createCadFluxRuntime(
+      process.env[WATCH_TEST_MODE_ENV] === '1'
+        ? new TestWatchCadFluxConverter()
+        : new NodeCadFluxConverter()
+    )
     const profile = buildProfile({ preset: options.preset })
     const absoluteInput = path.resolve(inputDirectory)
     const absoluteOutput = path.resolve(options.output)
     const stateDirectory = path.join(absoluteOutput, '.cadflux')
+    const archiveDirectory = options.archiveSuccess
+      ? path.resolve(options.archiveSuccess)
+      : undefined
+    const quarantineDirectory = options.quarantineFailures
+      ? path.resolve(options.quarantineFailures)
+      : undefined
     const ledgerPath = path.join(stateDirectory, 'watch-ledger.json')
     const ledger = await readWatchLedger(ledgerPath)
     const pending = new Map<string, WatchPendingEntry>()
     const sessionResults: CadFluxConversionResult[] = []
     let cancelled = false
 
+    const watchPaths = validateWatchPaths({
+      inputDirectory: absoluteInput,
+      outputDirectory: absoluteOutput,
+      stateDirectory,
+      archiveDirectory,
+      quarantineDirectory
+    })
+
     await mkdir(absoluteOutput, { recursive: true })
     await mkdir(stateDirectory, { recursive: true })
+    if (archiveDirectory) {
+      await mkdir(archiveDirectory, { recursive: true })
+    }
+    if (quarantineDirectory) {
+      await mkdir(quarantineDirectory, { recursive: true })
+    }
 
     const removeSignalHandlers = installCancellationHandlers(() => {
       cancelled = true
@@ -385,7 +490,9 @@ program
 
     logger.info('watch.started', {
       inputDirectory: absoluteInput,
-      outputDirectory: absoluteOutput
+      outputDirectory: absoluteOutput,
+      archiveDirectory,
+      quarantineDirectory
     })
 
     while (!cancelled) {
@@ -399,31 +506,54 @@ program
 
       for (const input of inputs) {
         const absolutePath = input.absolutePath
-        if (!absolutePath || isNestedPath(absolutePath, absoluteOutput)) {
+        if (
+          !absolutePath ||
+          isWatchManagedPath(absolutePath, watchPaths)
+        ) {
           continue
         }
         livePaths.add(absolutePath)
         const stamp = createInputStamp(input)
         const current = pending.get(absolutePath)
+        const ledgerEntry = ledger[absolutePath]
 
         if (!current || current.stamp !== stamp) {
           pending.set(absolutePath, {
             stamp,
             stableSinceMs: now,
-            attempts: 0,
-            nextEligibleAtMs: now + options.debounceMs
+            attempts:
+              ledgerEntry?.stamp === stamp && ledgerEntry.status === 'failed'
+                ? ledgerEntry.attempts
+                : 0,
+            nextEligibleAtMs:
+              ledgerEntry?.stamp === stamp && ledgerEntry.nextEligibleAt
+                ? Math.max(
+                    now + options.debounceMs,
+                    new Date(ledgerEntry.nextEligibleAt).getTime()
+                  )
+                : now + options.debounceMs
           })
           continue
         }
 
-        const ledgerEntry = ledger[absolutePath]
         if (
           ledgerEntry?.stamp === stamp &&
           ledgerEntry.status === 'completed'
         ) {
           continue
         }
+        if (ledgerEntry?.stamp !== stamp) {
+          delete ledger[absolutePath]
+        }
+        if (current.stableSinceMs + options.debounceMs > now) {
+          continue
+        }
         if (current.nextEligibleAtMs > now) {
+          continue
+        }
+        if (!(await isStableOnDisk(absolutePath, stamp))) {
+          current.stableSinceMs = now
+          current.nextEligibleAtMs = now + options.debounceMs
           continue
         }
 
@@ -458,11 +588,11 @@ program
             artifacts: result.artifacts.map(artifact => artifact.outputPath)
           })
           pending.delete(absolutePath)
-          if (options.archiveSuccess) {
+          if (archiveDirectory) {
             await moveProcessedFile(
               absolutePath,
               absoluteInput,
-              path.resolve(options.archiveSuccess)
+              archiveDirectory
             )
           }
         } else {
@@ -473,6 +603,7 @@ program
             status: 'failed',
             attempts: current.attempts,
             lastProcessedAt: new Date().toISOString(),
+            nextEligibleAt: new Date(current.nextEligibleAtMs).toISOString(),
             error: result.error
           }
           logger.error('watch.failed', {
@@ -481,13 +612,13 @@ program
             error: result.error
           })
           if (
-            options.quarantineFailures &&
+            quarantineDirectory &&
             current.attempts >= options.maxRetries
           ) {
             await moveProcessedFile(
               absolutePath,
               absoluteInput,
-              path.resolve(options.quarantineFailures)
+              quarantineDirectory
             )
             pending.delete(absolutePath)
           }
@@ -635,7 +766,10 @@ async function pathExists(targetPath: string): Promise<boolean> {
 }
 
 function createInputStamp(input: CadFluxInputSource): string {
-  return [input.sizeBytes ?? 0, input.lastModifiedMs ?? 0].join(':')
+  return createStampFromStats(
+    input.sizeBytes ?? 0,
+    input.lastModifiedMs ?? 0
+  )
 }
 
 function isNestedPath(targetPath: string, parentPath: string): boolean {
@@ -663,6 +797,57 @@ async function writeWatchLedger(
   await writeFile(ledgerPath, JSON.stringify(ledger, null, 2), 'utf8')
 }
 
+function validateWatchPaths(paths: WatchPaths): WatchPaths {
+  if (isNestedPath(paths.outputDirectory, paths.inputDirectory)) {
+    throw new Error('Watch output directory cannot be inside the watched input directory.')
+  }
+  if (paths.archiveDirectory && isNestedPath(paths.archiveDirectory, paths.inputDirectory)) {
+    throw new Error('Archive directory cannot be inside the watched input directory.')
+  }
+  if (
+    paths.quarantineDirectory &&
+    isNestedPath(paths.quarantineDirectory, paths.inputDirectory)
+  ) {
+    throw new Error('Quarantine directory cannot be inside the watched input directory.')
+  }
+  if (
+    paths.archiveDirectory &&
+    paths.quarantineDirectory &&
+    (isNestedPath(paths.archiveDirectory, paths.quarantineDirectory) ||
+      isNestedPath(paths.quarantineDirectory, paths.archiveDirectory))
+  ) {
+    throw new Error('Archive and quarantine directories must not contain each other.')
+  }
+  return paths
+}
+
+function isWatchManagedPath(targetPath: string, watchPaths: WatchPaths): boolean {
+  return [
+    watchPaths.outputDirectory,
+    watchPaths.stateDirectory,
+    watchPaths.archiveDirectory,
+    watchPaths.quarantineDirectory
+  ]
+    .filter((value): value is string => Boolean(value))
+    .some(candidate => isNestedPath(targetPath, candidate))
+}
+
+async function isStableOnDisk(
+  absolutePath: string,
+  expectedStamp: string
+): Promise<boolean> {
+  try {
+    const details = await stat(absolutePath)
+    return createStampFromStats(details.size, details.mtimeMs) === expectedStamp
+  } catch {
+    return false
+  }
+}
+
+function createStampFromStats(sizeBytes: number, modifiedMs: number): string {
+  return [sizeBytes, Math.trunc(modifiedMs)].join(':')
+}
+
 async function moveProcessedFile(
   sourcePath: string,
   inputRoot: string,
@@ -671,7 +856,13 @@ async function moveProcessedFile(
   const relativePath = path.relative(inputRoot, sourcePath)
   const targetPath = path.join(destinationRoot, relativePath)
   await mkdir(path.dirname(targetPath), { recursive: true })
-  await rename(sourcePath, targetPath)
+  await rm(targetPath, { force: true })
+  try {
+    await rename(sourcePath, targetPath)
+  } catch {
+    await copyFile(sourcePath, targetPath)
+    await rm(sourcePath, { force: true })
+  }
 }
 
 function delay(ms: number): Promise<void> {

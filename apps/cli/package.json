@@ -13,7 +13,8 @@
   },
   "scripts": {
     "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
-    "clean": "rimraf dist tsconfig.tsbuildinfo"
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "test:watch": "pnpm run build && node --test dist/apps/cli/src/cli.watch.test.js"
   },
   "dependencies": {
     "@cadflux/batch-engine": "workspace:*",
