@@ -25,7 +25,7 @@ jest.mock('../src/app/AcApProgress', () => ({
   })
 }))
 
-jest.mock('../src/editor', () => ({
+jest.mock('../src/editor/global/eventBus', () => ({
   eventBus: {
     emit: mockEventBusEmit
   }

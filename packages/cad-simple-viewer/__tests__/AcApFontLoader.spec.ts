@@ -21,13 +21,13 @@ jest.mock('@mlightcad/three-renderer', () => ({
   AcTrFontLoader: MockAcTrFontLoader
 }))
 
-jest.mock('../src/editor', () => ({
+jest.mock('../src/editor/global/eventBus', () => ({
   eventBus: {
     emit: jest.fn()
   }
 }))
 
-import { eventBus } from '../src/editor'
+import { eventBus } from '../src/editor/global/eventBus'
 import { AcApFontLoader } from '../src/app/AcApFontLoader'
 
 describe('AcApFontLoader', () => {
