@@ -65,6 +65,7 @@ export async function storeUploadStream(options: {
   stream: NodeJS.ReadableStream
 }): Promise<StoredUploadResult> {
   const safeRelativePath = sanitizeRelativePath(options.relativePath)
+  const format = detectCadFormat(options.originalName)
   const storagePaths = buildJobStoragePaths(options.dataDir, options.jobId)
   await mkdir(storagePaths.inputRoot, { recursive: true })
 
@@ -84,9 +85,13 @@ export async function storeUploadStream(options: {
 
   try {
     await pipeline(options.stream, writable)
+    if (sizeBytes <= 0) {
+      throw new Error('Uploaded CAD file is empty.')
+    }
     await rename(temporaryPath, storedPath)
   } catch (error) {
     await rm(temporaryPath, { force: true }).catch(() => undefined)
+    await rm(storedPath, { force: true }).catch(() => undefined)
     throw error
   }
 
@@ -95,6 +100,6 @@ export async function storeUploadStream(options: {
     storedPath,
     sizeBytes,
     checksum: hash.digest('hex'),
-    format: detectCadFormat(options.originalName)
+    format
   }
 }

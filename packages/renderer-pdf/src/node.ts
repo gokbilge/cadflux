@@ -2,115 +2,153 @@
 // Copyright (C) 2026 CadFlux contributors
 
 import { existsSync } from 'node:fs'
-import { readFile, writeFile } from 'node:fs/promises'
-import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import {
+  startLocalConversionBridge,
+  type LocalConversionBridge
+} from '@cadflux/core/browserBridge'
 import { chromium } from 'playwright'
+
+export interface PdfRenderRequest {
+  inputPath: string
+  outputPath: string
+}
+
+export interface PdfRenderResult {
+  outputPath: string
+  rendererBackend: 'playwright-browser-bridge'
+}
+
+export interface PdfRendererBackend {
+  readonly id: string
+  readonly requiresBrowser: boolean
+
+  render(
+    request: PdfRenderRequest,
+    signal?: AbortSignal
+  ): Promise<PdfRenderResult>
+}
 
 function runnerDistDir(): string {
   const packageRoot = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
+    '..',
+    '..',
     '..'
   )
   return path.join(packageRoot, 'dist-runner')
 }
 
-async function startStaticServer(root: string): Promise<{
-  url: string
-  close: () => Promise<void>
-}> {
-  return new Promise((resolve, reject) => {
-    const server = createServer(async (req, res) => {
-      try {
-        const urlPath = decodeURIComponent((req.url ?? '/').split('?')[0])
-        const relative =
-          urlPath === '/' ? 'index.html' : urlPath.replace(/^\//, '')
-        const filePath = path.join(root, relative)
+class PlaywrightBrowserBridgePdfRendererBackend
+  implements PdfRendererBackend
+{
+  readonly id = 'playwright-browser-bridge' as const
+  readonly requiresBrowser = true
 
-        if (!filePath.startsWith(root) || !existsSync(filePath)) {
-          res.writeHead(404)
-          res.end()
-          return
-        }
+  async render(
+    request: PdfRenderRequest,
+    signal?: AbortSignal
+  ): Promise<PdfRenderResult> {
+    const absoluteInput = path.resolve(request.inputPath)
+    const absoluteOutput = path.resolve(request.outputPath)
+    const runnerDir = runnerDistDir()
 
-        const ext = path.extname(filePath).toLowerCase()
-        const contentType: Record<string, string> = {
-          '.html': 'text/html; charset=utf-8',
-          '.js': 'text/javascript; charset=utf-8',
-          '.css': 'text/css; charset=utf-8',
-          '.json': 'application/json',
-          '.wasm': 'application/wasm'
-        }
-        res.setHeader(
-          'Content-Type',
-          contentType[ext] ?? 'application/octet-stream'
+    if (!existsSync(path.join(runnerDir, 'index.html'))) {
+      throw new Error(
+        'PDF runner is not built. Run "pnpm --filter @cadflux/renderer-pdf build:runner" or "pnpm build:conversion-runners".'
+      )
+    }
+
+    const bridge = await startLocalConversionBridge({
+      rootDirectory: runnerDir,
+      sourceFilePath: absoluteInput,
+      resultFilePath: absoluteOutput,
+      resultMimeType: 'application/pdf'
+    })
+
+    return withPlaywrightBridge(
+      bridge,
+      signal,
+      async browser => {
+        const page = await browser.newPage()
+        await page.goto(bridge.runnerUrl, { waitUntil: 'networkidle' })
+        await page.evaluate(
+          async ({ fileName, resultUrl, sourceUrl }) => {
+            await (
+              globalThis as unknown as {
+                exportCadToPdf: (request: {
+                  fileName: string
+                  resultUrl: string
+                  sourceUrl: string
+                }) => Promise<unknown>
+              }
+            ).exportCadToPdf({
+              fileName,
+              resultUrl,
+              sourceUrl
+            })
+          },
+          {
+            fileName: path.basename(absoluteInput),
+            resultUrl: bridge.resultUrl,
+            sourceUrl: bridge.sourceUrl
+          }
         )
-        res.writeHead(200)
-        res.end(await readFile(filePath))
-      } catch (error) {
-        reject(error)
-      }
-    })
+        await bridge.waitForResult()
 
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address()
-      if (!address || typeof address === 'string') {
-        reject(new Error('Failed to start PDF export server.'))
-        return
+        return {
+          outputPath: absoluteOutput,
+          rendererBackend: this.id
+        }
       }
-      resolve({
-        url: `http://127.0.0.1:${address.port}`,
-        close: () =>
-          new Promise((closeResolve, closeReject) => {
-            server.close(err => (err ? closeReject(err) : closeResolve()))
-          })
-      })
-    })
-  })
+    )
+  }
 }
+
+const defaultPdfRendererBackend = new PlaywrightBrowserBridgePdfRendererBackend()
 
 export async function exportPdfFile(
   inputPath: string,
-  outputPath: string
+  outputPath: string,
+  signal?: AbortSignal
 ): Promise<string> {
-  const absoluteInput = path.resolve(inputPath)
-  const absoluteOutput = path.resolve(outputPath)
-  const runnerDir = runnerDistDir()
+  const result = await defaultPdfRendererBackend.render(
+    {
+      inputPath,
+      outputPath
+    },
+    signal
+  )
+  return result.outputPath
+}
 
-  if (!existsSync(path.join(runnerDir, 'index.html'))) {
-    throw new Error(
-      'PDF runner is not built. Run "pnpm --filter @cadflux/renderer-pdf build:runner" or "pnpm build:conversion-runners".'
-    )
+async function withPlaywrightBridge<T>(
+  bridge: LocalConversionBridge,
+  signal: AbortSignal | undefined,
+  run: (browser: Awaited<ReturnType<typeof chromium.launch>>) => Promise<T>
+): Promise<T> {
+  const browser = await chromium.launch({ headless: true })
+  const abortHandler = () => {
+    void browser.close().catch(() => undefined)
   }
 
-  const fileName = path.basename(absoluteInput)
-  const fileBytes = await readFile(absoluteInput)
-  const server = await startStaticServer(runnerDir)
-  const browser = await chromium.launch({ headless: true })
+  if (signal) {
+    if (signal.aborted) {
+      abortHandler()
+      throw new Error('PDF rendering aborted.')
+    }
+    signal.addEventListener('abort', abortHandler, { once: true })
+  }
 
   try {
-    const page = await browser.newPage()
-    await page.goto(`${server.url}/index.html`, { waitUntil: 'networkidle' })
-    const pdfBytes = await page.evaluate(
-      async ({ name, data }) => {
-        const bytes = new Uint8Array(data)
-        return (
-          globalThis as unknown as {
-            exportCadToPdf: (
-              fileName: string,
-              bytes: Uint8Array
-            ) => Promise<number[]>
-          }
-        ).exportCadToPdf(name, bytes)
-      },
-      { name: fileName, data: [...fileBytes] }
-    )
-    await writeFile(absoluteOutput, Buffer.from(pdfBytes))
-    return absoluteOutput
+    return await run(browser)
   } finally {
-    await browser.close()
-    await server.close()
+    if (signal) {
+      signal.removeEventListener('abort', abortHandler)
+    }
+    await browser.close().catch(() => undefined)
+    await bridge.close()
   }
 }

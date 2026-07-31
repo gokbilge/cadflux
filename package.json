@@ -1,7 +1,7 @@
 {
   "name": "cadflux",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "author": "CadFlux contributors",
   "type": "module",
@@ -48,11 +48,12 @@
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test:integration": "node tools/test-cadflux-server.mjs",
     "test:e2e": "pnpm --filter @mlightcad/cad-viewer-example test:e2e",
+    "typecheck": "node tools/typecheck-workspaces.mjs",
     "doctor:server": "node apps/server/dist/apps/server/src/index.js doctor",
     "use:dwg-converter": "node tools/use-dwg-converter.mjs"
   },
   "engines": {
-    "node": ">=24",
+    "node": ">=22",
     "pnpm": ">=10"
   },
   "devDependencies": {

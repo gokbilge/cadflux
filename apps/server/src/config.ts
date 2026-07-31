@@ -18,6 +18,7 @@ export interface CadFluxServerConfig {
   adminPassword?: string
   sessionTtlHours: number
   maxFileSizeBytes: number
+  maxJobSizeBytes: number
   maxFilesPerJob: number
   workerConcurrency: number
   conversionTimeoutMs: number
@@ -57,6 +58,7 @@ export function loadServerConfig(
     adminPassword: environment.CADFLUX_ADMIN_PASSWORD,
     sessionTtlHours: 24,
     maxFileSizeBytes: Number(environment.CADFLUX_MAX_FILE_SIZE ?? String(250 * 1024 * 1024)),
+    maxJobSizeBytes: Number(environment.CADFLUX_MAX_JOB_SIZE ?? String(1024 * 1024 * 1024)),
     maxFilesPerJob: Number(environment.CADFLUX_MAX_FILES_PER_JOB ?? '500'),
     workerConcurrency: Number(environment.CADFLUX_WORKER_CONCURRENCY ?? '1'),
     conversionTimeoutMs: Number(environment.CADFLUX_CONVERSION_TIMEOUT_MS ?? '300000'),
@@ -74,6 +76,9 @@ export function validateServerConfig(config: CadFluxServerConfig): void {
   }
   if (!Number.isInteger(config.maxFileSizeBytes) || config.maxFileSizeBytes <= 0) {
     throw new Error('CADFLUX_MAX_FILE_SIZE must be a positive integer.')
+  }
+  if (!Number.isInteger(config.maxJobSizeBytes) || config.maxJobSizeBytes <= 0) {
+    throw new Error('CADFLUX_MAX_JOB_SIZE must be a positive integer.')
   }
   if (!Number.isInteger(config.maxFilesPerJob) || config.maxFilesPerJob <= 0) {
     throw new Error('CADFLUX_MAX_FILES_PER_JOB must be a positive integer.')

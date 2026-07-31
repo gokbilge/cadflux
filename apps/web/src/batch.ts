@@ -4,8 +4,7 @@
 import { zipSync, strToU8 } from 'fflate'
 
 import {
-  createBatchReportArtifacts,
-  type CadFluxBatchReport as WebBatchReport
+  createBatchReportArtifacts
 } from '@cadflux/batch-engine'
 import type { CadFluxFormat } from '@cadflux/core'
 

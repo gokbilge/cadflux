@@ -111,16 +111,24 @@ export async function buildServer(options: BuildServerOptions) {
   })
 
   app.setErrorHandler((error, _request, reply) => {
+    app.log.error({ err: error, requestId: _request.id }, 'cadflux.request_error')
     if (error instanceof ErrorResponse) {
       reply.code(reply.statusCode >= 400 ? reply.statusCode : 400).send({
         error: {
           code: error.code,
-          message: error.publicMessage
+          message: error.publicMessage,
+          requestId: _request.id
         }
       })
       return
     }
-    reply.send(error)
+    reply.code(reply.statusCode >= 400 ? reply.statusCode : 500).send({
+      error: {
+        code: 'internal_error',
+        message: 'An unexpected server error occurred.',
+        requestId: _request.id
+      }
+    })
   })
 
   const webDistPath = path.resolve(process.cwd(), 'apps', 'web', 'dist')
@@ -818,6 +826,15 @@ export async function buildServer(options: BuildServerOptions) {
     verifyCsrf(request, reply)
     const params = request.params as { jobId: string }
     const job = requireOwnedJob(options.database, request, reply, params.jobId)
+    if (!['draft', 'uploading'].includes(job.status)) {
+      reply.code(409)
+      return {
+        error: {
+          code: 'job_upload_closed',
+          message: 'Uploads are only allowed while the job is in draft or uploading state.'
+        }
+      }
+    }
     const currentFiles = options.database.listJobFiles(job.id)
     if (currentFiles.length >= options.config.maxFilesPerJob) {
       reply.code(400)
@@ -850,6 +867,15 @@ export async function buildServer(options: BuildServerOptions) {
         ? relativePathValue
         : filePart.filename
     const safeRelativePath = sanitizeRelativePath(providedRelativePath)
+    if (currentFiles.some(file => file.relativePath === safeRelativePath)) {
+      reply.code(409)
+      return {
+        error: {
+          code: 'duplicate_relative_path',
+          message: 'A file with the same relative path already exists in this job.'
+        }
+      }
+    }
     const stored = await storeUploadStream({
       dataDir: options.config.dataDir,
       jobId: job.id,
@@ -857,6 +883,18 @@ export async function buildServer(options: BuildServerOptions) {
       originalName: filePart.filename,
       stream: filePart.file
     })
+    const totalSizeBytes =
+      currentFiles.reduce((sum, file) => sum + file.sizeBytes, 0) + stored.sizeBytes
+    if (totalSizeBytes > options.config.maxJobSizeBytes) {
+      await rm(stored.storedPath, { force: true }).catch(() => undefined)
+      reply.code(400)
+      return {
+        error: {
+          code: 'job_size_limit_exceeded',
+          message: 'This job exceeds the maximum total upload size.'
+        }
+      }
+    }
 
     const now = new Date().toISOString()
     const id = randomUUID()

@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, openAsBlob } from 'node:fs'
 import {
   access,
+  chmod,
   copyFile,
   mkdir,
   readFile,
@@ -49,8 +50,6 @@ const EXIT_CANCELLED = 130
 const EXIT_FAILURE = 1
 const EXIT_PARTIAL_FAILURE = 7
 const WATCH_TEST_MODE_ENV = 'CADFLUX_CLI_WATCH_TEST_MODE'
-const CADFLUX_SESSION_FILE = path.join(homedir(), '.cadflux-session.json')
-
 type LogFormat = 'text' | 'json'
 
 interface SharedInputOptions {
@@ -468,8 +467,15 @@ program
   .option('--username <username>', 'Username', process.env.CADFLUX_USERNAME)
   .option('--password <password>', 'Password')
   .action(async (options: { server: string; username?: string; password?: string }) => {
-    if (!options.username || !options.password) {
-      throw new Error('login requires --username and --password.')
+    if (!options.username) {
+      throw new Error('login requires --username.')
+    }
+    const password =
+      options.password ??
+      process.env.CADFLUX_PASSWORD ??
+      (await promptForHiddenInput('Password: '))
+    if (!password) {
+      throw new Error('login requires a password.')
     }
     const response = await fetch(`${normalizeServerUrl(options.server)}/api/v1/auth/login`, {
       method: 'POST',
@@ -478,7 +484,7 @@ program
       },
       body: JSON.stringify({
         username: options.username,
-        password: options.password
+        password
       })
     })
     if (!response.ok) {
@@ -894,10 +900,16 @@ function createLogger(format: string) {
 }
 
 async function readSessionState(): Promise<CliSessionState | null> {
-  if (!existsSync(CADFLUX_SESSION_FILE)) {
+  const sessionFilePath = getCadFluxSessionFilePath()
+  if (!existsSync(sessionFilePath)) {
     return null
   }
-  return JSON.parse(await readFile(CADFLUX_SESSION_FILE, 'utf8')) as CliSessionState
+  try {
+    await tightenSessionFilePermissions(sessionFilePath)
+    return JSON.parse(await readFile(sessionFilePath, 'utf8')) as CliSessionState
+  } catch {
+    return null
+  }
 }
 
 async function requireSessionState(): Promise<CliSessionState> {
@@ -909,16 +921,81 @@ async function requireSessionState(): Promise<CliSessionState> {
 }
 
 async function writeSessionState(session: CliSessionState): Promise<void> {
-  await writeFile(CADFLUX_SESSION_FILE, JSON.stringify(session, null, 2), {
+  const sessionFilePath = getCadFluxSessionFilePath()
+  await mkdir(path.dirname(sessionFilePath), { recursive: true })
+  await writeFile(sessionFilePath, JSON.stringify(session, null, 2), {
     encoding: 'utf8',
     mode: 0o600
   })
+  await tightenSessionFilePermissions(sessionFilePath)
 }
 
 async function clearSessionState(): Promise<void> {
-  if (existsSync(CADFLUX_SESSION_FILE)) {
-    await rm(CADFLUX_SESSION_FILE, { force: true })
+  const sessionFilePath = getCadFluxSessionFilePath()
+  if (existsSync(sessionFilePath)) {
+    await rm(sessionFilePath, { force: true })
   }
+}
+
+function getCadFluxSessionFilePath(): string {
+  return process.env.CADFLUX_SESSION_FILE
+    ? path.resolve(process.env.CADFLUX_SESSION_FILE)
+    : path.join(homedir(), '.cadflux-session.json')
+}
+
+async function tightenSessionFilePermissions(filePath: string): Promise<void> {
+  if (process.platform === 'win32') {
+    return
+  }
+  await chmod(filePath, 0o600)
+}
+
+async function promptForHiddenInput(promptText: string): Promise<string> {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    throw new Error('Password prompt requires a TTY. Use CADFLUX_PASSWORD for non-interactive login.')
+  }
+
+  return await new Promise<string>((resolve, reject) => {
+    const stdin = process.stdin
+    const stdout = process.stdout
+    let value = ''
+
+    const cleanup = () => {
+      stdin.removeListener('data', handleData)
+      if (stdin.isTTY) {
+        stdin.setRawMode(false)
+      }
+      stdin.pause()
+    }
+
+    const handleData = (chunk: Buffer) => {
+      const input = chunk.toString('utf8')
+      if (input === '\u0003') {
+        cleanup()
+        stdout.write('\n')
+        reject(new Error('Password prompt cancelled.'))
+        return
+      }
+      if (input === '\r' || input === '\n') {
+        cleanup()
+        stdout.write('\n')
+        resolve(value)
+        return
+      }
+      if (input === '\b' || input === '\x7f') {
+        value = value.slice(0, -1)
+        return
+      }
+      value += input
+    }
+
+    stdout.write(promptText)
+    if (stdin.isTTY) {
+      stdin.setRawMode(true)
+    }
+    stdin.resume()
+    stdin.on('data', handleData)
+  })
 }
 
 function normalizeServerUrl(serverUrl: string): string {

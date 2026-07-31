@@ -34,6 +34,10 @@ const config: Config = {
     '^@cadflux/config$': '<rootDir>/packages/config/src/index.ts',
     '^@cadflux/contracts$': '<rootDir>/packages/contracts/src/index.ts',
     '^@cadflux/core$': '<rootDir>/packages/core/src/index.ts',
+    '^@cadflux/core/browserBridge$':
+      '<rootDir>/packages/core/src/browserBridge.ts',
+    '^@cadflux/core/checksum$':
+      '<rootDir>/packages/core/src/checksum.ts',
     '^@cadflux/database$': '<rootDir>/packages/database/src/index.ts',
     '^@cadflux/diagnostics$': '<rootDir>/packages/diagnostics/src/index.ts',
     '^@cadflux/drawing-model$': '<rootDir>/packages/drawing-model/src/index.ts',

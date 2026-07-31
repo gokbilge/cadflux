@@ -25,6 +25,8 @@
     "paths": {
       "@cadflux/auth": ["packages/auth/src/index.ts"],
       "@cadflux/core": ["packages/core/src/index.ts"],
+      "@cadflux/core/browserBridge": ["packages/core/src/browserBridge.ts"],
+      "@cadflux/core/checksum": ["packages/core/src/checksum.ts"],
       "@cadflux/contracts": ["packages/contracts/src/index.ts"],
       "@cadflux/database": ["packages/database/src/index.ts"],
       "@cadflux/storage": ["packages/storage/src/index.ts"],

@@ -215,6 +215,31 @@ export interface RecoverClaimedJobFilesResult {
   recoveredFileIds: string[]
 }
 
+export interface StoredWorker {
+  id: string
+  processId?: number
+  currentJobFileId?: string
+  startedAt: string
+  lastHeartbeatAt: string
+  status: string
+}
+
+export interface CreateWorkerInput {
+  id: string
+  processId?: number
+  currentJobFileId?: string
+  startedAt: string
+  lastHeartbeatAt: string
+  status: string
+}
+
+export interface UpdateWorkerInput {
+  processId?: number
+  currentJobFileId?: string
+  lastHeartbeatAt?: string
+  status?: string
+}
+
 export interface StoredArtifact {
   id: string
   jobId: string
@@ -264,6 +289,10 @@ export interface CadFluxDatabase {
   deleteExpiredSessions(nowIso: string): number
   deleteSessionsByUserId(userId: string): number
   touchSession(id: string, lastSeenAt: string): void
+  createWorker(input: CreateWorkerInput): void
+  getWorkerById(id: string): StoredWorker | null
+  listWorkers(): StoredWorker[]
+  updateWorker(id: string, input: UpdateWorkerInput): void
   createJob(input: CreateJobInput): void
   listJobsByUser(userId: string): StoredJob[]
   listAllJobs(): StoredJob[]
@@ -280,9 +309,11 @@ export interface CadFluxDatabase {
   listJobFiles(jobId: string): StoredJobFile[]
   getJobFileById(id: string): StoredJobFile | null
   claimNextJobFile(workerId: string, nowIso: string): StoredJobFile | null
+  listClaimedJobFilesBefore(staleBeforeIso: string): StoredJobFile[]
   updateJobFile(id: string, input: UpdateJobFileInput): void
   cancelPendingJobFiles(jobId: string, nowIso: string): number
   resetFailedJobFiles(jobId: string, nowIso: string): number
+  recoverClaimedJobFiles(fileIds: string[], nowIso: string): RecoverClaimedJobFilesResult
   recoverStaleClaimedJobFiles(staleBeforeIso: string, nowIso: string): RecoverClaimedJobFilesResult
   deleteJobFile(id: string): void
   createArtifact(input: CreateArtifactInput): void
@@ -423,6 +454,17 @@ const MIGRATIONS: Array<{ id: string; sql: string[] }> = [
         created_at TEXT NOT NULL
       )`
     ]
+  },
+  {
+    id: '20260731_0002_workers_hardening',
+    sql: [
+      `ALTER TABLE workers ADD COLUMN process_id INTEGER`,
+      `ALTER TABLE workers ADD COLUMN started_at TEXT NOT NULL DEFAULT ''`,
+      `ALTER TABLE workers ADD COLUMN status TEXT NOT NULL DEFAULT 'running'`,
+      `UPDATE workers
+       SET started_at = CASE WHEN started_at = '' THEN created_at ELSE started_at END`,
+      `CREATE INDEX IF NOT EXISTS idx_workers_last_heartbeat_at ON workers(last_heartbeat_at)`
+    ]
   }
 ]
 
@@ -554,6 +596,62 @@ export function openCadFluxDatabase(
     },
     touchSession(id, lastSeenAt) {
       db.prepare('UPDATE sessions SET last_seen_at = ? WHERE id = ?').run(lastSeenAt, id)
+    },
+    createWorker(input) {
+      db.prepare(
+        `INSERT OR REPLACE INTO workers (
+          id, process_id, current_job_file_id, started_at, last_heartbeat_at, status, created_at
+        ) VALUES (
+          @id, @processId, @currentJobFileId, @startedAt, @lastHeartbeatAt, @status, @createdAt
+        )`
+      ).run({
+        ...input,
+        createdAt: input.startedAt,
+        currentJobFileId: input.currentJobFileId ?? null,
+        processId: input.processId ?? null
+      })
+    },
+    getWorkerById(id) {
+      return (
+        mapWorkers(
+          db.prepare(
+            `SELECT id, process_id, current_job_file_id, started_at, last_heartbeat_at, status
+             FROM workers
+             WHERE id = ?`
+          ).all(id)
+        )[0] ?? null
+      )
+    },
+    listWorkers() {
+      return mapWorkers(
+        db.prepare(
+          `SELECT id, process_id, current_job_file_id, started_at, last_heartbeat_at, status
+           FROM workers
+           ORDER BY started_at ASC`
+        ).all()
+      )
+    },
+    updateWorker(id, input) {
+      const current = api.getWorkerById(id)
+      if (!current) {
+        return
+      }
+      db.prepare(
+        `UPDATE workers
+         SET process_id = @processId,
+             current_job_file_id = @currentJobFileId,
+             started_at = @startedAt,
+             last_heartbeat_at = @lastHeartbeatAt,
+             status = @status
+         WHERE id = @id`
+      ).run({
+        id,
+        processId: input.processId ?? current.processId ?? null,
+        currentJobFileId: input.currentJobFileId ?? current.currentJobFileId ?? null,
+        startedAt: current.startedAt,
+        lastHeartbeatAt: input.lastHeartbeatAt ?? current.lastHeartbeatAt,
+        status: input.status ?? current.status
+      })
     },
     createJob(input) {
       db.prepare(
@@ -734,6 +832,18 @@ export function openCadFluxDatabase(
         throw error
       }
     },
+    listClaimedJobFilesBefore(staleBeforeIso) {
+      return mapJobFiles(
+        db.prepare(
+          `SELECT *
+           FROM job_files
+           WHERE status IN ('claimed', 'parsing', 'rendering', 'exporting')
+             AND claimed_at IS NOT NULL
+             AND claimed_at <= ?
+           ORDER BY claimed_at ASC`
+        ).all(staleBeforeIso)
+      )
+    },
     updateJobFile(id, input) {
       const current = api.getJobFileById(id)
       if (!current) {
@@ -806,19 +916,11 @@ export function openCadFluxDatabase(
       ).run(nowIso, jobId)
       return result.changes
     },
-    recoverStaleClaimedJobFiles(staleBeforeIso, nowIso) {
-      const rows = db.prepare(
-        `SELECT id
-         FROM job_files
-         WHERE status IN ('claimed', 'parsing', 'rendering', 'exporting')
-           AND claimed_at IS NOT NULL
-           AND claimed_at <= ?`
-      ).all(staleBeforeIso) as Array<{ id: string }>
-      if (rows.length === 0) {
+    recoverClaimedJobFiles(fileIds, nowIso) {
+      if (fileIds.length === 0) {
         return { recoveredFileIds: [] }
       }
-      const ids = rows.map(row => row.id)
-      const placeholders = ids.map(() => '?').join(', ')
+      const placeholders = fileIds.map(() => '?').join(', ')
       db.prepare(
         `UPDATE job_files
          SET status = CASE WHEN attempt_count < max_attempts THEN 'ready' ELSE 'failed' END,
@@ -830,8 +932,21 @@ export function openCadFluxDatabase(
              error_message = CASE WHEN attempt_count < max_attempts THEN NULL ELSE 'Worker process became stale.' END,
              updated_at = ?
          WHERE id IN (${placeholders})`
-      ).run(nowIso, ...ids)
-      return { recoveredFileIds: ids }
+      ).run(nowIso, ...fileIds)
+      return { recoveredFileIds: [...fileIds] }
+    },
+    recoverStaleClaimedJobFiles(staleBeforeIso, nowIso) {
+      const rows = db.prepare(
+        `SELECT id
+         FROM job_files
+         WHERE status IN ('claimed', 'parsing', 'rendering', 'exporting')
+           AND claimed_at IS NOT NULL
+           AND claimed_at <= ?`
+      ).all(staleBeforeIso) as Array<{ id: string }>
+      return api.recoverClaimedJobFiles(
+        rows.map(row => row.id),
+        nowIso
+      )
     },
     deleteJobFile(id) {
       db.prepare('DELETE FROM job_files WHERE id = ?').run(id)
@@ -1043,6 +1158,31 @@ function mapArtifacts(rows: unknown[]): StoredArtifact[] {
       mimeType: String(artifact.mime_type),
       fidelity: String(artifact.fidelity),
       createdAt: String(artifact.created_at)
+    }
+  })
+}
+
+function mapWorkers(rows: unknown[]): StoredWorker[] {
+  return rows.map(row => {
+    const worker = row as Record<string, unknown>
+    return {
+      id: String(worker.id),
+      processId:
+        typeof worker.process_id === 'number'
+          ? worker.process_id
+          : typeof worker.process_id === 'bigint'
+            ? Number(worker.process_id)
+            : undefined,
+      currentJobFileId:
+        typeof worker.current_job_file_id === 'string'
+          ? worker.current_job_file_id
+          : undefined,
+      startedAt:
+        typeof worker.started_at === 'string' && worker.started_at.length > 0
+          ? worker.started_at
+          : String(worker.created_at ?? ''),
+      lastHeartbeatAt: String(worker.last_heartbeat_at),
+      status: String(worker.status)
     }
   })
 }

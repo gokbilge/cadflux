@@ -12,7 +12,11 @@ import { accmYieldForPaint } from '@mlightcad/data-model'
 
 declare global {
   interface Window {
-    exportCadToSvg: (fileName: string, bytes: Uint8Array) => Promise<string>
+    exportCadToSvg: (request: {
+      fileName: string
+      resultUrl: string
+      sourceUrl: string
+    }) => Promise<void>
   }
 }
 
@@ -38,9 +42,14 @@ async function ensureViewer(): Promise<void> {
   ready = true
 }
 
-window.exportCadToSvg = async (fileName, bytes) => {
+window.exportCadToSvg = async ({ fileName, resultUrl, sourceUrl }) => {
   await ensureViewer()
   const { AcSvgRenderer } = await import('@mlightcad/cad-svg-plugin/renderer')
+  const sourceResponse = await fetch(sourceUrl)
+  if (!sourceResponse.ok) {
+    throw new Error(`Failed to fetch CAD source: ${sourceResponse.status}`)
+  }
+  const bytes = new Uint8Array(await sourceResponse.arrayBuffer())
   const docManager = AcApDocManager.instance
   const buffer = bytes.buffer.slice(
     bytes.byteOffset,
@@ -73,5 +82,15 @@ window.exportCadToSvg = async (fileName, bytes) => {
   for (const entity of entities) {
     entity.worldDraw(renderer)
   }
-  return renderer.exportAsync()
+  const svg = await renderer.exportAsync()
+  const uploadResponse = await fetch(resultUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'image/svg+xml; charset=utf-8'
+    },
+    body: svg
+  })
+  if (!uploadResponse.ok) {
+    throw new Error(`Failed to upload generated SVG: ${uploadResponse.status}`)
+  }
 }

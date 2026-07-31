@@ -12,7 +12,11 @@ import { accmYieldForPaint } from '@mlightcad/data-model'
 
 declare global {
   interface Window {
-    exportCadToPdf: (fileName: string, bytes: Uint8Array) => Promise<number[]>
+    exportCadToPdf: (request: {
+      fileName: string
+      resultUrl: string
+      sourceUrl: string
+    }) => Promise<{ byteLength: number }>
   }
 }
 
@@ -38,13 +42,18 @@ async function ensureViewer(): Promise<void> {
   ready = true
 }
 
-window.exportCadToPdf = async (fileName, bytes) => {
+window.exportCadToPdf = async ({ fileName, resultUrl, sourceUrl }) => {
   await ensureViewer()
   const [{ AcSvgRenderer }, { jsPDF }, { svg2pdf }] = await Promise.all([
     import('@mlightcad/cad-svg-plugin/renderer'),
     import('jspdf'),
     import('svg2pdf.js')
   ])
+  const sourceResponse = await fetch(sourceUrl)
+  if (!sourceResponse.ok) {
+    throw new Error(`Failed to fetch CAD source: ${sourceResponse.status}`)
+  }
+  const bytes = new Uint8Array(await sourceResponse.arrayBuffer())
   const docManager = AcApDocManager.instance
   const buffer = bytes.buffer.slice(
     bytes.byteOffset,
@@ -92,5 +101,17 @@ window.exportCadToPdf = async (fileName, bytes) => {
 
   await svg2pdf(svgEl, pdf, { x: 0, y: 0, width, height })
   const arrayBuffer = pdf.output('arraybuffer')
-  return Array.from(new Uint8Array(arrayBuffer))
+  const uploadResponse = await fetch(resultUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/pdf'
+    },
+    body: new Blob([arrayBuffer], { type: 'application/pdf' })
+  })
+  if (!uploadResponse.ok) {
+    throw new Error(`Failed to upload generated PDF: ${uploadResponse.status}`)
+  }
+  return {
+    byteLength: arrayBuffer.byteLength
+  }
 }

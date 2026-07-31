@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import { createHash } from 'node:crypto'
-import { mkdir, readFile, stat } from 'node:fs/promises'
+import { mkdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 
 import type { CadFluxFormat, CadFluxProfile } from '@cadflux/core'
+import { checksumFile } from '@cadflux/core/checksum'
 import { inspectDwgInput } from '@cadflux/dwg-adapter'
 import { inspectDxfInput } from '@cadflux/dxf-adapter'
 import { resolveArtifactOutputPath } from '@cadflux/plot-engine'
@@ -114,11 +114,6 @@ function send(message: OutboundMessage): void {
   if (typeof process.send === 'function') {
     process.send(message)
   }
-}
-
-async function checksumFile(filePath: string): Promise<string> {
-  const buffer = await readFile(filePath)
-  return createHash('sha256').update(buffer).digest('hex')
 }
 
 function toPortablePath(filePath: string): string {

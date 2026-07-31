@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import { createHash, randomUUID } from 'node:crypto'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import {
@@ -10,6 +10,7 @@ import {
   createBatchReportFromResults
 } from '@cadflux/batch-engine'
 import type { CadFluxConversionResult, CadFluxFormat } from '@cadflux/core'
+import { checksumFile } from '@cadflux/core/checksum'
 import type { CadFluxDatabase, StoredArtifact, StoredJob } from '@cadflux/database'
 import { zipSync, strToU8 } from 'fflate'
 
@@ -111,7 +112,7 @@ export async function generateJobReports(options: {
     { type: 'manifest', format: 'json', relativePath: 'reports/manifest.json', storedPath: manifestPath, mimeType: 'application/json' },
     { type: 'zip', format: 'zip', relativePath: `bundle/cadflux-job-${options.job.id}.zip`, storedPath: zipPath, mimeType: 'application/zip' }
   ] as const) {
-    const bytes = await readFile(descriptor.storedPath)
+    const details = await stat(descriptor.storedPath)
     const id = randomUUID()
     options.database.createArtifact({
       id,
@@ -120,8 +121,8 @@ export async function generateJobReports(options: {
       format: descriptor.format,
       relativePath: descriptor.relativePath,
       storedPath: descriptor.storedPath,
-      sizeBytes: bytes.byteLength,
-      checksum: checksumBuffer(Buffer.from(bytes)),
+      sizeBytes: details.size,
+      checksum: await checksumFile(descriptor.storedPath),
       mimeType: descriptor.mimeType,
       fidelity: 'unknown',
       createdAt
@@ -143,8 +144,4 @@ function tryReadPresetId(profileJson: string): string {
 
 function uniqueFormats(artifacts: StoredArtifact[]): CadFluxFormat[] {
   return Array.from(new Set(artifacts.map(artifact => artifact.format as CadFluxFormat)))
-}
-
-function checksumBuffer(buffer: Buffer): string {
-  return createHash('sha256').update(buffer).digest('hex')
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
+import { openAsBlob } from 'node:fs'
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -422,5 +423,190 @@ describe('CadFlux server routes', () => {
     expect(content).toContain('event: file.completed')
     await reader.cancel()
 
+  })
+
+  test('upload route rejects uploads after the job has started', async () => {
+    const config = await createAdminFixture()
+    database!.createJob({
+      id: 'job-1',
+      userId: 'user-1',
+      status: 'queued',
+      name: 'job',
+      profileJson: JSON.stringify({
+        id: 'test',
+        label: 'Test',
+        paper: 'A4',
+        orientation: 'auto',
+        scale: 'fit',
+        color: 'color',
+        formats: ['pdf']
+      }),
+      totalFiles: 0,
+      completedFiles: 0,
+      warningFiles: 0,
+      failedFiles: 0,
+      cancelledFiles: 0,
+      progressPercent: 0,
+      createdAt: '2026-07-31T00:00:00.000Z',
+      version: '0.1.0'
+    })
+
+    app = await buildServer({
+      config,
+      database: database!,
+      events: createJobEventBus(),
+      worker: {
+        close: async () => undefined,
+        pauseJob: () => undefined,
+        resumeJob: () => undefined,
+        cancelJob: () => undefined,
+        retryJob: () => undefined
+      }
+    })
+
+    const auth = await loginAsAdmin()
+    await app.listen({ host: '127.0.0.1', port: 0 })
+    const port = Number((app.server.address() as { port: number }).port)
+    const fixturePath = path.join(tempRoot, 'fixture.dxf')
+    await writeFile(fixturePath, '0\nEOF\n', 'utf8')
+
+    const form = new FormData()
+    form.append('relativePath', 'fixture.dxf')
+    form.append(
+      'file',
+      await openAsBlob(fixturePath, { type: 'application/octet-stream' }),
+      'fixture.dxf'
+    )
+
+    const response = await fetch(`http://127.0.0.1:${port}/api/v1/jobs/job-1/files`, {
+      method: 'POST',
+      headers: {
+        Cookie: auth.cookie,
+        'X-CSRF-Token': auth.csrfToken
+      },
+      body: form
+    })
+
+    expect(response.status).toBe(409)
+    expect(await response.text()).toContain('job_upload_closed')
+  })
+
+  test('upload route rejects duplicate relative paths', async () => {
+    const config = await createAdminFixture()
+    database!.createJob({
+      id: 'job-1',
+      userId: 'user-1',
+      status: 'draft',
+      name: 'job',
+      profileJson: JSON.stringify({
+        id: 'test',
+        label: 'Test',
+        paper: 'A4',
+        orientation: 'auto',
+        scale: 'fit',
+        color: 'color',
+        formats: ['pdf']
+      }),
+      totalFiles: 1,
+      completedFiles: 0,
+      warningFiles: 0,
+      failedFiles: 0,
+      cancelledFiles: 0,
+      progressPercent: 0,
+      createdAt: '2026-07-31T00:00:00.000Z',
+      version: '0.1.0'
+    })
+    database!.createJobFile({
+      id: 'file-1',
+      jobId: 'job-1',
+      originalName: 'fixture.dxf',
+      relativePath: 'fixture.dxf',
+      storedPath: path.join(tempRoot, 'fixture-existing.dxf'),
+      sizeBytes: 12,
+      checksum: 'abc',
+      format: 'dxf',
+      status: 'ready',
+      progressPercent: 0,
+      attemptCount: 0,
+      maxAttempts: 3,
+      createdAt: '2026-07-31T00:00:00.000Z',
+      updatedAt: '2026-07-31T00:00:00.000Z'
+    })
+
+    app = await buildServer({
+      config,
+      database: database!,
+      events: createJobEventBus(),
+      worker: {
+        close: async () => undefined,
+        pauseJob: () => undefined,
+        resumeJob: () => undefined,
+        cancelJob: () => undefined,
+        retryJob: () => undefined
+      }
+    })
+
+    const auth = await loginAsAdmin()
+    await app.listen({ host: '127.0.0.1', port: 0 })
+    const port = Number((app.server.address() as { port: number }).port)
+    const fixturePath = path.join(tempRoot, 'fixture-upload.dxf')
+    await writeFile(fixturePath, '0\nEOF\n', 'utf8')
+
+    const form = new FormData()
+    form.append('relativePath', 'fixture.dxf')
+    form.append(
+      'file',
+      await openAsBlob(fixturePath, { type: 'application/octet-stream' }),
+      'fixture.dxf'
+    )
+
+    const response = await fetch(`http://127.0.0.1:${port}/api/v1/jobs/job-1/files`, {
+      method: 'POST',
+      headers: {
+        Cookie: auth.cookie,
+        'X-CSRF-Token': auth.csrfToken
+      },
+      body: form
+    })
+
+    expect(response.status).toBe(409)
+    expect(await response.text()).toContain('duplicate_relative_path')
+  })
+
+  test('generic error handler redacts internal details', async () => {
+    const config = await createAdminFixture()
+    app = await buildServer({
+      config,
+      database: database!,
+      events: createJobEventBus(),
+      worker: {
+        close: async () => undefined,
+        pauseJob: () => undefined,
+        resumeJob: () => undefined,
+        cancelJob: () => undefined,
+        retryJob: () => undefined
+      }
+    })
+    app.get('/boom', async () => {
+      throw new Error(`boom ${path.join(tempRoot, 'secret-path.txt')}`)
+    })
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/boom'
+    })
+
+    expect(response.statusCode).toBe(500)
+    const body = response.json() as {
+      error: {
+        code: string
+        message: string
+        requestId: string
+      }
+    }
+    expect(body.error.code).toBe('internal_error')
+    expect(body.error.requestId).toBeTruthy()
+    expect(body.error.message).not.toContain('secret-path.txt')
+    expect(body.error.message).not.toContain(tempRoot)
   })
 })

@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "main": "./dist/node.js",
-  "types": "./dist/node.d.ts",
+  "main": "./dist/renderer-pdf/src/node.js",
+  "types": "./dist/renderer-pdf/src/node.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/node.d.ts",
-      "import": "./dist/node.js"
+      "types": "./dist/renderer-pdf/src/node.d.ts",
+      "import": "./dist/renderer-pdf/src/node.js"
     }
   },
   "files": [
@@ -26,6 +26,7 @@
     "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
   },
   "dependencies": {
+    "@cadflux/core": "workspace:*",
     "@mlightcad/cad-pdf-plugin": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
     "@mlightcad/cad-svg-plugin": "workspace:*",

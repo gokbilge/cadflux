@@ -25,6 +25,7 @@ interface ActiveTask {
   child: ChildProcess
   fileId: string
   jobId: string
+  heartbeatTimer: NodeJS.Timeout
   timer: NodeJS.Timeout
   cancelled: boolean
 }
@@ -46,6 +47,8 @@ type WorkerMessage =
     }
   | { type: 'failed'; error: string }
 
+const WORKER_HEARTBEAT_INTERVAL_MS = 5_000
+
 export function startServerWorker(options: {
   config: CadFluxServerConfig
   database: CadFluxDatabase
@@ -63,7 +66,7 @@ export function startServerWorker(options: {
       return
     }
 
-    recoverStaleClaims(options)
+    recoverStaleClaims(options, activeTasks)
     settlePausingJobs(options, activeTasks)
     settleCancellingJobs(options, activeTasks)
 
@@ -93,6 +96,7 @@ export function startServerWorker(options: {
       clearInterval(interval)
       for (const active of activeTasks.values()) {
         active.cancelled = true
+        clearInterval(active.heartbeatTimer)
         clearTimeout(active.timer)
         active.child.kill()
       }
@@ -132,6 +136,7 @@ export function startServerWorker(options: {
           continue
         }
         active.cancelled = true
+        clearInterval(active.heartbeatTimer)
         clearTimeout(active.timer)
         active.child.kill()
       }
@@ -214,12 +219,30 @@ function startChildForFile(
     stdio: ['ignore', 'ignore', 'ignore', 'ipc']
   })
 
-  const active: ActiveTask = {
+  database.createWorker({
+    id: workerId,
+    processId: child.pid,
+    currentJobFileId: file.id,
+    startedAt,
+    lastHeartbeatAt: startedAt,
+    status: 'running'
+  })
+
+  let active!: ActiveTask
+  active = {
     workerId,
     child,
     fileId: file.id,
     jobId: job.id,
     cancelled: false,
+    heartbeatTimer: setInterval(() => {
+      options.database.updateWorker(workerId, {
+        currentJobFileId: file.id,
+        lastHeartbeatAt: new Date().toISOString(),
+        processId: child.pid,
+        status: active.cancelled ? 'stopping' : 'running'
+      })
+    }, WORKER_HEARTBEAT_INTERVAL_MS),
     timer: setTimeout(() => {
       active.cancelled = true
       child.kill()
@@ -231,8 +254,20 @@ function startChildForFile(
     handleChildMessage(options, file.id, workerId, message as WorkerMessage)
   })
   child.on('exit', (code, signal) => {
+    clearInterval(active.heartbeatTimer)
     clearTimeout(active.timer)
     activeTasks.delete(file.id)
+    options.database.updateWorker(workerId, {
+      currentJobFileId: undefined,
+      lastHeartbeatAt: new Date().toISOString(),
+      processId: child.pid,
+      status:
+        code === 0 && signal === null
+          ? 'stopped'
+          : active.cancelled
+            ? 'cancelled'
+            : 'failed'
+    })
     void finalizeChildExit(options, file.id, workerId, active.cancelled, code, signal)
   })
 }
@@ -444,11 +479,41 @@ function recoverStaleClaims(
       info(payload: Record<string, unknown>, message?: string): void
       error(payload: Record<string, unknown>, message?: string): void
     }
-  }
+  },
+  activeTasks: Map<string, ActiveTask>
 ): void {
-  const staleBeforeIso = new Date(Date.now() - options.config.staleClaimMinutes * 60_000).toISOString()
-  const recovered = options.database.recoverStaleClaimedJobFiles(
-    staleBeforeIso,
+  const staleBeforeIso = new Date(
+    Date.now() - options.config.staleClaimMinutes * 60_000
+  ).toISOString()
+  const recoverableFileIds = options.database
+    .listClaimedJobFilesBefore(staleBeforeIso)
+    .filter(file => {
+      if (activeTasks.has(file.id)) {
+        return false
+      }
+
+      if (!file.workerId) {
+        return true
+      }
+
+      const activeWorker = Array.from(activeTasks.values()).find(
+        activeTask => activeTask.workerId === file.workerId
+      )
+      if (activeWorker) {
+        return false
+      }
+
+      const worker = options.database.getWorkerById(file.workerId)
+      if (!worker) {
+        return true
+      }
+
+      return worker.lastHeartbeatAt <= staleBeforeIso
+    })
+    .map(file => file.id)
+
+  const recovered = options.database.recoverClaimedJobFiles(
+    recoverableFileIds,
     new Date().toISOString()
   )
   for (const fileId of recovered.recoveredFileIds) {
