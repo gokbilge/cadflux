@@ -3,89 +3,19 @@
 
 import { zipSync, strToU8 } from 'fflate'
 
+import {
+  createBatchReportArtifacts,
+  type CadFluxBatchReport as WebBatchReport
+} from '@cadflux/batch-engine'
 import type { CadFluxFormat } from '@cadflux/core'
+
+export { createBatchReportArtifacts }
 
 export interface WebBatchArtifact {
   format: CadFluxFormat
   downloadName: string
   relativeOutputPath: string
   blob: Blob
-}
-
-export interface WebBatchReportItem {
-  title: string
-  relativePath: string
-  status: 'completed' | 'failed' | 'cancelled'
-  attempts: number
-  error?: string
-  artifacts: Array<{
-    format: CadFluxFormat
-    relativeOutputPath: string
-    sizeBytes: number
-  }>
-}
-
-export interface WebBatchReport {
-  id: string
-  createdAt: string
-  presetId: string
-  strategy: 'filesystem' | 'zip'
-  formatIds: CadFluxFormat[]
-  items: WebBatchReportItem[]
-}
-
-export function createBatchReportArtifacts(report: WebBatchReport): {
-  json: string
-  csv: string
-  html: string
-  manifest: string
-} {
-  const json = JSON.stringify(report, null, 2)
-  const header = ['title', 'relativePath', 'status', 'attempts', 'artifacts', 'error']
-  const rows = report.items.map(item => [
-    item.title,
-    item.relativePath,
-    item.status,
-    String(item.attempts),
-    item.artifacts.map(artifact => artifact.relativeOutputPath).join('|'),
-    item.error ?? ''
-  ])
-  const csv = [header, ...rows]
-    .map(row => row.map(value => `"${value.replaceAll('"', '""')}"`).join(','))
-    .join('\n')
-
-  const htmlRows = report.items
-    .map(
-      item => `<tr><td>${escapeHtml(item.title)}</td><td>${escapeHtml(item.relativePath)}</td><td>${item.status}</td><td>${item.attempts}</td><td>${item.artifacts
-        .map(artifact => escapeHtml(artifact.relativeOutputPath))
-        .join('<br/>')}</td><td>${escapeHtml(item.error ?? '')}</td></tr>`
-    )
-    .join('')
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>CadFlux Batch Report</title><style>body{font-family:system-ui,sans-serif;padding:24px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px;vertical-align:top}th{background:#f3f3f3;text-align:left}</style></head><body><h1>CadFlux Batch Report</h1><p>Preset: ${escapeHtml(
-    report.presetId
-  )}</p><table><thead><tr><th>Title</th><th>Relative path</th><th>Status</th><th>Attempts</th><th>Artifacts</th><th>Error</th></tr></thead><tbody>${htmlRows}</tbody></table></body></html>`
-
-  const manifest = JSON.stringify(
-    {
-      createdAt: report.createdAt,
-      reportId: report.id,
-      presetId: report.presetId,
-      strategy: report.strategy,
-      formats: report.formatIds,
-      outputs: report.items.flatMap(item =>
-        item.artifacts.map(artifact => ({
-          input: item.relativePath,
-          format: artifact.format,
-          output: artifact.relativeOutputPath,
-          sizeBytes: artifact.sizeBytes
-        }))
-      )
-    },
-    null,
-    2
-  )
-
-  return { json, csv, html, manifest }
 }
 
 export async function createZipBundle(
@@ -206,11 +136,4 @@ export function formatBytes(size: number): string {
     return `${(size / (1024 * 1024)).toFixed(1)} MB`
   }
   return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
 }

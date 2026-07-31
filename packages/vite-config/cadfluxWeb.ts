@@ -85,6 +85,10 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
       )
     },
     {
+      find: '@cadflux/batch-engine',
+      replacement: resolve(appRoot, '../../packages/batch-engine/src/index.ts')
+    },
+    {
       find: '@cadflux/config',
       replacement: resolve(appRoot, '../../packages/config/src/index.ts')
     },

@@ -11,7 +11,11 @@ import {
 } from 'node:fs/promises'
 import path from 'node:path'
 
-import { CadFluxBatchEngine } from '@cadflux/batch-engine'
+import {
+  CadFluxBatchEngine,
+  createBatchReportArtifacts,
+  createBatchReportFromResults
+} from '@cadflux/batch-engine'
 import { CADFLUX_DEFAULT_FLAGS } from '@cadflux/config'
 import {
   createCadFluxRuntime,
@@ -23,7 +27,6 @@ import {
   type CadFluxInputSource,
   type CadFluxProfile
 } from '@cadflux/core'
-import { resultsToCsv, resultsToHtml, resultsToJson } from '@cadflux/diagnostics'
 import { inspectDwgInput } from '@cadflux/dwg-adapter'
 import { inspectDxfInput } from '@cadflux/dxf-adapter'
 import { collectNodeInputs, readInputListFile } from '@cadflux/file-ingest/node'
@@ -295,7 +298,12 @@ program
     removeSignalHandlers()
 
     if (options.report) {
-      await writeReport(path.resolve(options.report), results)
+      await writeReport(
+        path.resolve(options.report),
+        profile.id,
+        profile.formats,
+        results
+      )
     }
 
     const failures = results.filter(result => result.status !== 'completed')
@@ -430,7 +438,12 @@ program
         sessionResults.push(result)
 
         if (options.report) {
-          await writeReport(path.resolve(options.report), sessionResults)
+          await writeReport(
+            path.resolve(options.report),
+            profile.id,
+            profile.formats,
+            sessionResults
+          )
         }
 
         if (result.status === 'completed') {
@@ -579,17 +592,37 @@ function installCancellationHandlers(onCancel: () => void) {
 
 async function writeReport(
   reportPath: string,
+  presetId: string,
+  formatIds: CadFluxFormat[],
   results: CadFluxConversionResult[]
 ): Promise<void> {
   await mkdir(path.dirname(reportPath), { recursive: true })
-  const ext = path.extname(reportPath).toLowerCase()
-  const content =
-    ext === '.csv'
-      ? resultsToCsv(results)
-      : ext === '.html'
-        ? resultsToHtml(results)
-        : resultsToJson(results)
-  await writeFile(reportPath, content, 'utf8')
+  const report = createBatchReportFromResults(
+    {
+      presetId,
+      strategy: 'filesystem',
+      formatIds
+    },
+    results,
+    (_, artifact) => ({
+      format: artifact.format,
+      outputPath: artifact.outputPath,
+      relativeOutputPath: toPortablePath(
+        path.relative(
+          path.dirname(reportPath),
+          artifact.outputPath
+        )
+      ),
+      sizeBytes: undefined
+    })
+  )
+  const reportFiles = createBatchReportArtifacts(report)
+  const reportBasePath = stripKnownReportExtension(reportPath)
+
+  await writeFile(`${reportBasePath}.json`, reportFiles.json, 'utf8')
+  await writeFile(`${reportBasePath}.csv`, reportFiles.csv, 'utf8')
+  await writeFile(`${reportBasePath}.html`, reportFiles.html, 'utf8')
+  await writeFile(`${reportBasePath}.manifest.json`, reportFiles.manifest, 'utf8')
 }
 
 async function pathExists(targetPath: string): Promise<boolean> {
@@ -643,4 +676,16 @@ async function moveProcessedFile(
 
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+function stripKnownReportExtension(filePath: string): string {
+  const ext = path.extname(filePath).toLowerCase()
+  if (ext === '.json' || ext === '.csv' || ext === '.html') {
+    return filePath.slice(0, -ext.length)
+  }
+  return filePath
+}
+
+function toPortablePath(filePath: string): string {
+  return filePath.split(path.sep).join('/')
 }

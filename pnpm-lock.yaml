@@ -154,6 +154,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@cadflux/batch-engine':
+        specifier: workspace:*
+        version: link:../../packages/batch-engine
       '@cadflux/config':
         specifier: workspace:*
         version: link:../../packages/config
