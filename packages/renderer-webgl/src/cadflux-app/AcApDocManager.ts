@@ -8,7 +8,6 @@ import {
   acdbHostApplicationServices
 } from '@mlightcad/data-model'
 import { AcDbLibreDwgConverter } from '@mlightcad/libredwg-converter'
-import { FontManager } from '@mlightcad/mtext-renderer'
 import { AcTrMTextRenderer } from '@mlightcad/three-renderer'
 
 import { AcApContext } from '../../../cad-simple-viewer/src/app/AcApContext'
@@ -21,6 +20,10 @@ import {
   LIBREDWG_PARSER_WORKER_FILE,
   MTEXT_RENDERER_WORKER_FILE
 } from '../../../cad-simple-viewer/src/app/AcApWorkerAssets'
+import {
+  getCadFluxFontsToLoad,
+  setCadFluxDefaultFonts
+} from './AcApFontManager'
 
 export interface AcDbDocumentEventArgs {
   doc: AcApDocument
@@ -86,7 +89,7 @@ export class AcApDocManager {
 
   private constructor(options: AcApDocManagerOptions = {}) {
     this._baseUrl = options.baseUrl || DEFAULT_BASE_URL
-    FontManager.instance.setDefaultFonts(DEFAULT_FONTS_PRESET)
+    void setCadFluxDefaultFonts(DEFAULT_FONTS_PRESET)
 
     const doc = new AcApDocument()
     const initialSize = options.container?.getBoundingClientRect() ?? {
@@ -151,7 +154,8 @@ export class AcApDocManager {
 
   async loadDefaultFonts(fonts?: string[]) {
     if (fonts == null) {
-      await this._fontLoader.load([...FontManager.instance.getFontsToLoad()])
+      await setCadFluxDefaultFonts(DEFAULT_FONTS_PRESET)
+      await this._fontLoader.load(await getCadFluxFontsToLoad())
       return
     }
     await this._fontLoader.load(fonts)

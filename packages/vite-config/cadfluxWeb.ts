@@ -191,83 +191,109 @@ export function createCadFluxWebAliases(appRoot: string): AliasOptions {
 }
 
 export function cadfluxWebManualChunks(id: string): string | undefined {
-  if (id.includes('node_modules/vue')) {
+  const normalizedId = id.replace(/\\/g, '/')
+
+  if (normalizedId.includes('node_modules/vue')) {
     return 'vendor-vue'
   }
 
-  if (
-    id.includes('@mlightcad/data-model') ||
-    id.includes('/data-model/lib/index.js') ||
-    id.includes('\\data-model\\lib\\index.js')
-  ) {
-    return 'cad-runtime-model'
+  if (normalizedId.includes('/@mlightcad/common/')) {
+    return 'cad-runtime-common'
   }
 
-  if (id.includes('packages/core/src/browserExport')) {
+  if (normalizedId.includes('/@mlightcad/geometry-engine/')) {
+    return 'cad-runtime-geometry'
+  }
+
+  if (normalizedId.includes('/@mlightcad/graphic-interface/')) {
+    return 'cad-runtime-graphics'
+  }
+
+  if (normalizedId.includes('/@mlightcad/data-model/lib/base/')) {
+    return 'cad-runtime-model-core'
+  }
+
+  if (normalizedId.includes('/@mlightcad/data-model/lib/entity/')) {
+    return 'cad-runtime-entity'
+  }
+
+  if (
+    normalizedId.includes('/@mlightcad/data-model/lib/converter/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/database/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/dxf/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/misc/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/object/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/ly/') ||
+    normalizedId.includes('/@mlightcad/data-model/lib/index.js')
+  ) {
+    return 'cad-runtime-model-core'
+  }
+
+  if (normalizedId.includes('packages/core/src/browserExport')) {
     return 'cad-export-utils'
   }
 
-  if (id.includes('packages/cad-svg-plugin/src/AcSvgFontMap')) {
+  if (normalizedId.includes('packages/cad-svg-plugin/src/AcSvgFontMap')) {
     return 'cad-export-fonts'
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvgMText') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil')
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgMText') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgMTextUtil')
   ) {
     return 'cad-export-mtext'
   }
 
-  if (id.includes('node_modules/.pnpm/@mlightcad+mtext-parser')) {
+  if (normalizedId.includes('node_modules/.pnpm/@mlightcad+mtext-parser')) {
     return 'cad-export-mtext-parser'
   }
 
   if (
-    id.includes('node_modules/.pnpm/@mlightcad+mtext-renderer') ||
-    id.includes('@mlightcad/mtext-renderer/dist/index.js')
+    normalizedId.includes('node_modules/.pnpm/@mlightcad+mtext-renderer') ||
+    normalizedId.includes('@mlightcad/mtext-renderer/dist/index.js')
   ) {
     return 'cad-export-mtext-renderer'
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
-    id.includes('packages/cad-svg-plugin/src/CadFluxBrowserExport') ||
-    id.includes('packages/cad-pdf-plugin/src/CadFluxBrowserExport')
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgShape') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgShapeUtil') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/CadFluxBrowserExport') ||
+    normalizedId.includes('packages/cad-pdf-plugin/src/CadFluxBrowserExport')
   ) {
     return 'cad-export-shape'
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvgImage') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgExportUtil') ||
-    id.includes('node_modules/dompurify')
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgImage') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgExportUtil') ||
+    normalizedId.includes('node_modules/dompurify')
   ) {
     return 'cad-export-image'
   }
 
   if (
-    id.includes('packages/cad-svg-plugin/src/AcSvgArea') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgCircArc') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgEllipticalArc') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgGroup') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgLine') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgLineSegments') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgPoint') ||
-    id.includes('packages/cad-svg-plugin/src/AcSvgRenderer')
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgArea') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgCircArc') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgEllipticalArc') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgGroup') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgLine') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgLineSegments') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgPoint') ||
+    normalizedId.includes('packages/cad-svg-plugin/src/AcSvgRenderer')
   ) {
     return 'cad-export-geometry'
   }
 
   if (
-    id.includes('packages/cad-pdf-plugin/src/AcApPdfConvertor') ||
-    id.includes('node_modules/.pnpm/jspdf') ||
-    id.includes('node_modules/.pnpm/svg2pdf.js')
+    normalizedId.includes('packages/cad-pdf-plugin/src/AcApPdfConvertor') ||
+    normalizedId.includes('node_modules/.pnpm/jspdf') ||
+    normalizedId.includes('node_modules/.pnpm/svg2pdf.js')
   ) {
     return 'cad-export-pdf'
   }
 
-  if (id.includes('packages/cad-svg-plugin/src/AcSvg')) {
+  if (normalizedId.includes('packages/cad-svg-plugin/src/AcSvg')) {
     return 'cad-export-core'
   }
 
