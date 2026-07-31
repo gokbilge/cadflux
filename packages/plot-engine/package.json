@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/plot-engine/src/index.js",
+  "types": "./dist/plot-engine/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/plot-engine/src/index.d.ts",
+      "import": "./dist/plot-engine/src/index.js"
     }
   },
   "files": [

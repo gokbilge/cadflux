@@ -3,16 +3,16 @@
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/file-ingest/src/index.js",
+  "types": "./dist/file-ingest/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "types": "./dist/file-ingest/src/index.d.ts",
+      "import": "./dist/file-ingest/src/index.js"
     },
     "./node": {
-      "types": "./dist/node.d.ts",
-      "import": "./dist/node.js"
+      "types": "./dist/file-ingest/src/node.d.ts",
+      "import": "./dist/file-ingest/src/node.js"
     }
   },
   "files": [

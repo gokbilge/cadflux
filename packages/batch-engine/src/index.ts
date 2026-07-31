@@ -12,7 +12,9 @@ export interface BatchProgress<T> {
   taskId: string
   completed: number
   total: number
+  status: 'running' | 'completed' | 'failed' | 'cancelled'
   result?: T
+  error?: unknown
 }
 
 export class CadFluxBatchEngine<T = CadFluxConversionResult> {
@@ -38,7 +40,7 @@ export class CadFluxBatchEngine<T = CadFluxConversionResult> {
     onProgress?: (progress: BatchProgress<T>) => void
   ): Promise<T[]> {
     const pending = [...tasks]
-    const results: T[] = []
+    const results = new Array<T>(tasks.length)
     let completed = 0
 
     const worker = async () => {
@@ -50,21 +52,41 @@ export class CadFluxBatchEngine<T = CadFluxConversionResult> {
         if (!task) {
           return
         }
-        const result = await task.run()
-        results.push(result)
-        completed += 1
+        const resultIndex = tasks.indexOf(task)
         onProgress?.({
           taskId: task.id,
           completed,
           total: tasks.length,
-          result
+          status: 'running'
         })
+        try {
+          const result = await task.run()
+          results[resultIndex] = result
+          completed += 1
+          onProgress?.({
+            taskId: task.id,
+            completed,
+            total: tasks.length,
+            status: 'completed',
+            result
+          })
+        } catch (error) {
+          completed += 1
+          onProgress?.({
+            taskId: task.id,
+            completed,
+            total: tasks.length,
+            status: this.cancelled ? 'cancelled' : 'failed',
+            error
+          })
+          throw error
+        }
       }
     }
 
     const workerCount = Math.max(1, Math.min(this.concurrency, tasks.length))
     await Promise.all(Array.from({ length: workerCount }, () => worker()))
-    return results
+    return results.filter((result): result is T => result !== undefined)
   }
 }
 
