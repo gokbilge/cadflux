@@ -37,7 +37,13 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js'
 
 import { AcApDocManager, AcApSettingManager } from '../app'
 import { AcEdConditionWaiter } from '../editor/global/AcEdConditionWaiter'
+import {
+  ACGI_MODEL_SPACE_BACKGROUND,
+  isModelSpaceDatabase,
+  readLayoutBackgroundColor
+} from '../editor/global/AcEdUiColor'
 import { eventBus } from '../editor/global/eventBus'
+import { AcEdGripManager } from '../editor/grip/AcEdGripManager'
 import { AcEdCorsorType } from '../editor/input/AcEdCursorManager'
 import { AcEdMTextEditor } from '../editor/input/ui/AcEdMTextEditor'
 import {
@@ -51,12 +57,6 @@ import {
   AcEdSpatialQueryResultItem,
   AcEdSpatialQueryResultItemEx
 } from '../editor/view/AcEdSpatialQueryResult'
-import { AcEdGripManager } from '../editor/grip/AcEdGripManager'
-import {
-  ACGI_MODEL_SPACE_BACKGROUND,
-  isModelSpaceDatabase,
-  readLayoutBackgroundColor
-} from '../editor/global/AcEdUiColor'
 import { isEffectiveSpatialQueryHit } from '../editor/view/AcEdSpatialQueryResult'
 import type { AcTrSpatialSearchOptions } from '../spatialIndex/AcTrSpatialIndex'
 import { AcTrGeometryUtil } from '../util'

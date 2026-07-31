@@ -17,9 +17,9 @@ import type { AcTrSpatialSearchOptions } from '../../spatialIndex/AcTrSpatialInd
 import {
   AcEdCorsorType
 } from '../input/AcEdCursorManager'
-import { AcEdSelectionSet } from '../input/AcEdSelectionSet'
 import { AcEditor } from '../input/AcEditor'
 import { AcEdOsnapResolver } from '../input/AcEdOsnapResolver'
+import { AcEdSelectionSet } from '../input/AcEdSelectionSet'
 import { AcEdHoverController } from './AcEdHoverController'
 import {
   AcEdSelectionAction,
