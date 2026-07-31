@@ -2,6 +2,12 @@ import { readCadFluxBrowserFontMapping } from '@cadflux/core'
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
 import type { AcSvgRenderer } from '@mlightcad/cad-svg-plugin'
 
+export interface CadFluxPdfExportResult {
+  downloadName: string
+  svgString: string
+  blob: Blob
+}
+
 /**
  * Utility class for converting CAD drawings to PDF format.
  *
@@ -13,6 +19,11 @@ export class AcApPdfConvertor {
    * Renders the current drawing to PDF and triggers a browser download.
    */
   async convert(context: AcApContext) {
+    const result = await this.render(context)
+    this.downloadResult(result)
+  }
+
+  async render(context: AcApContext): Promise<CadFluxPdfExportResult> {
     const svgString = await this.buildSvg(context)
     const { resolveCadFluxExportDownloadName } = await import(
       './CadFluxBrowserExport'
@@ -21,7 +32,11 @@ export class AcApPdfConvertor {
       context.doc.fileName || context.doc.docTitle,
       'pdf'
     )
-    await this.downloadAsPdf(svgString, downloadName)
+    return {
+      downloadName,
+      svgString,
+      blob: await this.buildPdfBlob(svgString)
+    }
   }
 
   private async buildSvg(context: AcApContext): Promise<string> {
@@ -52,7 +67,18 @@ export class AcApPdfConvertor {
     renderer.changeForeground(bg === 0 ? 0xffffff : 0x000000)
   }
 
-  private async downloadAsPdf(svgString: string, downloadName: string) {
+  downloadResult(result: CadFluxPdfExportResult) {
+    const url = URL.createObjectURL(result.blob)
+    const downloadLink = document.createElement('a')
+    downloadLink.href = url
+    downloadLink.download = result.downloadName
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  }
+
+  private async buildPdfBlob(svgString: string): Promise<Blob> {
     const [{ jsPDF }, { svg2pdf }] = await Promise.all([
       import('jspdf'),
       import('svg2pdf.js')
@@ -80,7 +106,7 @@ export class AcApPdfConvertor {
       height: vbHeight
     })
 
-    pdf.save(downloadName)
+    return pdf.output('blob')
   }
 
 }

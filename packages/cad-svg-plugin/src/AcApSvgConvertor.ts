@@ -2,6 +2,12 @@ import { readCadFluxBrowserFontMapping } from '@cadflux/core'
 import type { AcApContext } from '@mlightcad/cad-simple-viewer'
 import type { AcSvgRenderer } from './AcSvgRenderer'
 
+export interface CadFluxSvgExportResult {
+  downloadName: string
+  svgContent: string
+  blob: Blob
+}
+
 /**
  * Utility class for converting CAD drawings to SVG format.
  *
@@ -13,6 +19,11 @@ export class AcApSvgConvertor {
    * Converts the current CAD drawing to SVG format and initiates download.
    */
   async convert(context: AcApContext) {
+    const result = await this.render(context)
+    this.downloadResult(result)
+  }
+
+  async render(context: AcApContext): Promise<CadFluxSvgExportResult> {
     const [{ AcSvgRenderer }, exportModule] = await Promise.all([
       import('./AcSvgRenderer'),
       import('./CadFluxBrowserExport')
@@ -34,7 +45,11 @@ export class AcApSvgConvertor {
       context.doc.fileName || context.doc.docTitle,
       'svg'
     )
-    this.createFileAndDownloadIt(svgContent, downloadName)
+    return {
+      downloadName,
+      svgContent,
+      blob: this.createSvgBlob(svgContent)
+    }
   }
 
   /**
@@ -53,20 +68,22 @@ export class AcApSvgConvertor {
     renderer.changeForeground(bg === 0 ? 0xffffff : 0x000000)
   }
 
-  private createFileAndDownloadIt(svgContent: string, downloadName: string) {
-    const svgBlob = new Blob([svgContent], {
-      type: 'image/svg+xml;charset=utf-8'
-    })
-
-    const url = URL.createObjectURL(svgBlob)
+  downloadResult(result: CadFluxSvgExportResult) {
+    const url = URL.createObjectURL(result.blob)
 
     const downloadLink = document.createElement('a')
     downloadLink.href = url
-    downloadLink.download = downloadName
+    downloadLink.download = result.downloadName
 
     document.body.appendChild(downloadLink)
     downloadLink.click()
     document.body.removeChild(downloadLink)
     window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  }
+
+  private createSvgBlob(svgContent: string) {
+    return new Blob([svgContent], {
+      type: 'image/svg+xml;charset=utf-8'
+    })
   }
 }

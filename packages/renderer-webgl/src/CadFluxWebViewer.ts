@@ -89,7 +89,7 @@ export const CadFluxWebViewer = defineComponent({
       default: 'en'
     }
   },
-  emits: ['create'],
+  emits: ['create', 'document-opened'],
   setup(props, { emit }) {
     const hostRef = ref<HTMLElement | null>(null)
     const isReady = ref(false)
@@ -185,16 +185,28 @@ export const CadFluxWebViewer = defineComponent({
 
         if (!success) {
           errorMessage.value = `Failed to open ${props.localFile.name}.`
+          emit('document-opened', {
+            fileName: props.localFile.name,
+            success: false
+          })
           return
         }
 
         syncLayouts()
         syncLayers()
+        emit('document-opened', {
+          fileName: props.localFile.name,
+          success: true
+        })
       } catch (error) {
         errorMessage.value =
           error instanceof Error
             ? error.message
             : `Failed to open ${props.localFile.name}.`
+        emit('document-opened', {
+          fileName: props.localFile.name,
+          success: false
+        })
       } finally {
         isOpening.value = false
       }

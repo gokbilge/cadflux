@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
-          scope: '@mlightcad'
+          scope: '@cadflux'
 
       - name: Upgrade npm for Trusted Publishing
         run: npm install -g npm@latest
@@ -89,7 +89,7 @@ jobs:
       #   Repository: mlightcad/cad-viewer
       #   Workflow filename: ci.yml
       #   Environment: release  (must match the job environment below)
-      - name: Publish packages to npm
+      - name: Publish CadFlux packages to npm
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           npm --version
@@ -97,7 +97,11 @@ jobs:
           if [ -f "$HOME/.npmrc" ]; then
             sed -i '/_authToken/d' "$HOME/.npmrc"
           fi
-          pnpm publish:viewer
+          pnpm publish:cadflux
+
+      - name: Generate release artifacts
+        if: startsWith(github.ref, 'refs/tags/')
+        run: pnpm release:artifacts
 
       - name: Create github release
         if: startsWith(github.ref, 'refs/tags/')
@@ -106,6 +110,8 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           generate_release_notes: true
+          files: |
+            artifacts/release/*
 
       - name: Export self-contained HTML demo
         if: github.ref == 'refs/heads/main'

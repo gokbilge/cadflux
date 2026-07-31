@@ -16,6 +16,8 @@
     "@cadflux/presets": "workspace:*",
     "@cadflux/renderer-webgl": "workspace:*",
     "element-plus": "^2.12.0",
+    "fflate": "^0.8.2",
+    "idb": "^8.0.3",
     "vue": "^3.4.21"
   },
   "devDependencies": {

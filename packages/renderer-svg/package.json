@@ -15,6 +15,10 @@
     "dist",
     "dist-runner"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "rimraf dist dist-runner tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
     "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"

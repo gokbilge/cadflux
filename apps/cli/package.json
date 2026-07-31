@@ -7,6 +7,10 @@
     "cadflux": "./dist/apps/cli/src/cli.js"
   },
   "main": "./dist/apps/cli/src/cli.js",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
     "clean": "rimraf dist tsconfig.tsbuildinfo"
