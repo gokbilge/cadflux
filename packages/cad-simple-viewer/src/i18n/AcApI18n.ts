@@ -6,7 +6,7 @@ import { AcEdCommandStack } from '../editor'
  * Language/locale id used in the application.
  * Matches the naming style used by vue-i18n ("Locale").
  */
-export type AcApLocale = 'en' | 'zh' | 'tr' | 'cs'
+export type AcApLocale = 'en'
 
 /**
  * A single locale message tree.
@@ -52,10 +52,7 @@ export interface AcApLocaleChangedEventArgs {
  */
 export class AcApI18n {
   private static _messages: AcApLocaleMessages = {
-    en: {},
-    zh: {},
-    tr: {},
-    cs: {}
+    en: {}
   }
 
   /**
@@ -115,7 +112,7 @@ export class AcApI18n {
   /**
    * Set the current active locale for translation.
    *
-   * @param locale - Locale to activate (`"en"` or `"zh"`)
+   * @param locale - Locale to activate (`"en"`)
    *
    * @remarks
    * This method updates the internal locale state used by all
@@ -124,8 +121,8 @@ export class AcApI18n {
    *
    * @example
    * ```ts
-   * AcApI18n.setCurrentLocale('zh')
-   * console.log(AcApI18n.t('core.start'))   // uses Chinese messages
+   * AcApI18n.setCurrentLocale('en')
+   * console.log(AcApI18n.t('core.start'))
    * ```
    */
   public static setCurrentLocale(locale: AcApLocale): void {
@@ -141,7 +138,7 @@ export class AcApI18n {
    *
    * @example
    * ```ts
-   * console.log(AcApI18n.currentLocale)  // "en" or "zh"
+   * console.log(AcApI18n.currentLocale)  // "en"
    * ```
    */
   public static get currentLocale(): AcApLocale {

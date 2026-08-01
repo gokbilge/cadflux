@@ -13,6 +13,10 @@ Changes completed:
   - `packages/cad-simple-viewer/src/ui/AcUiAboutDialog.ts`
   - `packages/cad-simple-viewer/src/ui/AcUiDialog.ts`
   - `packages/cad-simple-viewer/src/ui/index.ts`
+- `packages/cad-simple-viewer/src/i18n` is now English-only:
+  - `AcApLocale` was narrowed to `en`
+  - `cs/*`, `tr/*`, and `zh/*` locale files were removed
+  - locale registration now loads only English command/jig/main messages
 - `packages/renderer-webgl/src/mlightcad-bridge/app.ts` now exports only the symbols required by the active read-only viewer path.
 - `packages/renderer-webgl/src/cadflux-app/index.ts` no longer re-exports the broad MLightCAD bridge surface.
 - `packages/renderer-webgl/src/CadFluxWebViewer.ts` no longer depends on `mlightcad-bridge/service.ts` for layer event typing.
@@ -35,6 +39,12 @@ Effect:
 - Active package-root imports of `@mlightcad/cad-simple-viewer` are now reduced to README/example text references instead of production code.
 - The plugin surface no longer exports the unused example plugin.
 - `AcApDocManager` no longer registers the `about` command in the active viewer command set.
+- `cad-simple-viewer` locale payload was reduced from multi-language message bundles to English-only runtime data.
+
+Observed bundle change in this slice:
+
+- before: `cad-simple-viewer.js` `2,542.02 kB` / gzip `684.77 kB`
+- after: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
 
 Deletion completed in this slice:
 
