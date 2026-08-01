@@ -10,5 +10,10 @@
     "lib": ["ES2022", "DOM"],
     "paths": {}
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/cadflux-editor/**/*.ts",
+    "src/mlightcad-bridge/editor.ts",
+    "src/mlightcad-bridge/service.ts"
+  ]
 }

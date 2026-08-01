@@ -20,9 +20,9 @@
 
 ## Group 3 — MLightCAD UI/editor removal
 
-- Files/packages affected: @mlightcad/cad-simple-viewer
+- Files/packages affected: @mlightcad/cad-simple-viewer, packages/renderer-webgl/src/cadflux-editor/**, packages/renderer-webgl/src/mlightcad-bridge/editor.ts, packages/renderer-webgl/src/mlightcad-bridge/service.ts
 - Expected size reduction: baseline measurement required
-- Required replacement: CadFlux-owned viewer wrappers/adapters
+- Required replacement: CadFlux-owned viewer wrappers/adapters; preserve the current read-only viewer path and remove command/input/editor flows from production
 - Tests protecting behavior: test:minimization + existing server/build tests
 - Risk: high
 - Rollback strategy: restore package from git and rerun baseline tests

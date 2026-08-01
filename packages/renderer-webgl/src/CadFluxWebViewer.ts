@@ -5,7 +5,6 @@
 import { acdbHostApplicationServices } from '@mlightcad/data-model'
 import { AcApDocManager } from './cadflux-app/AcApDocManager'
 import { AcApI18n } from './cadflux-i18n/AcApI18n'
-import type { AcApLayerStoreChangedEventArgs } from './mlightcad-bridge/service'
 import {
   defineComponent,
   h,
@@ -31,6 +30,11 @@ interface LayerOption {
   isOn: boolean
   isFrozen: boolean
   isLocked: boolean
+}
+
+interface LayerStoreChangedEventArgs {
+  currentLayerName: string
+  layers: LayerOption[]
 }
 
 function readLayouts(docManager: CadFluxDocManager): LayoutOption[] {
@@ -129,7 +133,7 @@ export const CadFluxWebViewer = defineComponent({
       syncLayouts()
     }
 
-    const handleLayerStoreChanged = (args: AcApLayerStoreChangedEventArgs) => {
+    const handleLayerStoreChanged = (args: LayerStoreChangedEventArgs) => {
       currentLayerName.value = args.currentLayerName
       layers.value = args.layers.map(layer => ({
         name: layer.name,
