@@ -13,16 +13,14 @@ import { AcDbLibreDwgConverter } from '@mlightcad/libredwg-converter'
 import { FontManager } from '@mlightcad/mtext-renderer'
 import { AcTrMTextRenderer } from '@mlightcad/three-renderer'
 
-import {
-  AcApOpenCmd,
-  AcApPanCmd,
-  AcApRedoCmd,
-  AcApRegenCmd,
-  AcApSelectCmd,
-  AcApSwitchBgCmd,
-  AcApUndoCmd,
-  AcApZoomCmd
-} from '../command'
+import { AcApOpenCmd } from '../command/AcApOpenCmd'
+import { AcApPanCmd } from '../command/AcApPanCmd'
+import { AcApRedoCmd } from '../command/AcApRedoCmd'
+import { AcApRegenCmd } from '../command/AcApRegenCmd'
+import { AcApSelectCmd } from '../command/AcApSelectCmd'
+import { AcApSwitchBgCmd } from '../command/AcApSwitchBgCmd'
+import { AcApUndoCmd } from '../command/AcApUndoCmd'
+import { AcApZoomCmd } from '../command/AcApZoomCmd'
 import {
   AcEdCalculateSizeCallback,
   AcEdCommand,

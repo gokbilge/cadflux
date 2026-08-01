@@ -1,7 +1,7 @@
 import { AcCmColor, AcDbSysVarManager } from '@mlightcad/data-model'
 
 import { AcApContext } from '../app'
-import { AcEdCommand } from '../editor'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
 import {
   layoutBackgroundSysVar,
   toggleBlackWhiteBackgroundColor

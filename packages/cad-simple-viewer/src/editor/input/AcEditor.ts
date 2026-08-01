@@ -1,7 +1,7 @@
 import { AcCmEventManager, AcDbObjectId } from '@mlightcad/data-model'
 
 import { AcApDocManager } from '../../app'
-import { AcEdCommand } from '../command'
+import { AcEdCommand } from '../command/AcEdCommand'
 import { AcEdBaseView } from '../view/AcEdBaseView'
 import { AcEdCorsorType, AcEdCursorManager } from './AcEdCursorManager'
 import { AcEdInputModifiers } from './AcEdInputModifiers'

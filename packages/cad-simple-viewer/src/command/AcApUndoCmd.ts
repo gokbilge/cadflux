@@ -1,5 +1,5 @@
 import { AcApContext } from '../app'
-import { AcEdCommand } from '../editor'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
 import { AcApI18n } from '../i18n'
 import { acapNotifyUndoStackChanged } from '../util/AcApDatabaseEdit'
 

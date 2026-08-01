@@ -7,12 +7,12 @@ import {
 
 import { AcApContext, AcApDocManager } from '../app'
 import {
-  AcEdCommand,
   AcEdPromptBoxOptions,
   AcEdPromptPointOptions,
   AcEdPromptStatus,
   AcEdPromptStringOptions
-} from '../editor'
+} from '../editor/input/prompt'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
 import { AcApI18n } from '../i18n'
 
 /**

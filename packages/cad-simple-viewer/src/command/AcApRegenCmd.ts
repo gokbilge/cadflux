@@ -1,5 +1,5 @@
 import { AcApDocManager } from '../app'
-import { AcEdCommand } from '../editor'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
 
 /**
  * Command to redraw the current drawing in the CAD viewer.

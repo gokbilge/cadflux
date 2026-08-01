@@ -1,5 +1,6 @@
 import { AcApContext } from '../app'
-import { AcEdCommand, eventBus } from '../editor'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
+import { eventBus } from '../editor/global/eventBus'
 
 /**
  * Command to open a CAD file.
