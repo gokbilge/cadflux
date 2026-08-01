@@ -15,7 +15,6 @@ import { FontManager } from '@mlightcad/mtext-renderer'
 import { AcTrMTextRenderer } from '@mlightcad/three-renderer'
 
 import {
-  AcApAboutCmd,
   AcApArcCmd,
   AcApCacheFontCmd,
   AcApCircleCmd,
@@ -1196,7 +1195,6 @@ export class AcApDocManager {
       )
     }
 
-    addSystemCommand('about', 'about', new AcApAboutCmd())
     addSystemCommand('arc', 'arc', new AcApArcCmd())
     addSystemCommand('cachefont', 'cachefont', new AcApCacheFontCmd())
     addSystemCommand('circle', 'circle', new AcApCircleCmd())
