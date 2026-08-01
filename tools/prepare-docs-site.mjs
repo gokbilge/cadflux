@@ -8,7 +8,7 @@ const outputDir = resolve(repoRoot, 'docs');
 
 mkdirSync(outputDir, { recursive: true });
 
-const baseUrl = (process.env.DOCS_BASE_URL || 'https://mlightcad.github.io/cad-viewer/').trim();
+const baseUrl = (process.env.DOCS_BASE_URL || 'https://gokbilge.github.io/cadflux/').trim();
 const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 
 const robotsContent = `User-agent: *\nAllow: /\n\nSitemap: ${normalizedBaseUrl}sitemap.xml\n`;

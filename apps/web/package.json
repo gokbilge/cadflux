@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "analyze": "vite build --mode analyze && node ../../tools/minimization/summarize-web-bundle.mjs",
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview"

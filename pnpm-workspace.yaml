@@ -5,7 +5,6 @@ allowBuilds:
   '@parcel/watcher': true
   core-js: true
   esbuild: true
-  nx: true
   unrs-resolver: true
   vue-demi: true
 overrides:
@@ -20,4 +19,3 @@ overrides:
   lodash-es: '4.17.21'
   three: '^0.172.0'
   vue: '^3.4.21'
-  vue-i18n: '^11.4.4'

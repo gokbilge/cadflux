@@ -2,9 +2,7 @@
 // Copyright (C) 2026 CadFlux contributors
 
 import { AcApI18n, type AcApLocale } from './AcApI18n'
-import enCommand from '../../../cad-simple-viewer/src/i18n/en/command'
-import enJig from '../../../cad-simple-viewer/src/i18n/en/jig'
-import enMain from '../../../cad-simple-viewer/src/i18n/en/main'
+import { enCommand, enJig, enMain } from '../mlightcad-bridge/i18n'
 
 AcApI18n.mergeLocaleMessage('en', {
   command: enCommand,

@@ -5,32 +5,30 @@ import { AcCmEventManager } from '@mlightcad/data-model'
 
 import {
   AcEdCorsorType,
-  AcEdCursorManager
-} from '../../../cad-simple-viewer/src/editor/input/AcEdCursorManager'
-import type { AcEdInputModifiers } from '../../../cad-simple-viewer/src/editor/input/AcEdInputModifiers'
-import type { AcEdInputToggles } from '../../../cad-simple-viewer/src/editor/input/AcEdInputToggles'
-import type { AcEdSelectionFilter } from '../../../cad-simple-viewer/src/editor/input/AcEdSelectionFilter'
-import type {
-  AcEdPromptAngleOptions,
-  AcEdPromptBoxOptions,
-  AcEdPromptBoxResult,
-  AcEdPromptDistanceOptions,
-  AcEdPromptDoubleOptions,
-  AcEdPromptDoubleResult,
-  AcEdPromptEntityOptions,
-  AcEdPromptEntityResult,
-  AcEdPromptIntegerOptions,
-  AcEdPromptIntegerResult,
-  AcEdPromptKeywordOptions,
-  AcEdPromptPointOptions,
-  AcEdPromptPointResult,
-  AcEdPromptResult,
-  AcEdPromptSelectionOptions,
-  AcEdPromptSelectionResult,
-  AcEdPromptStringOptions
-} from '../../../cad-simple-viewer/src/editor/input/prompt'
-import { AcEdPromptStatus } from '../../../cad-simple-viewer/src/editor/input/prompt/AcEdPromptStatus'
-import type { AcEdBaseView } from '../../../cad-simple-viewer/src/editor/view/AcEdBaseView'
+  AcEdCursorManager,
+  type AcEdInputModifiers,
+  type AcEdInputToggles,
+  type AcEdSelectionFilter,
+  type AcEdPromptAngleOptions,
+  type AcEdPromptBoxOptions,
+  type AcEdPromptBoxResult,
+  type AcEdPromptDistanceOptions,
+  type AcEdPromptDoubleOptions,
+  type AcEdPromptDoubleResult,
+  type AcEdPromptEntityOptions,
+  type AcEdPromptEntityResult,
+  type AcEdPromptIntegerOptions,
+  type AcEdPromptIntegerResult,
+  type AcEdPromptKeywordOptions,
+  type AcEdPromptPointOptions,
+  type AcEdPromptPointResult,
+  type AcEdPromptResult,
+  type AcEdPromptSelectionOptions,
+  type AcEdPromptSelectionResult,
+  type AcEdPromptStringOptions,
+  AcEdPromptStatus,
+  type AcEdBaseView
+} from '../mlightcad-bridge/editor'
 
 export interface AcDbSysVarEventArgs {
   name: string

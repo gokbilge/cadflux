@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import type { AcEdPromptKeywordOptions } from '../../../cad-simple-viewer/src/editor/input/prompt/AcEdPromptKeywordOptions'
 import {
+  type AcEdPromptKeywordOptionsSingle as AcEdPromptKeywordOptions,
   AcEdKeywordSession,
   type AcEdCommandLineSessionControl,
   type AcEdPromptInputMode,
   type AcEdPromptInputResult,
   AcEdPromptInputSession
-} from '../../../cad-simple-viewer/src/editor/input/session'
-import type { AcEdMessageType } from '../../../cad-simple-viewer/src/editor/input/ui/AcEdMessageType'
+  ,
+  type AcEdMessageType
+} from '../mlightcad-bridge/editor'
 
 export class AcEdCommandLine {
   private readonly container: HTMLElement

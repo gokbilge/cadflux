@@ -5,7 +5,7 @@
 import { acdbHostApplicationServices } from '@mlightcad/data-model'
 import { AcApDocManager } from './cadflux-app/AcApDocManager'
 import { AcApI18n } from './cadflux-i18n/AcApI18n'
-import type { AcApLayerStoreChangedEventArgs } from '../../cad-simple-viewer/src/service/AcApLayerStore'
+import type { AcApLayerStoreChangedEventArgs } from './mlightcad-bridge/service'
 import {
   defineComponent,
   h,

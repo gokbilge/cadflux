@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { cadfluxRunnerManualChunks } from '../vite-config/index'
+import { cadfluxRunnerManualChunks } from '../../tools/vite-shared'
 import { defineConfig } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))

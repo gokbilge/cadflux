@@ -1,0 +1,31 @@
+{
+  "name": "@cadflux/cad-import",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/cad-import/src/index.js",
+  "types": "./dist/cad-import/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cad-import/src/index.d.ts",
+      "import": "./dist/cad-import/src/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@cadflux/core": "workspace:*",
+    "@cadflux/drawing-model": "workspace:*",
+    "@cadflux/dwg-adapter": "workspace:*",
+    "@cadflux/dxf-adapter": "workspace:*"
+  }
+}

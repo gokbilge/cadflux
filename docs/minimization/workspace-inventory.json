@@ -1,0 +1,2748 @@
+{
+  "generatedAt": "2026-08-01T10:34:35.146Z",
+  "workspaceCount": 25,
+  "activeWorkspaceCount": 25,
+  "workspaces": [
+    {
+      "name": "@cadflux/auth",
+      "dir": "C:\\dev\\cadflux\\packages\\auth",
+      "relativeDir": "packages/auth",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "bcryptjs": "^3.0.3"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/server/src/index.ts",
+          "specifier": "@cadflux/auth",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.test.ts",
+          "specifier": "@cadflux/auth",
+          "context": "test"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/auth",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/server/src/index.ts",
+          "specifier": "@cadflux/auth",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/auth",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [
+        {
+          "file": "apps/server/src/server.test.ts",
+          "specifier": "@cadflux/auth",
+          "context": "test"
+        }
+      ],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/batch-engine",
+      "dir": "C:\\dev\\cadflux\\packages\\batch-engine",
+      "relativeDir": "packages/batch-engine",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/batch-engine/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/batch.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/batch.ts",
+          "specifier": "@cadflux/batch-engine",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/cad-import",
+      "dir": "C:\\dev\\cadflux\\packages\\cad-import",
+      "relativeDir": "packages/cad-import",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*",
+        "@cadflux/drawing-model": "workspace:*",
+        "@cadflux/dwg-adapter": "workspace:*",
+        "@cadflux/dxf-adapter": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/drawing-model"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/dwg-adapter"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/dxf-adapter"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/cad-import/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/cad-import",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/cad-import",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/cad-import",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/cad-import",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/cli",
+      "dir": "C:\\dev\\cadflux\\apps\\cli",
+      "relativeDir": "apps/cli",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "app",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/batch-engine": "workspace:*",
+        "@cadflux/cad-import": "workspace:*",
+        "@cadflux/config": "workspace:*",
+        "@cadflux/core": "workspace:*",
+        "@cadflux/diagnostics": "workspace:*",
+        "@cadflux/file-ingest": "workspace:*",
+        "@cadflux/plot-engine": "workspace:*",
+        "@cadflux/presets": "workspace:*",
+        "@cadflux/renderer-pdf": "workspace:*",
+        "@cadflux/renderer-svg": "workspace:*",
+        "commander": "^12.1.0",
+        "playwright": "^1.49.1"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/batch-engine"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/cad-import"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/config"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/diagnostics"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/file-ingest"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/plot-engine"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/presets"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/renderer-pdf"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/renderer-svg"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo",
+        "test:watch": "pnpm run build && node --test dist/apps/cli/src/cli.watch.test.js"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/apps/cli/src/cli.js",
+      "sourceImporters": [],
+      "directDependents": [],
+      "buildImporters": [],
+      "runtimeImporters": [],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/config",
+      "dir": "C:\\dev\\cadflux\\packages\\config",
+      "relativeDir": "packages/config",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "tsc -p tsconfig.json",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/config",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/config",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/contracts",
+      "dir": "C:\\dev\\cadflux\\packages\\contracts",
+      "relativeDir": "packages/contracts",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@sinclair/typebox": "^0.34.52"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/App.vue",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/database/src/index.ts",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/database",
+        "@cadflux/server",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/App.vue",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/database/src/index.ts",
+          "specifier": "@cadflux/contracts",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/core",
+      "dir": "C:\\dev\\cadflux\\packages\\core",
+      "relativeDir": "packages/core",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/core/checksum",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/core/checksum",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/batch.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/storage.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/batch-engine/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/CadFluxBrowserExport.d.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/CadFluxBrowserExport.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/CadFluxBrowserExport.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgConvertor.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/CadFluxBrowserExport.d.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/CadFluxBrowserExport.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/CadFluxBrowserExport.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/diagnostics/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/dwg-adapter/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/dxf-adapter/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/file-ingest/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/file-ingest/src/node.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/plot-engine/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/presets/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/src/node.ts",
+          "specifier": "@cadflux/core/browserBridge",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/src/node.ts",
+          "specifier": "@cadflux/core/browserBridge",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/batch-engine",
+        "@cadflux/cad-import",
+        "@cadflux/cli",
+        "@cadflux/diagnostics",
+        "@cadflux/drawing-model",
+        "@cadflux/dwg-adapter",
+        "@cadflux/dxf-adapter",
+        "@cadflux/file-ingest",
+        "@cadflux/plot-engine",
+        "@cadflux/presets",
+        "@cadflux/renderer-pdf",
+        "@cadflux/renderer-svg",
+        "@cadflux/server",
+        "@mlightcad/cad-pdf-plugin",
+        "@mlightcad/cad-svg-plugin"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/core/checksum",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/core/checksum",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/batch.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/web/src/storage.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/batch-engine/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/CadFluxBrowserExport.d.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/CadFluxBrowserExport.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/CadFluxBrowserExport.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgConvertor.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/CadFluxBrowserExport.d.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/CadFluxBrowserExport.js",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/CadFluxBrowserExport.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/diagnostics/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/dwg-adapter/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/dxf-adapter/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/file-ingest/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/file-ingest/src/node.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/plot-engine/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/presets/src/index.ts",
+          "specifier": "@cadflux/core",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/src/node.ts",
+          "specifier": "@cadflux/core/browserBridge",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/src/node.ts",
+          "specifier": "@cadflux/core/browserBridge",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/database",
+      "dir": "C:\\dev\\cadflux\\packages\\database",
+      "relativeDir": "packages/database",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/contracts": "workspace:*",
+        "better-sqlite3": "^13.0.2"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/contracts"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/database/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/server/src/index.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.test.ts",
+          "specifier": "@cadflux/database",
+          "context": "test"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/server/src/index.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/reports.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker.ts",
+          "specifier": "@cadflux/database",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [
+        {
+          "file": "apps/server/src/server.test.ts",
+          "specifier": "@cadflux/database",
+          "context": "test"
+        }
+      ],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/diagnostics",
+      "dir": "C:\\dev\\cadflux\\packages\\diagnostics",
+      "relativeDir": "packages/diagnostics",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/diagnostics/src/index.js",
+      "sourceImporters": [],
+      "directDependents": [
+        "@cadflux/cli"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/drawing-model",
+      "dir": "C:\\dev\\cadflux\\packages\\drawing-model",
+      "relativeDir": "packages/drawing-model",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "tsc -p tsconfig.json",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/drawing-model",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-import/src/types.ts",
+          "specifier": "@cadflux/drawing-model",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cad-import",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/drawing-model",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-import/src/types.ts",
+          "specifier": "@cadflux/drawing-model",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/dwg-adapter",
+      "dir": "C:\\dev\\cadflux\\packages\\dwg-adapter",
+      "relativeDir": "packages/dwg-adapter",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/dwg-adapter/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/dwg-adapter",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cad-import"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/dwg-adapter",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/dxf-adapter",
+      "dir": "C:\\dev\\cadflux\\packages\\dxf-adapter",
+      "relativeDir": "packages/dxf-adapter",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/dxf-adapter/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/dxf-adapter",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cad-import"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-import/src/mlightcad/adapter.ts",
+          "specifier": "@cadflux/dxf-adapter",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/file-ingest",
+      "dir": "C:\\dev\\cadflux\\packages\\file-ingest",
+      "relativeDir": "packages/file-ingest",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/file-ingest/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/file-ingest/node",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/file-ingest/node",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/plot-engine",
+      "dir": "C:\\dev\\cadflux\\packages\\plot-engine",
+      "relativeDir": "packages/plot-engine",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/plot-engine/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/plot-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/plot-engine",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/plot-engine",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/plot-engine",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/presets",
+      "dir": "C:\\dev\\cadflux\\packages\\presets",
+      "relativeDir": "packages/presets",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/presets/src/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/presets",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/presets",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server",
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/presets",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/presets",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/renderer-pdf",
+      "dir": "C:\\dev\\cadflux\\packages\\renderer-pdf",
+      "relativeDir": "packages/renderer-pdf",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-pdf-plugin": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/cad-svg-plugin": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "jspdf": "^4.2.1",
+        "playwright": "^1.49.1"
+      },
+      "devDependencies": {
+        "svg2pdf.js": "^2.7.0",
+        "vite": "^6.4.3"
+      },
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-pdf-plugin"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-svg-plugin"
+        }
+      ],
+      "scripts": {
+        "build": "pnpm run build:lib && pnpm run build:runner",
+        "build:lib": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "build:runner": "rimraf dist-runner && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
+        "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
+      },
+      "buildScript": "pnpm run build:lib && pnpm run build:runner",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/renderer-pdf/src/node.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/renderer-pdf",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/renderer-pdf",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/renderer-pdf",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/renderer-pdf",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/renderer-svg",
+      "dir": "C:\\dev\\cadflux\\packages\\renderer-svg",
+      "relativeDir": "packages/renderer-svg",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/cad-svg-plugin": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "playwright": "^1.49.1"
+      },
+      "devDependencies": {
+        "vite": "^6.4.3"
+      },
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-svg-plugin"
+        }
+      ],
+      "scripts": {
+        "build": "pnpm run build:lib && pnpm run build:runner",
+        "build:lib": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "build:runner": "rimraf dist-runner && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
+        "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
+      },
+      "buildScript": "pnpm run build:lib && pnpm run build:runner",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/renderer-svg/src/node.js",
+      "sourceImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/renderer-svg",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/renderer-svg",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/cli",
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/cli/src/cli.ts",
+          "specifier": "@cadflux/renderer-svg",
+          "context": "runtime"
+        },
+        {
+          "file": "apps/server/src/worker-child.ts",
+          "specifier": "@cadflux/renderer-svg",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/renderer-webgl",
+      "dir": "C:\\dev\\cadflux\\packages\\renderer-webgl",
+      "relativeDir": "packages/renderer-webgl",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/cad-pdf-plugin": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/cad-svg-plugin": "workspace:*",
+        "@mlightcad/libredwg-converter": "^3.12.1",
+        "@mlightcad/mtext-renderer": "^0.12.1",
+        "@mlightcad/three-renderer": "workspace:*"
+      },
+      "devDependencies": {},
+      "peerDependencies": {
+        "vue": "^3.4.21"
+      },
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-pdf-plugin"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/cad-svg-plugin"
+        },
+        {
+          "section": "dependencies",
+          "target": "@mlightcad/three-renderer"
+        }
+      ],
+      "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "tsc -p tsconfig.json",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [],
+      "directDependents": [
+        "@cadflux/web"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/server",
+      "dir": "C:\\dev\\cadflux\\apps\\server",
+      "relativeDir": "apps/server",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "app",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/auth": "workspace:*",
+        "@cadflux/batch-engine": "workspace:*",
+        "@cadflux/cad-import": "workspace:*",
+        "@cadflux/core": "workspace:*",
+        "@cadflux/contracts": "workspace:*",
+        "@cadflux/database": "workspace:*",
+        "@cadflux/presets": "workspace:*",
+        "@cadflux/plot-engine": "workspace:*",
+        "@cadflux/renderer-pdf": "workspace:*",
+        "@cadflux/renderer-svg": "workspace:*",
+        "@cadflux/storage": "workspace:*",
+        "@fastify/cookie": "^11.1.2",
+        "@fastify/multipart": "^10.1.0",
+        "@fastify/rate-limit": "^11.2.0",
+        "@fastify/static": "^10.1.2",
+        "@fastify/swagger": "^9.8.1",
+        "@sinclair/typebox": "^0.34.52",
+        "fflate": "^0.8.2",
+        "fastify": "^5.11.0"
+      },
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/auth"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/batch-engine"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/cad-import"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/contracts"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/database"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/presets"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/plot-engine"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/renderer-pdf"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/renderer-svg"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/storage"
+        }
+      ],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo",
+        "dev": "tsx watch src/index.ts serve",
+        "start": "node dist/apps/server/src/index.js serve"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/apps/server/src/index.js",
+      "sourceImporters": [],
+      "directDependents": [],
+      "buildImporters": [],
+      "runtimeImporters": [],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/storage",
+      "dir": "C:\\dev\\cadflux\\packages\\storage",
+      "relativeDir": "packages/storage",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {},
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+        "clean": "rimraf dist tsconfig.tsbuildinfo"
+      },
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.js",
+      "sourceImporters": [
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/storage",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/server"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "apps/server/src/server.ts",
+          "specifier": "@cadflux/storage",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@cadflux/web",
+      "dir": "C:\\dev\\cadflux\\apps\\web",
+      "relativeDir": "apps/web",
+      "activeWorkspace": true,
+      "version": "0.1.0",
+      "private": true,
+      "packageType": "app",
+      "typeField": "module",
+      "dependencies": {
+        "@cadflux/batch-engine": "workspace:*",
+        "@cadflux/config": "workspace:*",
+        "@cadflux/contracts": "workspace:*",
+        "@cadflux/drawing-model": "workspace:*",
+        "@cadflux/file-ingest": "workspace:*",
+        "@cadflux/presets": "workspace:*",
+        "@cadflux/renderer-webgl": "workspace:*",
+        "element-plus": "^2.12.0",
+        "fflate": "^0.8.2",
+        "idb": "^8.0.3",
+        "vue": "^3.4.21"
+      },
+      "devDependencies": {
+        "@vitejs/plugin-vue": "^6.0.8",
+        "vite": "^6.4.3",
+        "vue-tsc": "^2.1.6"
+      },
+      "peerDependencies": {},
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "dependencies",
+          "target": "@cadflux/batch-engine"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/config"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/contracts"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/drawing-model"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/file-ingest"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/presets"
+        },
+        {
+          "section": "dependencies",
+          "target": "@cadflux/renderer-webgl"
+        }
+      ],
+      "scripts": {
+        "analyze": "vite build --mode analyze && node ../../tools/minimization/summarize-web-bundle.mjs",
+        "build": "vite build",
+        "dev": "vite",
+        "preview": "vite preview"
+      },
+      "buildScript": "vite build",
+      "testScript": null,
+      "runtimeEntryPoint": null,
+      "sourceImporters": [],
+      "directDependents": [],
+      "buildImporters": [],
+      "runtimeImporters": [],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@mlightcad/cad-pdf-plugin",
+      "dir": "C:\\dev\\cadflux\\packages\\cad-pdf-plugin",
+      "relativeDir": "packages/cad-pdf-plugin",
+      "activeWorkspace": true,
+      "version": "1.5.8",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/cad-svg-plugin": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "jspdf": "^4.2.1",
+        "pdfjs-dist": "^5.6.205",
+        "svg2pdf.js": "^2.7.0"
+      },
+      "peerDependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/cad-svg-plugin": "workspace:*"
+      },
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "devDependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "devDependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "devDependencies",
+          "target": "@mlightcad/cad-svg-plugin"
+        },
+        {
+          "section": "peerDependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "peerDependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "peerDependencies",
+          "target": "@mlightcad/cad-svg-plugin"
+        }
+      ],
+      "scripts": {
+        "clean": "rimraf dist lib tsconfig.tsbuildinfo",
+        "build": "tsc && vite build",
+        "lint": "eslint src/",
+        "lint:fix": "eslint --fix --quiet src/"
+      },
+      "buildScript": "tsc && vite build",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/cad-pdf-plugin.umd.cjs",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-pdf-plugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/plugin/AcApLazyPluginRegistration.d.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/plugin/AcApLazyPluginRegistration.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-webgl/src/index.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/convertor",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/renderer-pdf",
+        "@cadflux/renderer-webgl"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-pdf-plugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/plugin/AcApLazyPluginRegistration.d.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/plugin/AcApLazyPluginRegistration.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-webgl/src/index.ts",
+          "specifier": "@mlightcad/cad-pdf-plugin/convertor",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@mlightcad/cad-simple-viewer",
+      "dir": "C:\\dev\\cadflux\\packages\\cad-simple-viewer",
+      "relativeDir": "packages/cad-simple-viewer",
+      "activeWorkspace": true,
+      "version": "1.5.8",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/libredwg-converter": "^3.12.1",
+        "@mlightcad/mtext-input-box": "^0.2.22",
+        "@mlightcad/mtext-renderer": "^0.12.1",
+        "@mlightcad/three-renderer": "workspace:*",
+        "@mlightcad/three-viewcube": "0.0.9",
+        "@types/lodash-es": "^4.17.12",
+        "@types/rbush": "^3.0.4",
+        "@types/three": "^0.172.0",
+        "lodash-es": "4.17.21",
+        "mitt": "^3.0.1",
+        "rbush": "^4.0.1",
+        "three": "^0.172.0"
+      },
+      "peerDependencies": {
+        "@mlightcad/data-model": "^1.12.1",
+        "lodash-es": "4.17.21",
+        "three": "^0.172.0"
+      },
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "devDependencies",
+          "target": "@mlightcad/three-renderer"
+        }
+      ],
+      "scripts": {
+        "clean": "rimraf dist lib tsconfig.tsbuildinfo",
+        "build": "tsc && vite build",
+        "copy:workers": "node ../../tools/copy-workers.mjs",
+        "lint": "eslint src/",
+        "lint:fix": "eslint --fix --quiet src/"
+      },
+      "buildScript": "tsc && vite build",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/cad-simple-viewer.umd.cjs",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApConvertToPdfCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApConvertToPdfCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApImportPdfCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApImportPdfCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfImportConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfPlugin.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfPlugin.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfImportConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/plugin/AcApPluginExample.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApConvertToSvgCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApConvertToSvgCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgPlugin.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgPlugin.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/runner/main.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/runner/main.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/renderer-pdf",
+        "@cadflux/renderer-svg",
+        "@cadflux/renderer-webgl",
+        "@mlightcad/cad-pdf-plugin",
+        "@mlightcad/cad-svg-plugin"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApConvertToPdfCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApConvertToPdfCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApImportPdfCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApImportPdfCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfImportConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfPlugin.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfPlugin.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfImportConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/plugin/AcApPluginExample.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApConvertToSvgCmd.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApConvertToSvgCmd.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgConvertor.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgPlugin.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/AcApSvgPlugin.js",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/runner/main.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/runner/main.ts",
+          "specifier": "@mlightcad/cad-simple-viewer",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@mlightcad/cad-svg-plugin",
+      "dir": "C:\\dev\\cadflux\\packages\\cad-svg-plugin",
+      "relativeDir": "packages/cad-svg-plugin",
+      "activeWorkspace": true,
+      "version": "1.5.8",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/mtext-parser": "^1.4.1",
+        "@mlightcad/mtext-renderer": "^0.12.1"
+      },
+      "peerDependencies": {
+        "@cadflux/core": "workspace:*",
+        "@mlightcad/cad-simple-viewer": "workspace:*",
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/mtext-parser": "^1.4.1",
+        "@mlightcad/mtext-renderer": "^0.12.1"
+      },
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [
+        {
+          "section": "devDependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "devDependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        },
+        {
+          "section": "peerDependencies",
+          "target": "@cadflux/core"
+        },
+        {
+          "section": "peerDependencies",
+          "target": "@mlightcad/cad-simple-viewer"
+        }
+      ],
+      "scripts": {
+        "clean": "rimraf dist lib tsconfig.tsbuildinfo",
+        "build": "tsc && vite build",
+        "lint": "eslint src/",
+        "lint:fix": "eslint --fix --quiet src/"
+      },
+      "buildScript": "tsc && vite build",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/cad-svg-plugin.umd.cjs",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.js",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.js",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-svg-plugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/runner/main.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/runner/main.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-webgl/src/index.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/convertor",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/renderer-pdf",
+        "@cadflux/renderer-svg",
+        "@cadflux/renderer-webgl",
+        "@mlightcad/cad-pdf-plugin"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-pdf-plugin/lib/AcApPdfConvertor.js",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.d.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/lib/register.js",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/README.md",
+          "specifier": "@mlightcad/cad-svg-plugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/register.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/register",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-pdf/runner/main.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-svg/runner/main.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-webgl/src/index.ts",
+          "specifier": "@mlightcad/cad-svg-plugin/convertor",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [],
+      "productionReachable": true
+    },
+    {
+      "name": "@mlightcad/three-renderer",
+      "dir": "C:\\dev\\cadflux\\packages\\three-renderer",
+      "relativeDir": "packages/three-renderer",
+      "activeWorkspace": true,
+      "version": "1.5.8",
+      "private": false,
+      "packageType": "package",
+      "typeField": "module",
+      "dependencies": {},
+      "devDependencies": {
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/mtext-renderer": "^0.12.1",
+        "@types/three": "^0.172.0",
+        "three": "^0.172.0"
+      },
+      "peerDependencies": {
+        "@mlightcad/data-model": "^1.12.1",
+        "@mlightcad/mtext-renderer": "^0.12.1",
+        "@velipso/polybool": "^1.1.1",
+        "three": "^0.172.0"
+      },
+      "optionalDependencies": {},
+      "manifestWorkspaceDeps": [],
+      "scripts": {
+        "clean": "rimraf dist lib tsconfig.tsbuildinfo",
+        "build": "tsc && vite build",
+        "lint": "eslint src/",
+        "lint:fix": "eslint --fix --quiet src/"
+      },
+      "buildScript": "tsc && vite build",
+      "testScript": null,
+      "runtimeEntryPoint": "./dist/index.umd.cjs",
+      "sourceImporters": [
+        {
+          "file": "packages/cad-simple-viewer/lib/app/AcApDocManager.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/app/AcApFontLoader.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/AcApMemoryProfiler.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/AcApMemoryProfiler.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/convert/AcApEntityPreviewConvertor.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/spatialIndex/AcTrHierarchicalSpatialIndex.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrGroupWcsBboxAssert.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrInheritedLayerMaterialMapper.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrInheritedLayerMaterialMapper.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayer.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayer.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayerAppearanceController.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayout.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayout.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayoutView.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayoutView.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrScene.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrScene.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrView2d.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrView2d.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/app/AcApDocManager.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/app/AcApFontLoader.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/AcApMemoryProfiler.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/convert/AcApBlockPreviewConvertor.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/convert/AcApEntityPreviewConvertor.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/spatialIndex/AcTrHierarchicalSpatialIndex.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrGroupWcsBboxAssert.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrInheritedLayerMaterialMapper.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayer.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayerAppearanceController.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayout.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayoutView.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrScene.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrView2d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrInheritedLayerMaterialMapper.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrLayer.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrLayout.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrView2d.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrView2dLayerSync.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/renderer-webgl/src/cadflux-app/AcApDocManager.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        }
+      ],
+      "directDependents": [
+        "@cadflux/renderer-webgl",
+        "@mlightcad/cad-simple-viewer"
+      ],
+      "buildImporters": [],
+      "runtimeImporters": [
+        {
+          "file": "packages/cad-simple-viewer/lib/app/AcApDocManager.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/app/AcApFontLoader.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/AcApMemoryProfiler.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/AcApMemoryProfiler.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/command/convert/AcApEntityPreviewConvertor.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/spatialIndex/AcTrHierarchicalSpatialIndex.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrGroupWcsBboxAssert.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrInheritedLayerMaterialMapper.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrInheritedLayerMaterialMapper.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayer.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayer.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayerAppearanceController.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayout.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayout.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayoutView.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrLayoutView.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrScene.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrScene.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrView2d.d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/lib/view/AcTrView2d.js",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/app/AcApDocManager.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/app/AcApFontLoader.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/AcApMemoryProfiler.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/convert/AcApBlockPreviewConvertor.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/command/convert/AcApEntityPreviewConvertor.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/spatialIndex/AcTrHierarchicalSpatialIndex.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrGroupWcsBboxAssert.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrInheritedLayerMaterialMapper.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayer.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayerAppearanceController.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayout.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrLayoutView.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrScene.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-simple-viewer/src/view/AcTrView2d.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/renderer-webgl/src/cadflux-app/AcApDocManager.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "runtime"
+        }
+      ],
+      "testImporters": [
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrInheritedLayerMaterialMapper.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrLayer.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrLayout.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrView2d.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        },
+        {
+          "file": "packages/cad-simple-viewer/__tests__/AcTrView2dLayerSync.spec.ts",
+          "specifier": "@mlightcad/three-renderer",
+          "context": "test"
+        }
+      ],
+      "productionReachable": true
+    }
+  ]
+}

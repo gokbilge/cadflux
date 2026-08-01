@@ -4,7 +4,7 @@ import { defineConfig, PluginOption } from 'vite'
 import {
   createLibEntryFileName,
   createLibRollupOutput
-} from '../vite-config/pluginRollupOutput'
+} from '../../tools/vite-shared'
 
 const packageName = '@mlightcad/cad-pdf-plugin'
 const pluginId = 'cad-pdf-plugin'

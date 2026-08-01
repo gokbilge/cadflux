@@ -3,8 +3,7 @@
 
 import type { AcGePoint2dLike, AcGePoint3dLike } from '@mlightcad/data-model'
 
-import type { AcEdMarkerType } from '../../../cad-simple-viewer/src/editor/input/marker/AcEdMarker'
-import type { AcEdBaseView } from '../../../cad-simple-viewer/src/editor/view/AcEdBaseView'
+import type { AcEdMarkerType, AcEdBaseView } from '../mlightcad-bridge/editor'
 
 export type AcEdOsnapPoint = AcGePoint3dLike & {
   type: number

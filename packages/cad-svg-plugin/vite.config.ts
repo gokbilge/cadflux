@@ -4,7 +4,7 @@ import { defineConfig, PluginOption } from 'vite'
 import {
   createLibEntryFileName,
   createLibRollupOutput
-} from '../vite-config/pluginRollupOutput'
+} from '../../tools/vite-shared'
 
 const packageName = '@mlightcad/cad-svg-plugin'
 const pluginId = 'cad-svg-plugin'

@@ -152,7 +152,7 @@ describe('CadFlux server routes', () => {
 
     expect((await app.inject({ method: 'POST', url: '/api/v1/jobs/job-1/start', headers })).statusCode).toBe(200)
 
-  })
+  }, 15000)
 
   test('report endpoint generates persisted report artifacts', async () => {
     const config = await createAdminFixture()

@@ -47,3 +47,6 @@ Thumbs.db
 .nx/workspace-data
 artifacts/
 data/
+!artifacts/minimization/
+artifacts/minimization/deploy/
+artifacts/minimization/docker-build/

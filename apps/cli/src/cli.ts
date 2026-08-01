@@ -23,6 +23,7 @@ import {
   createBatchReportArtifacts,
   createBatchReportFromResults
 } from '@cadflux/batch-engine'
+import { inspectCadInput } from '@cadflux/cad-import'
 import { CADFLUX_DEFAULT_FLAGS } from '@cadflux/config'
 import {
   createCadFluxRuntime,
@@ -34,8 +35,6 @@ import {
   type CadFluxInputSource,
   type CadFluxProfile
 } from '@cadflux/core'
-import { inspectDwgInput } from '@cadflux/dwg-adapter'
-import { inspectDxfInput } from '@cadflux/dxf-adapter'
 import { collectNodeInputs, readInputListFile } from '@cadflux/file-ingest/node'
 import { resolveArtifactOutputPath } from '@cadflux/plot-engine'
 import { CADFLUX_PRESETS, getCadFluxPreset, validateCadFluxProfile } from '@cadflux/presets'
@@ -125,11 +124,20 @@ const program = new Command()
 
 class NodeCadFluxConverter implements CadFluxConverter {
   async inspect(input: CadFluxInputSource): Promise<CadFluxInspection> {
-    if (input.extension === '.dwg') {
-      return inspectDwgInput(input)
-    }
-    if (input.extension === '.dxf') {
-      return inspectDxfInput(input)
+    if (input.extension === '.dwg' || input.extension === '.dxf') {
+      const inspection = await inspectCadInput({
+        name: input.name,
+        format: input.extension === '.dwg' ? 'dwg' : 'dxf',
+        path: input.absolutePath,
+        relativePath: input.relativePath,
+        sizeBytes: input.sizeBytes,
+        lastModifiedMs: input.lastModifiedMs
+      })
+      return {
+        input,
+        detectedFormat: inspection.format,
+        warnings: inspection.warnings.map(item => item.message)
+      }
     }
     return {
       input,

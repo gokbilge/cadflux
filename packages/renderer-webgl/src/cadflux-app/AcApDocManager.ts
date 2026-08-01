@@ -10,16 +10,16 @@ import {
 import { AcDbLibreDwgConverter } from '@mlightcad/libredwg-converter'
 import { AcTrMTextRenderer } from '@mlightcad/three-renderer'
 
-import { AcApContext } from '../../../cad-simple-viewer/src/app/AcApContext'
-import { AcApDocument } from '../../../cad-simple-viewer/src/app/AcApDocument'
-import { AcApFontLoader } from '../../../cad-simple-viewer/src/app/AcApFontLoader'
-import type { AcApOpenDatabaseOptions } from '../../../cad-simple-viewer/src/app/AcDbOpenDatabaseOptions'
-import { AcEdOpenMode } from '../../../cad-simple-viewer/src/editor/view/AcEdOpenMode'
-import { AcTrView2d } from '../../../cad-simple-viewer/src/view'
 import {
+  AcApContext,
+  AcApDocument,
+  AcApFontLoader,
+  type AcApOpenDatabaseOptions,
+  AcEdOpenMode,
+  AcTrView2d,
   LIBREDWG_PARSER_WORKER_FILE,
   MTEXT_RENDERER_WORKER_FILE
-} from '../../../cad-simple-viewer/src/app/AcApWorkerAssets'
+} from '../mlightcad-bridge/app'
 import {
   getCadFluxFontsToLoad,
   setCadFluxDefaultFonts

@@ -1,0 +1,14 @@
+{
+  "allowedPackages": [
+    "packages/cad-import",
+    "packages/dwg-adapter",
+    "packages/dxf-adapter",
+    "packages/renderer-webgl",
+    "packages/renderer-svg",
+    "packages/renderer-pdf",
+    "packages/cad-simple-viewer",
+    "packages/cad-pdf-plugin",
+    "packages/cad-svg-plugin",
+    "packages/three-renderer"
+  ]
+}

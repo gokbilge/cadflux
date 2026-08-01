@@ -33,6 +33,7 @@
       "@cadflux/batch-engine": ["packages/batch-engine/src/index.ts"],
       "@cadflux/diagnostics": ["packages/diagnostics/src/index.ts"],
       "@cadflux/config": ["packages/config/src/index.ts"],
+      "@cadflux/cad-import": ["packages/cad-import/src/index.ts"],
       "@cadflux/drawing-model": ["packages/drawing-model/src/index.ts"],
       "@cadflux/dwg-adapter": ["packages/dwg-adapter/src/index.ts"],
       "@cadflux/dxf-adapter": ["packages/dxf-adapter/src/index.ts"],

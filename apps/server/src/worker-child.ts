@@ -4,10 +4,9 @@
 import { mkdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 
+import { inspectCadInput } from '@cadflux/cad-import'
 import type { CadFluxFormat, CadFluxProfile } from '@cadflux/core'
 import { checksumFile } from '@cadflux/core/checksum'
-import { inspectDwgInput } from '@cadflux/dwg-adapter'
-import { inspectDxfInput } from '@cadflux/dxf-adapter'
 import { resolveArtifactOutputPath } from '@cadflux/plot-engine'
 import { exportPdfFile } from '@cadflux/renderer-pdf'
 import { exportSvgFile } from '@cadflux/renderer-svg'
@@ -55,9 +54,14 @@ async function main(): Promise<void> {
 
   try {
     send({ type: 'stage', stage: 'parsing', progressPercent: 10 })
-    const inspection =
-      payload.format === 'dwg' ? inspectDwgInput(input) : inspectDxfInput(input)
-    const warnings = [...inspection.warnings]
+    const inspection = await inspectCadInput({
+      name: payload.originalName,
+      format: payload.format === 'dwg' ? 'dwg' : 'dxf',
+      path: payload.storedPath,
+      relativePath: payload.relativePath,
+      sizeBytes: payload.sizeBytes
+    })
+    const warnings = inspection.warnings.map(item => item.message)
 
     send({ type: 'stage', stage: 'rendering', progressPercent: 35 })
     const artifacts: ChildArtifactPayload[] = []

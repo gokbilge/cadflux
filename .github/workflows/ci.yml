@@ -57,31 +57,8 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      # Use system Google Chrome (preinstalled on ubuntu-latest) via channel "chrome".
-      # Avoids playwright install chromium, which often hangs at zip extraction on CI.
-      - name: Install Playwright system dependencies
-        run: pnpm --filter @mlightcad/cad-viewer-example exec playwright install-deps chromium
-
-      - name: Run E2E tests
-        run: pnpm --filter @mlightcad/cad-viewer-example test:e2e
-        env:
-          PLAYWRIGHT_BROWSER_CHANNEL: chrome
-
-      - name: Upload Playwright artifacts
-        if: failure()
-        uses: actions/upload-artifact@v6
-        with:
-          name: playwright-artifacts
-          path: |
-            packages/cad-viewer-example/playwright-report/
-            packages/cad-viewer-example/test-results/
-          if-no-files-found: ignore
-
       - name: Build docs
         run: pnpm docs:build
-
-      - name: Pre-serve
-        run: pnpm pre-serve
 
       # Authenticates via npm Trusted Publishing (OIDC); no NPM_TOKEN needed.
       # Configure each package on npmjs.com → Settings → Trusted publishing:
@@ -112,27 +89,3 @@ jobs:
           generate_release_notes: true
           files: |
             artifacts/release/*
-
-      - name: Export self-contained HTML demo
-        if: github.ref == 'refs/heads/main'
-        run: node packages/examples/exportDemoHtml.js
-        env:
-          PLAYWRIGHT_BROWSER_CHANNEL: chrome
-
-      - name: Upload github pages artifact
-        if: github.ref == 'refs/heads/main' && github.event.repository.has_pages == true
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: './packages/examples/public/'
-
-  deploy-pages:
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event.repository.has_pages == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

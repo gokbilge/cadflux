@@ -10,7 +10,7 @@ import { spawn } from 'node:child_process'
 const tempRoot = await mkdtemp(path.join(tmpdir(), 'cadflux-server-test-'))
 const dataDir = path.join(tempRoot, 'data')
 const databasePath = path.join(dataDir, 'database', 'cadflux.sqlite')
-const fixturePath = path.resolve('packages/cad-viewer-example/e2e/fixtures/minimal-line.dxf')
+const fixturePath = path.resolve('fixtures/minimization/minimal-line.dxf')
 const port = 18080
 const baseUrl = `http://127.0.0.1:${port}`
 

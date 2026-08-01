@@ -25,7 +25,7 @@ export async function loadCadFluxViewerComponent(): Promise<unknown> {
 export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> {
   const [{ AcApDocManager }, { AcEdOpenMode }] = await Promise.all([
     import('./cadflux-app/AcApDocManager'),
-    import('../../cad-simple-viewer/src/editor/view/AcEdOpenMode')
+    import('./mlightcad-bridge/app')
   ])
 
   const exportCurrent = async (command: 'cpdf' | 'csvg') => {

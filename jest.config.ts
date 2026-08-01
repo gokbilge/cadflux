@@ -31,6 +31,7 @@ const config: Config = {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@cadflux/auth$': '<rootDir>/packages/auth/src/index.ts',
     '^@cadflux/batch-engine$': '<rootDir>/packages/batch-engine/src/index.ts',
+    '^@cadflux/cad-import$': '<rootDir>/packages/cad-import/src/index.ts',
     '^@cadflux/config$': '<rootDir>/packages/config/src/index.ts',
     '^@cadflux/contracts$': '<rootDir>/packages/contracts/src/index.ts',
     '^@cadflux/core$': '<rootDir>/packages/core/src/index.ts',

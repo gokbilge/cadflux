@@ -2,7 +2,7 @@
 // Copyright (C) 2026 CadFlux contributors
 
 import { AcEdMTextEditor } from './AcEdMTextEditor'
-import type { AcTrView2d } from '../../../cad-simple-viewer/src/view/AcTrView2d'
+import type { AcTrView2d } from '../mlightcad-bridge/editor'
 
 export class AcEdViewKeyHandler {
   constructor(private readonly view: AcTrView2d) {}

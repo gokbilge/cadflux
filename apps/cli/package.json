@@ -18,11 +18,10 @@
   },
   "dependencies": {
     "@cadflux/batch-engine": "workspace:*",
+    "@cadflux/cad-import": "workspace:*",
     "@cadflux/config": "workspace:*",
     "@cadflux/core": "workspace:*",
     "@cadflux/diagnostics": "workspace:*",
-    "@cadflux/dwg-adapter": "workspace:*",
-    "@cadflux/dxf-adapter": "workspace:*",
     "@cadflux/file-ingest": "workspace:*",
     "@cadflux/plot-engine": "workspace:*",
     "@cadflux/presets": "workspace:*",

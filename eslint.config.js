@@ -1,6 +1,5 @@
 import globals from 'globals'
 import jsLint from '@eslint/js'
-import vueI18n from '@intlify/eslint-plugin-vue-i18n'
 import tsLint from 'typescript-eslint'
 import vueLint from 'eslint-plugin-vue'
 import eslintConfigPrettier from 'eslint-config-prettier'
@@ -49,20 +48,42 @@ export default [
   jsLint.configs.recommended,
   ...tsLint.configs.recommended,
   ...vueLint.configs["flat/essential"],
-  ...vueI18n.configs['flat/recommended'],
   {
     ignores: ['node_modules', 'dist', 'public', '.nuxt']
   },
   eslintConfigPrettier,
   {
+    files: [
+      'apps/web/**/*.{ts,tsx,vue}',
+      'apps/server/**/*.{ts,tsx,vue}',
+      'apps/cli/**/*.{ts,tsx,vue}',
+      'packages/drawing-model/**/*.{ts,tsx,vue}',
+      'packages/cad-import/**/*.{ts,tsx,vue}',
+      'packages/plot-engine/**/*.{ts,tsx,vue}',
+      'packages/diagnostics/**/*.{ts,tsx,vue}',
+      'packages/contracts/**/*.{ts,tsx,vue}',
+      'packages/storage/**/*.{ts,tsx,vue}',
+      'packages/database/**/*.{ts,tsx,vue}',
+      'packages/presets/**/*.{ts,tsx,vue}',
+      'packages/file-ingest/**/*.{ts,tsx,vue}',
+      'packages/batch-engine/**/*.{ts,tsx,vue}'
+    ],
     rules: {
-      '@intlify/vue-i18n/no-dynamic-keys': 'error',
-      '@intlify/vue-i18n/no-unused-keys': [
+      'no-restricted-imports': [
         'error',
         {
-          extensions: ['.js', '.ts', '.vue']
+          patterns: [
+            {
+              group: ['@mlightcad/*'],
+              message: 'Use @cadflux/cad-import or an approved CadFlux adapter.'
+            }
+          ]
         }
-      ],
+      ]
+    }
+  },
+  {
+    rules: {
       "@typescript-eslint/no-empty-object-type": ["off"],
       "@typescript-eslint/no-unused-expressions": ["off"],
       '@typescript-eslint/no-unused-vars': [
@@ -75,14 +96,6 @@ export default [
         }
       ],
       'quotes': ['error', 'single']
-    },
-    settings: {
-      'vue-i18n': {
-        localeDir: './**/locales/*.{json,json5,ts,js,yaml,yml}',
-        // Specify the version of `vue-i18n` you are using.
-        // If not specified, the message will be parsed twice.
-        messageSyntaxVersion: '^11.0.0'
-      }
     }
   }
 ]

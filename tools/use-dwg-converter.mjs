@@ -140,17 +140,6 @@ const targets = [
     transform: replaceLibreDwgParserWorkerFile
   },
   {
-    path: join(
-      rootDir,
-      'packages',
-      'cad-simple-viewer-example',
-      'src',
-      'main.ts'
-    ),
-    label: 'cad-simple-viewer-example/src/main.ts',
-    transform: replaceLibreDwgParserWorkerFile
-  },
-  {
     path: join(rootDir, 'pnpm-workspace.yaml'),
     label: 'pnpm-workspace.yaml',
     transform(content) {
