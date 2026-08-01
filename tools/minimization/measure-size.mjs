@@ -411,19 +411,15 @@ async function measurePlaywright() {
       })
     }
   }
-  const browserPathCommand = spawnSync(
-    'pnpm.cmd',
-    ['--filter', '@cadflux/renderer-pdf', 'exec', 'node', '-e', "import('playwright').then(({ chromium }) => console.log(chromium.executablePath()))"],
-    { cwd: ROOT, encoding: 'utf8', shell: false }
-  )
-  const executablePath = (browserPathCommand.stdout ?? '').trim()
+  const legacyPlaywrightPath = path.join(ROOT, 'node_modules', 'playwright')
+  const localRendererPlaywrightPath = path.join(ROOT, 'packages', 'renderer-pdf', 'node_modules', 'playwright')
   return {
-    commandExitCode: browserPathCommand.status,
-    commandStderr: (browserPathCommand.stderr ?? '').trim(),
-    executablePath,
-    executableSize: executablePath && existsSync(executablePath) ? (await stat(executablePath)).size : 0,
+    removedFromRuntime: true,
+    executablePath: '',
+    executableSize: 0,
     runnerAssets: runnerDirSizes,
-    playwrightPackageSize: await directorySize(path.join(ROOT, 'packages', 'renderer-pdf', 'node_modules', 'playwright')).catch(() => 0)
+    playwrightPackageSize: await directorySize(localRendererPlaywrightPath).catch(() => 0),
+    rootPlaywrightPackageSize: await directorySize(legacyPlaywrightPath).catch(() => 0)
   }
 }
 
@@ -572,7 +568,7 @@ function renderBaselineMarkdown(report) {
     `- node_modules size: ${formatBytes(report.repo.nodeModulesSize)} (${report.repo.nodeModulesMeasurement.mode})`,
     `- Web bundle size: ${report.webBundle.available ? formatBytes(report.webBundle.totalRawBytes) : 'not built yet'}`,
     `- Docker image size: ${report.docker.available ? formatBytes(report.docker.inspect?.Size ?? 0) : 'docker unavailable'}`,
-    `- Playwright browser executable size: ${formatBytes(report.playwright.executableSize)}`,
+    `- Legacy Playwright browser executable size: ${formatBytes(report.playwright.executableSize)}`,
     '',
     'Fast mode skips Docker and production deploy measurement by default. Set `CADFLUX_MINIMIZE_FULL=1` for the slower full baseline.'
   ].join('\n')

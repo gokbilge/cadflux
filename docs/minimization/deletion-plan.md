@@ -27,13 +27,14 @@
 - Risk: high
 - Rollback strategy: restore package from git and rerun baseline tests
 
-## Group 4 — Playwright removal
+## Group 4 � Playwright removal
 
-- Files/packages affected: @cadflux/cli, @cadflux/renderer-pdf, @cadflux/renderer-svg
-- Expected size reduction: baseline measurement required
+- Status: completed on August 1, 2026
+- Files/packages affected: @cadflux/cli, @cadflux/renderer-pdf, @cadflux/renderer-svg, local bridge/runtime runner assets
+- Expected size reduction: requires regenerated minimization baseline
 - Required replacement: direct Node-native PDF/SVG renderer path
-- Tests protecting behavior: test:minimization + existing server/build tests
-- Risk: high
+- Tests protecting behavior: test:minimization + test:integration + build:cadflux
+- Risk: closed for active runtime path; residual documentation cleanup remains
 - Rollback strategy: restore package from git and rerun baseline tests
 
 ## Group 5 — workspace/tooling simplification

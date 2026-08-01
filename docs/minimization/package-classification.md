@@ -17,8 +17,8 @@
 | @cadflux/file-ingest | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/plot-engine | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/presets | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @cadflux/renderer-pdf | REWRITE_FIRST | Current production conversion uses Playwright browser bridge; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @cadflux/renderer-svg | REWRITE_FIRST | Current production conversion uses Playwright browser bridge; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
+| @cadflux/renderer-pdf | KEEP_RUNTIME | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
+| @cadflux/renderer-svg | KEEP_RUNTIME | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/renderer-webgl | WRAP_FIRST | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; Web preview depends on wrapped MLightCAD viewer stack |
 | @cadflux/server | KEEP_RUNTIME | Production root |
 | @cadflux/storage | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
@@ -27,9 +27,9 @@
 | @mlightcad/cad-simple-viewer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @mlightcad/cad-svg-plugin | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @mlightcad/three-renderer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| playwright | REWRITE_FIRST | Required by current PDF/SVG bridge and CLI doctor/browser discovery |
-| vue-i18n | REWRITE_FIRST | Used in 9 source/config files; Inherited viewer locale system still present |
+| playwright | DELETE_AFTER_TESTS | Removed from current production conversion path; only historical baseline references remain |
+| vue-i18n | DELETE_AFTER_TESTS | Active runtime/build references detected: 0; Removed from current English-only UI path; historical references may remain in baseline artifacts |
 | fastify | KEEP_RUNTIME | Primary server framework |
 | better-sqlite3 | KEEP_RUNTIME | Primary server database and queue storage |
-| vite | KEEP_BUILD | Current web and runner build tool |
+| vite | KEEP_BUILD | Current web build tool |
 | typescript | KEEP_BUILD | Current workspace build and analysis compiler |

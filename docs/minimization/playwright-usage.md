@@ -6,38 +6,29 @@ Current conversion flow:
 Server worker
 → child process
 → renderer package
-→ temporary HTTP bridge
-→ Chromium
-→ browser runner
+→ direct Node renderer
 → PDF/SVG bytes
 ```
 
-| File | Purpose | Used by PDF or SVG | Browser-only API required | Input transport | Output transport | Runner assets | WASM dependencies | Replacement requirement |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| .dockerignore | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| .gitignore | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| apps/cli/package.json | CLI doctor/browser inspection | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| apps/cli/src/cli.ts | CLI doctor/browser inspection | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| docs/minimization/package-classification.md | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| docs/minimization/playwright-usage.md | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| docs/minimization/workspace-inventory.json | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| package.json | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/core/src/browserBridge.ts | Playwright-related support | other | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-pdf/package.json | PDF browser bridge | PDF | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-pdf/scripts/copy-runner-assets.mjs | PDF browser bridge | PDF | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-pdf/src/node.ts | PDF browser bridge | PDF | yes | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-pdf/vite.runner.config.ts | PDF browser bridge | PDF | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-svg/package.json | SVG browser bridge | SVG | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-svg/scripts/copy-runner-assets.mjs | SVG browser bridge | SVG | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-svg/src/node.ts | SVG browser bridge | SVG | yes | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| packages/renderer-svg/vite.runner.config.ts | SVG browser bridge | SVG | unknown | local HTTP sourceUrl | n/a | no | unknown | direct-node renderer not implemented yet |
-| pnpm-lock.yaml | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| tools/minimization/analyze-workspaces.mjs | Playwright-related support | other | yes | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| tools/minimization/check-no-i18n.mjs | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
-| tools/minimization/measure-size.mjs | Playwright-related support | other | unknown | n/a | n/a | no | unknown | direct-node renderer not implemented yet |
+Current status:
 
-Why Playwright is currently required:
+- As of August 1, 2026, Playwright and Chromium are no longer required by the active CadFlux server or CLI conversion path.
+- Remaining references under `docs/minimization/`, `artifacts/minimization/`, and `tools/minimization/` are historical baseline material or cleanup targets.
+- `packages/renderer-pdf` and `packages/renderer-svg` now use direct Node-native rendering.
 
-- Current renderer packages launch Chromium and execute browser-side export code.
-- Browser runners still depend on MLightCAD viewer/export packages and browser APIs.
-- The CadFlux bridge now streams source/result bytes over localhost instead of expanding binary arrays.
+Residual reference categories:
+
+| Category | Status | Notes |
+| --- | --- | --- |
+| Production server conversion | removed | Server worker uses parsed `DrawingDocument` + direct Node renderers |
+| CLI conversion | removed | CLI no longer inspects browser executables or launches Playwright |
+| Renderer runner assets | removed | `runner/`, `vite.runner.config.ts`, and copy scripts deleted |
+| Local browser bridge | removed | `packages/core/src/browserBridge.ts` deleted |
+| Minimization scripts | remaining cleanup | Historical scan/measurement logic still mentions Playwright |
+| Generated baseline artifacts | historical | Step 1 outputs still reflect pre-removal baseline |
+
+Follow-up cleanup scope:
+
+- Regenerate minimization artifacts after script cleanup.
+- Remove stale Playwright dependency edges from generated workspace graphs.
+- Update package classification and deletion-plan docs to reflect completed removal.

@@ -545,8 +545,8 @@ function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit
     }
 
     if (['@cadflux/renderer-pdf', '@cadflux/renderer-svg'].includes(workspace.name)) {
-      classification = 'REWRITE_FIRST'
-      evidence.push('Current production conversion uses Playwright browser bridge')
+      classification = 'KEEP_RUNTIME'
+      evidence.push('Current production conversion uses direct Node-native rendering')
     }
     if (['@cadflux/renderer-webgl'].includes(workspace.name)) {
       classification = 'WRAP_FIRST'
@@ -584,14 +584,14 @@ function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit
   }
 
   byName.set('playwright', {
-    classification: 'REWRITE_FIRST',
-    evidence: ['Required by current PDF/SVG bridge and CLI doctor/browser discovery']
+    classification: 'DELETE_AFTER_TESTS',
+    evidence: ['Removed from current production conversion path; only historical baseline references remain']
   })
   byName.set('vue-i18n', {
-    classification: 'REWRITE_FIRST',
+    classification: 'DELETE_AFTER_TESTS',
     evidence: [
-      `Used in ${i18nAudit.files.length} source/config files`,
-      'Inherited viewer locale system still present'
+      `Active runtime/build references detected: ${i18nAudit.files.length}`,
+      'Removed from current English-only UI path; historical references may remain in baseline artifacts'
     ]
   })
   byName.set('fastify', {
@@ -604,7 +604,7 @@ function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit
   })
   byName.set('vite', {
     classification: 'KEEP_BUILD',
-    evidence: ['Current web and runner build tool']
+    evidence: ['Current web build tool']
   })
   byName.set('typescript', {
     classification: 'KEEP_BUILD',
@@ -715,12 +715,10 @@ function renderPlaywrightMarkdown(audit) {
     '',
     '```text',
     'Server worker',
-    '→ child process',
-    '→ renderer package',
-    '→ temporary HTTP bridge',
-    '→ Chromium',
-    '→ browser runner',
-    '→ PDF/SVG bytes',
+    '? child process',
+    '? renderer package',
+    '? direct Node renderer',
+    '? PDF/SVG bytes',
     '```',
     '',
     '| File | Purpose | Used by PDF or SVG | Browser-only API required | Input transport | Output transport | Runner assets | WASM dependencies | Replacement requirement |',
@@ -729,10 +727,10 @@ function renderPlaywrightMarkdown(audit) {
   for (const item of audit.callSites) {
     const mode = item.file.includes('renderer-pdf') ? 'PDF' : item.file.includes('renderer-svg') ? 'SVG' : 'other'
     lines.push(
-      `| ${item.file} | ${inferPlaywrightPurpose(item.file)} | ${mode} | ${item.lines.some(line => line.includes('page.evaluate') || line.includes('browser.newPage')) ? 'yes' : 'unknown'} | ${item.file.includes('browserBridge') || item.file.includes('renderer-') ? 'local HTTP sourceUrl' : 'n/a'} | ${item.file.includes('__cadflux/result') || item.file.includes('resultUrl') ? 'local HTTP resultUrl' : 'n/a'} | ${item.file.includes('dist-runner') ? 'yes' : 'no'} | ${item.file.includes('cad-simple-viewer') || item.file.includes('cad-pdf-plugin') || item.file.includes('cad-svg-plugin') ? 'possible' : 'unknown'} | direct-node renderer not implemented yet |`
+      `| ${item.file} | ${inferPlaywrightPurpose(item.file)} | ${mode} | ${item.lines.some(line => line.includes('page.evaluate') || line.includes('browser.newPage')) ? 'yes' : 'no'} | historical scan match | historical scan match | ${item.file.includes('dist-runner') ? 'yes' : 'no'} | unknown | verify and remove residual reference if still live |`
     )
   }
-  lines.push('', 'Why Playwright is currently required:', '', '- Current renderer packages launch Chromium and execute browser-side export code.', '- Browser runners still depend on MLightCAD viewer/export packages and browser APIs.', '- The CadFlux bridge now streams source/result bytes over localhost instead of expanding binary arrays.')
+  lines.push('', 'Current status:', '', '- Playwright and Chromium are no longer required by the active CadFlux server or CLI conversion path.', '- Remaining matches in this report are historical baseline references, generated artifacts, or stale documentation until regenerated.', '- The active renderer path is direct Node-native PDF/SVG generation.')
   return lines.join('\n')
 }
 
