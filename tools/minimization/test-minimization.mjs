@@ -6,6 +6,7 @@ import { spawnSync } from 'node:child_process'
 const nodeExecutable = process.execPath
 const commands = [
   [nodeExecutable, ['./tools/minimization/check-no-i18n.mjs']],
+  [nodeExecutable, ['./tools/minimization/check-no-playwright-runtime.mjs']],
   [nodeExecutable, ['./tools/minimization/check-mlightcad-boundary.mjs']],
   [nodeExecutable, ['./tools/minimization/check-public-api-boundary.mjs']],
   [nodeExecutable, ['./tools/test-cadflux-server.mjs']],

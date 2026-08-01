@@ -276,14 +276,18 @@ async function scanRepoFiles(files, workspaces) {
       })
     }
 
-    if (!generatedOrHistorical && /(?:playwright|chromium|page\.evaluate|browser\.newPage|dist-runner|build:runner|__cadflux\/source|__cadflux\/result)/u.test(text)) {
+    if (
+      !generatedOrHistorical &&
+      !file.relativePath.endsWith('package.json') &&
+      /(?:playwright|chromium|page\.evaluate|browser\.newPage)/u.test(text)
+    ) {
       playwrightMatches.push({
         file: file.relativePath,
         context,
         ownerWorkspace: ownerWorkspace?.name ?? null,
         lines: extractInterestingLines(
           text,
-          /(playwright|chromium|page\.evaluate|browser\.newPage|dist-runner|build:runner|__cadflux\/source|__cadflux\/result)/u
+          /(playwright|chromium|page\.evaluate|browser\.newPage)/u
         )
       })
     }
@@ -530,7 +534,8 @@ function analyzePlaywright(matches) {
     }))
   return {
     callSites,
-    dependencies: [...new Set(callSites.map(item => item.ownerWorkspace).filter(Boolean))].sort()
+    dependencies: [...new Set(callSites.map(item => item.ownerWorkspace).filter(Boolean))].sort(),
+    removedFromRuntime: callSites.length === 0
   }
 }
 
@@ -611,7 +616,7 @@ function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit
 
   byName.set('playwright', {
     classification: 'DELETE_AFTER_TESTS',
-    evidence: ['Removed from current production conversion path; only historical baseline references remain']
+    evidence: ['Removed from current production conversion path; only minimization and regression references remain']
   })
   byName.set('vue-i18n', {
     classification: 'DELETE_AFTER_TESTS',
@@ -741,11 +746,12 @@ function renderPlaywrightMarkdown(audit) {
     '',
     '```text',
     'Server worker',
-    '? child process',
-    '? renderer package',
-    '? direct Node renderer',
-    '? PDF/SVG bytes',
+    '→ child process',
+    '→ direct Node renderer package',
+    '→ PDF/SVG bytes',
     '```',
+    '',
+    `Active runtime/build call sites: ${audit.callSites.length}`,
     '',
     '| File | Purpose | Used by PDF or SVG | Browser-only API required | Input transport | Output transport | Runner assets | WASM dependencies | Replacement requirement |',
     '| --- | --- | --- | --- | --- | --- | --- | --- | --- |'
@@ -753,10 +759,17 @@ function renderPlaywrightMarkdown(audit) {
   for (const item of audit.callSites) {
     const mode = item.file.includes('renderer-pdf') ? 'PDF' : item.file.includes('renderer-svg') ? 'SVG' : 'other'
     lines.push(
-      `| ${item.file} | ${inferPlaywrightPurpose(item.file)} | ${mode} | ${item.lines.some(line => line.includes('page.evaluate') || line.includes('browser.newPage')) ? 'yes' : 'no'} | historical scan match | historical scan match | ${item.file.includes('dist-runner') ? 'yes' : 'no'} | unknown | verify and remove residual reference if still live |`
+      `| ${item.file} | ${inferPlaywrightPurpose(item.file)} | ${mode} | ${item.lines.some(line => line.includes('page.evaluate') || line.includes('browser.newPage')) ? 'yes' : 'no'} | n/a | n/a | no | n/a | remove residual reference |`
     )
   }
-  lines.push('', 'Current status:', '', '- Playwright and Chromium are no longer required by the active CadFlux server or CLI conversion path.', '- Remaining matches in this report are historical baseline references, generated artifacts, or stale documentation until regenerated.', '- The active renderer path is direct Node-native PDF/SVG generation.')
+  lines.push(
+    '',
+    'Current status:',
+    '',
+    '- Playwright and Chromium are no longer required by the active CadFlux server or CLI conversion path.',
+    '- The active renderer path is direct Node-native PDF/SVG generation.',
+    `- Runtime/build source references remaining: ${audit.callSites.length}.`
+  )
   return lines.join('\n')
 }
 

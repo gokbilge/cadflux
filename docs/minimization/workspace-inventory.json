@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T15:28:32.184Z",
+  "generatedAt": "2026-08-01T19:43:29.182Z",
   "workspaceCount": 25,
   "activeWorkspaceCount": 25,
   "workspaces": [
@@ -1771,41 +1771,56 @@
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfImportConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPlugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommandStack",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/register.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager",
           "context": "runtime"
         },
         {
           "file": "packages/cad-simple-viewer/README.md",
-          "specifier": "@mlightcad/cad-simple-viewer",
-          "context": "runtime"
-        },
-        {
-          "file": "packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts",
           "specifier": "@mlightcad/cad-simple-viewer",
           "context": "runtime"
         },
@@ -1816,22 +1831,37 @@
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPlugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommandStack",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/register.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager",
           "context": "runtime"
         }
       ],
@@ -1849,41 +1879,56 @@
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApConvertToPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApImportPdfCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfImportConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPlugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-pdf-plugin/src/AcApPdfPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommandStack",
           "context": "runtime"
         },
         {
           "file": "packages/cad-pdf-plugin/src/register.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager",
           "context": "runtime"
         },
         {
           "file": "packages/cad-simple-viewer/README.md",
-          "specifier": "@mlightcad/cad-simple-viewer",
-          "context": "runtime"
-        },
-        {
-          "file": "packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts",
           "specifier": "@mlightcad/cad-simple-viewer",
           "context": "runtime"
         },
@@ -1894,22 +1939,37 @@
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApConvertToSvgCmd.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApSvgConvertor.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/app/AcApContext",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPlugin",
+          "context": "runtime"
+        },
+        {
+          "file": "packages/cad-svg-plugin/src/AcApSvgPlugin.ts",
+          "specifier": "@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommandStack",
           "context": "runtime"
         },
         {
           "file": "packages/cad-svg-plugin/src/register.ts",
-          "specifier": "@mlightcad/cad-simple-viewer",
+          "specifier": "@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager",
           "context": "runtime"
         }
       ],
@@ -2080,16 +2140,6 @@
           "context": "runtime"
         },
         {
-          "file": "packages/cad-simple-viewer/src/command/convert/AcApBlockPreviewConvertor.ts",
-          "specifier": "@mlightcad/three-renderer",
-          "context": "runtime"
-        },
-        {
-          "file": "packages/cad-simple-viewer/src/command/convert/AcApEntityPreviewConvertor.ts",
-          "specifier": "@mlightcad/three-renderer",
-          "context": "runtime"
-        },
-        {
           "file": "packages/cad-simple-viewer/src/spatialIndex/AcTrHierarchicalSpatialIndex.ts",
           "specifier": "@mlightcad/three-renderer",
           "context": "runtime"
@@ -2183,16 +2233,6 @@
         },
         {
           "file": "packages/cad-simple-viewer/src/command/AcApMemoryProfiler.ts",
-          "specifier": "@mlightcad/three-renderer",
-          "context": "runtime"
-        },
-        {
-          "file": "packages/cad-simple-viewer/src/command/convert/AcApBlockPreviewConvertor.ts",
-          "specifier": "@mlightcad/three-renderer",
-          "context": "runtime"
-        },
-        {
-          "file": "packages/cad-simple-viewer/src/command/convert/AcApEntityPreviewConvertor.ts",
           "specifier": "@mlightcad/three-renderer",
           "context": "runtime"
         },

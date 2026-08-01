@@ -1,6 +1,6 @@
 # Workspace inventory
 
-Generated: 2026-08-01T15:28:32.186Z
+Generated: 2026-08-01T19:43:29.184Z
 
 | Package | Path | Type | Direct dependents | Runtime use | Build use | Test use | Current classification | Removal candidate | Replacement required | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

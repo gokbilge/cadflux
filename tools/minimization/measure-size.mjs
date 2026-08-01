@@ -46,7 +46,7 @@ const report = {
   generatedAssets: await topGeneratedAssets(50, rootScan),
   runtimeReports: FAST_MODE ? skippedRuntimeReports() : await measureRuntimeDeployments(),
   docker: FAST_MODE ? skippedDockerReport() : await measureDocker(),
-  playwright: await measurePlaywright(),
+  playwright: await measurePlaywrightResiduals(),
   webBundle: await measureWebBundle()
 }
 
@@ -400,26 +400,29 @@ function skippedDockerReport() {
   }
 }
 
-async function measurePlaywright() {
-  const runnerDirSizes = []
-  for (const runner of ['packages/renderer-pdf/dist-runner', 'packages/renderer-svg/dist-runner']) {
-    const fullPath = path.join(ROOT, runner)
-    if (existsSync(fullPath)) {
-      runnerDirSizes.push({
-        path: runner,
-        size: FAST_MODE ? (await scanDirectory(fullPath)).totalSize : await directorySize(fullPath)
-      })
+async function measurePlaywrightResiduals() {
+  const residualPaths = [
+    'packages/renderer-pdf/dist-runner',
+    'packages/renderer-svg/dist-runner',
+    'node_modules/playwright',
+    'packages/renderer-pdf/node_modules/playwright',
+    'packages/renderer-svg/node_modules/playwright'
+  ]
+  const residuals = []
+  for (const relativePath of residualPaths) {
+    const fullPath = path.join(ROOT, relativePath)
+    if (!existsSync(fullPath)) {
+      continue
     }
+    residuals.push({
+      path: relativePath.replace(/\\/g, '/'),
+      size: FAST_MODE ? (await scanDirectory(fullPath)).totalSize : await directorySize(fullPath)
+    })
   }
-  const legacyPlaywrightPath = path.join(ROOT, 'node_modules', 'playwright')
-  const localRendererPlaywrightPath = path.join(ROOT, 'packages', 'renderer-pdf', 'node_modules', 'playwright')
   return {
     removedFromRuntime: true,
-    executablePath: '',
-    executableSize: 0,
-    runnerAssets: runnerDirSizes,
-    playwrightPackageSize: await directorySize(localRendererPlaywrightPath).catch(() => 0),
-    rootPlaywrightPackageSize: await directorySize(legacyPlaywrightPath).catch(() => 0)
+    residuals,
+    totalResidualBytes: residuals.reduce((sum, item) => sum + item.size, 0)
   }
 }
 
@@ -568,7 +571,8 @@ function renderBaselineMarkdown(report) {
     `- node_modules size: ${formatBytes(report.repo.nodeModulesSize)} (${report.repo.nodeModulesMeasurement.mode})`,
     `- Web bundle size: ${report.webBundle.available ? formatBytes(report.webBundle.totalRawBytes) : 'not built yet'}`,
     `- Docker image size: ${report.docker.available ? formatBytes(report.docker.inspect?.Size ?? 0) : 'docker unavailable'}`,
-    `- Legacy Playwright browser executable size: ${formatBytes(report.playwright.executableSize)}`,
+    `- Playwright runtime status: ${report.playwright.removedFromRuntime ? 'removed' : 'present'}`,
+    `- Residual Playwright bytes on disk: ${formatBytes(report.playwright.totalResidualBytes)}`,
     '',
     'Fast mode skips Docker and production deploy measurement by default. Set `CADFLUX_MINIMIZE_FULL=1` for the slower full baseline.'
   ].join('\n')

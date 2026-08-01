@@ -42,6 +42,7 @@
     "check:mlightcad-boundary": "node tools/minimization/check-mlightcad-boundary.mjs",
     "check:public-api-boundary": "node tools/minimization/check-public-api-boundary.mjs",
     "check:no-i18n": "node tools/minimization/check-no-i18n.mjs",
+    "check:no-playwright": "node tools/minimization/check-no-playwright-runtime.mjs",
     "typecheck": "node tools/typecheck-workspaces.mjs",
     "minimize:analyze": "node tools/minimization/analyze-workspaces.mjs",
     "minimize:measure": "node tools/minimization/measure-size.mjs",
