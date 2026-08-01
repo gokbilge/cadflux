@@ -39,12 +39,19 @@ Effect:
 - Active package-root imports of `@mlightcad/cad-simple-viewer` are now reduced to README/example text references instead of production code.
 - The plugin surface no longer exports the unused example plugin.
 - `AcApDocManager` no longer registers the `about` command in the active viewer command set.
+- `packages/cad-simple-viewer/src/app/AcApDocManager.ts` command registration was narrowed to the read-only viewer subset still relevant to CadFlux (`open`, `pan`, `regen`, `select`, `switchbg`, `undo`, `redo`, `zoom`).
 - `cad-simple-viewer` locale payload was reduced from multi-language message bundles to English-only runtime data.
+- Legacy draw/edit/measure/layer/sysvar command registration was removed from the default `cad-simple-viewer` bootstrap path.
 
 Observed bundle change in this slice:
 
 - before: `cad-simple-viewer.js` `2,542.02 kB` / gzip `684.77 kB`
 - after: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
+
+Observed bundle change in the command-registry narrowing slice:
+
+- before: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
+- after: `cad-simple-viewer.js` `2,227.13 kB` / gzip `617.14 kB`
 
 Deletion completed in this slice:
 
@@ -55,4 +62,5 @@ Deletion completed in this slice:
 Validation:
 
 - `pnpm --filter @cadflux/renderer-webgl build`
+- `pnpm --filter @mlightcad/cad-simple-viewer build`
 - `pnpm test:minimization`

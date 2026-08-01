@@ -6,7 +6,6 @@ import {
   AcDbFileType,
   acdbHostApplicationServices,
   AcDbOpenDatabaseOptions,
-  AcDbSysVarManager,
   AcGeBox2d,
   log
 } from '@mlightcad/data-model'
@@ -15,68 +14,13 @@ import { FontManager } from '@mlightcad/mtext-renderer'
 import { AcTrMTextRenderer } from '@mlightcad/three-renderer'
 
 import {
-  AcApArcCmd,
-  AcApCacheFontCmd,
-  AcApCircleCmd,
-  AcApClearMeasurementsCmd,
-  AcApConvertToDxfCmd,
-  AcApConvertToPngCmd,
-  AcApCopyCmd,
-  AcApDimLinearCmd,
-  AcApEllipseCmd,
-  AcApEntityPreviewCmd,
-  AcApEraseCmd,
-  AcApHatchCmd,
-  AcApHideObjectsCmd,
-  AcApImageAttachCmd,
-  AcApInsertCmd,
-  AcApLayerCloseCmd,
-  AcApLayerCmd,
-  AcApLayerCurCmd,
-  AcApLayerDelCmd,
-  AcApLayerFreezeCmd,
-  AcApLayerIsoCmd,
-  AcApLayerLockCmd,
-  AcApLayerOnCmd,
-  AcApLayerPCmd,
-  AcApLayerThawCmd,
-  AcApLayerUnisoCmd,
-  AcApLayerUnlockCmd,
-  AcApLayoffCmd,
-  AcApLineCmd,
-  AcApLogCmd,
-  AcApMeasureAngleCmd,
-  AcApMeasureArcCmd,
-  AcApMeasureAreaCmd,
-  AcApMeasureDistanceCmd,
-  AcApMLineCmd,
-  AcApMoveCmd,
-  AcApMTextCmd,
-  AcApOffsetCmd,
   AcApOpenCmd,
   AcApPanCmd,
-  AcApPointCmd,
-  AcApPolygonCmd,
-  AcApPolylineCmd,
-  AcApQNewCmd,
-  AcApRayCmd,
-  AcApRectCmd,
   AcApRedoCmd,
   AcApRegenCmd,
-  AcApRevCircleCmd,
-  AcApRevCloudCmd,
-  AcApRevRectCmd,
-  AcApRevVisibilityCmd,
-  AcApRotateCmd,
   AcApSelectCmd,
-  AcApSketchCmd,
-  AcApSplineCmd,
   AcApSwitchBgCmd,
-  AcApSysVarCmd,
   AcApUndoCmd,
-  AcApUnisolateObjectsCmd,
-  AcApXAttachCmd,
-  AcApXLineCmd,
   AcApZoomCmd
 } from '../command'
 import {
@@ -130,38 +74,10 @@ const DEFAULT_NEW_DRAWING_TEMPLATE = 'templates/acadiso.dxf'
  *   and will fully replace the defaults for the same command name.
  */
 const DEFAULT_COMMAND_ALIASES: Record<string, string[]> = {
-  ARC: ['A'],
-  CIRCLE: ['C'],
-  ELLIPSE: ['EL'],
-  ERASE: ['E'],
-  DIMLINEAR: ['DLI'],
-  MEASUREDISTANCE: ['DI', 'DIST'],
-  MEASUREAREA: ['AA', 'AREA'],
-  MEASUREANGLE: ['ANG'],
-  '-HATCH': ['-H'],
-  IMAGEATTACH: ['IAT'],
-  '-INSERT': ['I'],
-  XATTACH: ['XA'],
-  LAYER: ['LA'],
-  '-LAYER': ['-LA'],
-  LINE: ['L'],
-  MLINE: ['ML'],
-  MTEXT: ['T'],
-  MOVE: ['M'],
-  OFFSET: ['O'],
-  COPY: ['CO'],
-  ROTATE: ['RO'],
   OPEN: ['OP'],
   PAN: ['P'],
-  POINT: ['PO'],
-  POLYGON: ['POL'],
-  PLINE: ['PL'],
-  RAY: ['RA'],
-  RECTANG: ['REC'],
   REGEN: ['RE'],
   SELECT: ['SE'],
-  SPLINE: ['SPL'],
-  XLINE: ['XL'],
   ZOOM: ['Z'],
   UNDO: ['U'],
   REDO: ['REDO']
@@ -1195,92 +1111,14 @@ export class AcApDocManager {
       )
     }
 
-    addSystemCommand('arc', 'arc', new AcApArcCmd())
-    addSystemCommand('cachefont', 'cachefont', new AcApCacheFontCmd())
-    addSystemCommand('circle', 'circle', new AcApCircleCmd())
-    addSystemCommand('cdxf', 'cdxf', new AcApConvertToDxfCmd())
-    addSystemCommand('pngout', 'pngout', new AcApConvertToPngCmd())
-    addSystemCommand('entout', 'entout', new AcApEntityPreviewCmd())
-    addSystemCommand('ellipse', 'ellipse', new AcApEllipseCmd())
-    addSystemCommand('erase', 'erase', new AcApEraseCmd())
-    addSystemCommand('hideobjects', 'hideobjects', new AcApHideObjectsCmd())
-    addSystemCommand('dimlinear', 'dimlinear', new AcApDimLinearCmd())
-    addSystemCommand(
-      'measuredistance',
-      'measuredistance',
-      new AcApMeasureDistanceCmd()
-    )
-    addSystemCommand('measurearea', 'measurearea', new AcApMeasureAreaCmd())
-    addSystemCommand('measureangle', 'measureangle', new AcApMeasureAngleCmd())
-    addSystemCommand('measurearc', 'measurearc', new AcApMeasureArcCmd())
-    addSystemCommand(
-      'clearmeasurements',
-      'clearmeasurements',
-      new AcApClearMeasurementsCmd()
-    )
-    addSystemCommand('-hatch', '-hatch', new AcApHatchCmd())
-    addSystemCommand('imageattach', 'imageattach', new AcApImageAttachCmd())
-    addSystemCommand('-insert', '-insert', new AcApInsertCmd())
-    addSystemCommand('xattach', 'xattach', new AcApXAttachCmd())
-    addSystemCommand('-layer', '-layer', new AcApLayerCmd())
-    addSystemCommand('laycur', 'laycur', new AcApLayerCurCmd())
-    addSystemCommand('laydel', 'laydel', new AcApLayerDelCmd())
-    addSystemCommand('layfrz', 'layfrz', new AcApLayerFreezeCmd())
-    addSystemCommand('layiso', 'layiso', new AcApLayerIsoCmd())
-    addSystemCommand('laylck', 'laylck', new AcApLayerLockCmd())
-    addSystemCommand('layon', 'layon', new AcApLayerOnCmd())
-    addSystemCommand('layoff', 'layoff', new AcApLayoffCmd())
-    addSystemCommand('laythw', 'laythw', new AcApLayerThawCmd())
-    addSystemCommand('layuniso', 'layuniso', new AcApLayerUnisoCmd())
-    addSystemCommand('layulk', 'layulk', new AcApLayerUnlockCmd())
-    addSystemCommand('layerp', 'layerp', new AcApLayerPCmd())
-    addSystemCommand('layerclose', 'layerclose', new AcApLayerCloseCmd())
-    addSystemCommand('line', 'line', new AcApLineCmd())
-    addSystemCommand('mline', 'mline', new AcApMLineCmd())
-    addSystemCommand('mtext', 'mtext', new AcApMTextCmd())
-    addSystemCommand('copy', 'copy', new AcApCopyCmd())
-    addSystemCommand('move', 'move', new AcApMoveCmd())
-    addSystemCommand('offset', 'offset', new AcApOffsetCmd())
-    addSystemCommand('rotate', 'rotate', new AcApRotateCmd())
-    addSystemCommand('log', 'log', new AcApLogCmd())
     addSystemCommand('open', 'open', new AcApOpenCmd())
     addSystemCommand('pan', 'pan', new AcApPanCmd())
-    addSystemCommand('point', 'point', new AcApPointCmd())
-    addSystemCommand('polygon', 'polygon', new AcApPolygonCmd())
-    addSystemCommand('pline', 'pline', new AcApPolylineCmd())
-    addSystemCommand('qnew', 'qnew', new AcApQNewCmd())
-    addSystemCommand('ray', 'ray', new AcApRayCmd())
-    addSystemCommand('rectang', 'rectang', new AcApRectCmd())
     addSystemCommand('regen', 'regen', new AcApRegenCmd())
-    addSystemCommand('revcircle', 'revcircle', new AcApRevCircleCmd())
-    addSystemCommand('revcloud', 'revcloud', new AcApRevCloudCmd())
-    addSystemCommand('revrect', 'revrect', new AcApRevRectCmd())
-    addSystemCommand('revvis', 'revvis', new AcApRevVisibilityCmd())
     addSystemCommand('select', 'select', new AcApSelectCmd())
-    addSystemCommand('sketch', 'sketch', new AcApSketchCmd())
-    addSystemCommand('spline', 'spline', new AcApSplineCmd())
     addSystemCommand('switchbg', 'switchbg', new AcApSwitchBgCmd())
-    addSystemCommand(
-      'unisolateobjects',
-      'unisolateobjects',
-      new AcApUnisolateObjectsCmd()
-    )
-    addSystemCommand('xline', 'xline', new AcApXLineCmd())
     addSystemCommand('undo', 'undo', new AcApUndoCmd())
     addSystemCommand('redo', 'redo', new AcApRedoCmd())
     addSystemCommand('zoom', 'zoom', new AcApZoomCmd())
-
-    // Register system variables as commands
-    const sysVars = AcDbSysVarManager.instance().getAllDescriptors()
-    sysVars.forEach(sysVar => {
-      register.addCommand(
-        AcEdCommandStack.SYSTEMT_COMMAND_GROUP_NAME,
-        sysVar.name,
-        sysVar.name,
-        new AcApSysVarCmd(),
-        this.resolveCommandAliases(sysVar.name, [])
-      )
-    })
   }
 
   /**
