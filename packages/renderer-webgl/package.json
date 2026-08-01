@@ -16,9 +16,7 @@
   ],
   "dependencies": {
     "@mlightcad/data-model": "^1.12.1",
-    "@mlightcad/cad-pdf-plugin": "workspace:*",
     "@mlightcad/cad-simple-viewer": "workspace:*",
-    "@mlightcad/cad-svg-plugin": "workspace:*",
     "@mlightcad/libredwg-converter": "^3.12.1",
     "@mlightcad/mtext-renderer": "^0.12.1",
     "@mlightcad/three-renderer": "workspace:*"

@@ -1,0 +1,52 @@
+{
+  "packages": [
+    {
+      "name": "@mlightcad/data-model",
+      "reason": "Required by the active WebGL viewer bridge and legacy viewer kernel",
+      "owner": "@cadflux/renderer-webgl,@mlightcad/cad-simple-viewer,@mlightcad/three-renderer",
+      "mode": "runtime",
+      "temporary": true,
+      "plannedReplacement": "CadFlux-owned viewer kernel and geometry bridge"
+    },
+    {
+      "name": "@mlightcad/libredwg-converter",
+      "reason": "Required for DWG parsing in viewer-side local preview and fallback import paths",
+      "owner": "@cadflux/cad-import,@cadflux/renderer-webgl,@mlightcad/cad-simple-viewer",
+      "mode": "runtime",
+      "temporary": false,
+      "plannedReplacement": "None planned until DWG parser replacement exists"
+    },
+    {
+      "name": "@mlightcad/mtext-renderer",
+      "reason": "Required for MText display in the active WebGL viewer path",
+      "owner": "@cadflux/renderer-webgl,@mlightcad/cad-simple-viewer,@mlightcad/three-renderer",
+      "mode": "runtime",
+      "temporary": true,
+      "plannedReplacement": "CadFlux-owned normalized text run rendering"
+    },
+    {
+      "name": "@mlightcad/cad-simple-viewer",
+      "reason": "Legacy viewer kernel still used behind the CadFlux WebGL facade",
+      "owner": "@cadflux/renderer-webgl",
+      "mode": "runtime",
+      "temporary": true,
+      "plannedReplacement": "CadFlux-owned viewer adapter"
+    },
+    {
+      "name": "@mlightcad/three-renderer",
+      "reason": "Legacy Three.js CAD scene renderer still used by the active viewer kernel",
+      "owner": "@cadflux/renderer-webgl,@mlightcad/cad-simple-viewer",
+      "mode": "runtime",
+      "temporary": true,
+      "plannedReplacement": "CadFlux-owned rendering core"
+    },
+    {
+      "name": "@mlightcad/mtext-input-box",
+      "reason": "Still referenced by the legacy viewer package internals, though not desired in production",
+      "owner": "@mlightcad/cad-simple-viewer",
+      "mode": "runtime",
+      "temporary": true,
+      "plannedReplacement": "Remove legacy MText editor path"
+    }
+  ]
+}

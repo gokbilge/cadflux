@@ -14,7 +14,7 @@ const ARTIFACTS_DIR = path.join(ROOT, 'artifacts', 'minimization')
 const PRODUCTION_ROOTS = new Set(['@cadflux/web', '@cadflux/server', '@cadflux/cli'])
 const PACKAGE_DIRS = ['apps', 'packages']
 const WORKSPACE_NAME_BY_DIR = new Map()
-const EXCLUDED_WORKSPACE_DIRS = loadExcludedWorkspaceDirs()
+const ACTIVE_WORKSPACE_DIRS = loadActiveWorkspaceDirs()
 
 await mkdir(DOCS_DIR, { recursive: true })
 await mkdir(ARTIFACTS_DIR, { recursive: true })
@@ -107,17 +107,18 @@ console.log(JSON.stringify({
   playwrightCallSites: playwrightAudit.callSites.length
 }, null, 2))
 
-function loadExcludedWorkspaceDirs() {
+function loadActiveWorkspaceDirs() {
   const workspaceConfigPath = path.join(ROOT, 'pnpm-workspace.yaml')
   if (!existsSync(workspaceConfigPath)) {
-    return new Set()
+    return null
   }
   const text = readFileSyncUtf8(workspaceConfigPath)
-  const excluded = new Set()
-  for (const match of text.matchAll(/^\s*-\s*'!([^']+)'\s*$/gmu)) {
-    excluded.add(match[1].replace(/\\/g, '/'))
-  }
-  return excluded
+  const included = new Set(
+    [...text.matchAll(/^\s*-\s*'([^']+)'\s*$/gmu)]
+      .map(match => match[1].replace(/\\/g, '/'))
+      .filter(entry => !entry.startsWith('!') && !entry.includes('*'))
+  )
+  return included.size > 0 ? included : null
 }
 
 function readFileSyncUtf8(filePath) {
@@ -151,7 +152,9 @@ async function loadWorkspaces() {
         name: manifest.name ?? `${dirName}/${entry.name}`,
         dir: dirPath,
         relativeDir: path.relative(ROOT, dirPath).replace(/\\/g, '/'),
-        activeWorkspace: !EXCLUDED_WORKSPACE_DIRS.has(path.relative(ROOT, dirPath).replace(/\\/g, '/')),
+        activeWorkspace: ACTIVE_WORKSPACE_DIRS == null
+          ? true
+          : ACTIVE_WORKSPACE_DIRS.has(path.relative(ROOT, dirPath).replace(/\\/g, '/')),
         version: manifest.version ?? '',
         private: Boolean(manifest.private),
         packageType: dirName === 'apps' ? 'app' : 'package',
@@ -174,7 +177,9 @@ async function loadWorkspaces() {
       })
     }
   }
-  return items.sort((a, b) => a.name.localeCompare(b.name))
+  return items
+    .filter(item => item.activeWorkspace)
+    .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 async function listRepoFiles(dir) {

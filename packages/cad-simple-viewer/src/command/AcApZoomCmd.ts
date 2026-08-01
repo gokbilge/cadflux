@@ -6,13 +6,13 @@ import {
 } from '@mlightcad/data-model'
 
 import { AcApContext, AcApDocManager } from '../app'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
 import {
   AcEdPromptBoxOptions,
   AcEdPromptPointOptions,
   AcEdPromptStatus,
   AcEdPromptStringOptions
 } from '../editor/input/prompt'
-import { AcEdCommand } from '../editor/command/AcEdCommand'
 import { AcApI18n } from '../i18n'
 
 /**

@@ -4,12 +4,6 @@
 export interface CadFluxViewerRuntime {
   readMode: unknown
   viewerCreated(): void
-  execute(command: 'cpdf' | 'csvg'): Promise<void>
-  exportCurrent(command: 'cpdf' | 'csvg'): Promise<{
-    format: 'pdf' | 'svg'
-    downloadName: string
-    blob: Blob
-  }>
 }
 
 export async function ensureCadFluxViewerLocale(_locale = 'en'): Promise<void> {
@@ -23,70 +17,12 @@ export async function loadCadFluxViewerComponent(): Promise<unknown> {
 }
 
 export async function loadCadFluxViewerRuntime(): Promise<CadFluxViewerRuntime> {
-  const [{ AcApDocManager }, { AcEdOpenMode }] = await Promise.all([
-    import('./cadflux-app/AcApDocManager'),
-    import('./mlightcad-bridge/app')
-  ])
-
-  const exportCurrent = async (command: 'cpdf' | 'csvg') => {
-    if (command === 'csvg') {
-      const module = (await import(
-        '@mlightcad/cad-svg-plugin/convertor'
-      )) as unknown as {
-        AcApSvgConvertor: new () => {
-          render: (
-            context: unknown
-          ) => Promise<{ downloadName: string; blob: Blob }>
-        }
-      }
-      const result = await new module.AcApSvgConvertor().render(
-        AcApDocManager.instance.context
-      )
-      return {
-        format: 'svg' as const,
-        downloadName: result.downloadName,
-        blob: result.blob
-      }
-    }
-
-    const module = (await import(
-      '@mlightcad/cad-pdf-plugin/convertor'
-    )) as unknown as {
-      AcApPdfConvertor: new () => {
-        render: (
-          context: unknown
-        ) => Promise<{ downloadName: string; blob: Blob }>
-      }
-    }
-    const result = await new module.AcApPdfConvertor().render(
-      AcApDocManager.instance.context
-    )
-    return {
-      format: 'pdf' as const,
-      downloadName: result.downloadName,
-      blob: result.blob
-    }
-  }
+  const { AcEdOpenMode } = await import('./mlightcad-bridge/app')
 
   return {
     readMode: AcEdOpenMode.Read,
     viewerCreated() {
       // Reserved hook for future CadFlux-specific viewer setup.
-    },
-    exportCurrent,
-    async execute(command: 'cpdf' | 'csvg') {
-      const artifact = await exportCurrent(command)
-      const url = URL.createObjectURL(artifact.blob)
-      try {
-        const anchor = document.createElement('a')
-        anchor.href = url
-        anchor.download = artifact.downloadName
-        document.body.appendChild(anchor)
-        anchor.click()
-        document.body.removeChild(anchor)
-      } finally {
-        window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
-      }
     }
   }
 }

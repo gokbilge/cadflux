@@ -1,9 +1,9 @@
 import { spawn } from 'node:child_process'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 const repoRoot = process.cwd()
-const workspaceRoots = ['apps', 'packages']
+const workspaceConfigPath = path.join(repoRoot, 'pnpm-workspace.yaml')
 const tscBinPath = path.join(
   repoRoot,
   'node_modules',
@@ -13,16 +13,10 @@ const tscBinPath = path.join(
 )
 const tsconfigPaths = []
 
-for (const workspaceRoot of workspaceRoots) {
-  const absoluteWorkspaceRoot = path.join(repoRoot, workspaceRoot)
-  for (const entry of readdirSync(absoluteWorkspaceRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory()) {
-      continue
-    }
-    const tsconfigPath = path.join(absoluteWorkspaceRoot, entry.name, 'tsconfig.json')
-    if (existsSync(tsconfigPath)) {
-      tsconfigPaths.push(tsconfigPath)
-    }
+for (const relativeWorkspaceDir of readActiveWorkspaceDirs(workspaceConfigPath)) {
+  const tsconfigPath = path.join(repoRoot, relativeWorkspaceDir, 'tsconfig.json')
+  if (existsSync(tsconfigPath)) {
+    tsconfigPaths.push(tsconfigPath)
   }
 }
 
@@ -54,4 +48,13 @@ async function runTypecheck(tsconfigPath) {
       reject(new Error(`Typecheck failed for ${tsconfigPath}`))
     })
   })
+}
+
+function readActiveWorkspaceDirs(configPath) {
+  const source = existsSync(configPath) ? readFileSync(configPath, 'utf8') : ''
+  return source
+    .split(/\r?\n/u)
+    .map(line => line.trim())
+    .filter(line => line.startsWith("- '") && !line.startsWith("- '!"))
+    .map(line => line.slice(3, -1))
 }

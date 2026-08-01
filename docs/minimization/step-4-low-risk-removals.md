@@ -31,7 +31,7 @@ Validation used:
 Known remaining legacy surface:
 
 - `packages/cad-simple-viewer`
-- `packages/cad-pdf-plugin`
-- `packages/cad-svg-plugin`
 - `packages/three-renderer`
-- Playwright-backed PDF/SVG bridge
+- `@mlightcad/mtext-renderer`
+- `@mlightcad/mtext-input-box`
+- `@mlightcad/libredwg-converter`
