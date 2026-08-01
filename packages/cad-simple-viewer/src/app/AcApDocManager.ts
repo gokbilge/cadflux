@@ -29,7 +29,7 @@ import {
 } from '../editor'
 import { AcApPluginManager } from '../plugin/AcApPluginManager'
 import { acapWithSecondaryDatabase } from '../util/AcApSecondaryDatabase'
-import { AcTrView2d } from '../view'
+import { AcTrView2d } from '../view/AcTrView2d'
 import type { AcTrLayout } from '../view/AcTrLayout'
 import { AcApBusyIndicator } from './AcApBusyIndicator'
 import { acapBindCommandServices } from './AcApCommandServices'

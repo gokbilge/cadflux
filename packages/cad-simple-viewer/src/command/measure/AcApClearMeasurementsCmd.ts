@@ -1,6 +1,6 @@
 import { AcApContext } from '../../app'
 import { AcEdCommand, AcEdOpenMode } from '../../editor'
-import { AcTrView2d } from '../../view'
+import { AcTrView2d } from '../../view/AcTrView2d'
 
 /** Cleanup callbacks registered by measurement commands. */
 const cleanups: (() => void)[] = []

@@ -6,7 +6,7 @@ import {
 } from '@mlightcad/data-model'
 
 import { AcEdBaseView } from '../editor/view/AcEdBaseView'
-import { AcTrView2d } from '../view'
+import { AcTrView2d } from '../view/AcTrView2d'
 import { AcApDocument } from './AcApDocument'
 import {
   type AcDbEntityModifiedEventArgs,
