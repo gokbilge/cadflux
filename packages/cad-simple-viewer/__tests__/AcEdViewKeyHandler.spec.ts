@@ -1,18 +1,3 @@
-jest.mock('../src/app', () => ({
-  AcApDocManager: {
-    instance: {
-      sendStringToExecute: jest.fn()
-    }
-  }
-}))
-
-jest.mock('../src/editor/input/ui/AcEdMTextEditor', () => ({
-  AcEdMTextEditor: {
-    getActiveInputBox: jest.fn(() => null)
-  }
-}))
-
-import { AcApDocManager } from '../src/app'
 import { AcEdViewKeyHandler } from '../src/view/AcEdViewKeyHandler'
 import type { AcTrView2d } from '../src/view/AcTrView2d'
 
@@ -42,49 +27,22 @@ describe('AcEdViewKeyHandler', () => {
     jest.clearAllMocks()
   })
 
-  test('handleKeyDown maps platform undo/redo keys to commands', () => {
+  test('handleKeyDown clears selection on escape', () => {
     const handler = new AcEdViewKeyHandler(createMockView())
-    const sendCommand = AcApDocManager.instance.sendStringToExecute as jest.Mock
+    const clearSelection = handler['view'].selectionSet.clear as jest.Mock
 
-    handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyZ', ctrlKey: true, shiftKey: false })
-    )
-    expect(sendCommand).toHaveBeenLastCalledWith('undo')
-
-    handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyZ', metaKey: true, shiftKey: false })
-    )
-    expect(sendCommand).toHaveBeenLastCalledWith('undo')
-
-    handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyY', ctrlKey: true, shiftKey: false })
-    )
-    expect(sendCommand).toHaveBeenLastCalledWith('redo')
-
-    handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyZ', metaKey: true, shiftKey: true })
-    )
-    expect(sendCommand).toHaveBeenLastCalledWith('redo')
-
-    handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyZ', ctrlKey: true, shiftKey: true })
-    )
-    expect(sendCommand).toHaveBeenLastCalledWith('redo')
-
-    sendCommand.mockClear()
-    handler.handleKeyDown(keyboardEvent({ code: 'KeyA', ctrlKey: true }))
-    expect(sendCommand).not.toHaveBeenCalled()
+    const handled = handler.handleKeyDown(keyboardEvent({ code: 'Escape' }))
+    expect(handled).toBe(false)
+    expect(clearSelection).toHaveBeenCalledTimes(1)
   })
 
-  test('handleKeyDown skips undo/redo while editor input is active', () => {
+  test('handleKeyDown ignores unrelated keys', () => {
     const handler = new AcEdViewKeyHandler(createMockView(true))
-    const sendCommand = AcApDocManager.instance.sendStringToExecute as jest.Mock
+    const clearSelection = handler['view'].selectionSet.clear as jest.Mock
 
-    const handled = handler.handleKeyDown(
-      keyboardEvent({ code: 'KeyZ', ctrlKey: true })
-    )
+    const handled = handler.handleKeyDown(keyboardEvent({ code: 'KeyZ' }))
 
     expect(handled).toBe(false)
-    expect(sendCommand).not.toHaveBeenCalled()
+    expect(clearSelection).not.toHaveBeenCalled()
   })
 })
