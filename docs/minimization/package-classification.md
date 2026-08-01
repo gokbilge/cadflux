@@ -28,7 +28,7 @@
 | @mlightcad/cad-svg-plugin | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @mlightcad/three-renderer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | playwright | DELETE_AFTER_TESTS | Removed from current production conversion path; only historical baseline references remain |
-| vue-i18n | DELETE_AFTER_TESTS | Active runtime/build references detected: 0; Removed from current English-only UI path; historical references may remain in baseline artifacts |
+| vue-i18n | DELETE_AFTER_TESTS | Active runtime/build references detected: 1; Removed from current English-only UI path; historical references may remain in baseline artifacts |
 | fastify | KEEP_RUNTIME | Primary server framework |
 | better-sqlite3 | KEEP_RUNTIME | Primary server database and queue storage |
 | vite | KEEP_BUILD | Current web build tool |

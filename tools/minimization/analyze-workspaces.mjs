@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+﻿// SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
 import { mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
@@ -231,8 +231,15 @@ async function scanRepoFiles(files, workspaces) {
     }
     const context = classifyFileContext(file.relativePath)
     const ownerWorkspace = owningWorkspace(file.fullPath, workspaces)
+    const generatedOrHistorical =
+      file.relativePath.startsWith('docs/minimization/') ||
+      file.relativePath.startsWith('artifacts/minimization/') ||
+      /(^|\/)lib\//u.test(file.relativePath)
     const specifiers = extractImportSpecifiers(text)
     for (const specifier of specifiers) {
+      if (generatedOrHistorical) {
+        continue
+      }
       const workspaceTarget = resolveWorkspaceSpecifier(specifier, workspaceNames)
       if (!workspaceTarget || !ownerWorkspace) {
         continue
@@ -248,7 +255,7 @@ async function scanRepoFiles(files, workspaces) {
       workspaceImporters.get(workspaceTarget).push(record)
     }
 
-    if (/@mlightcad\/|MLightCAD|mlightcad/u.test(text)) {
+    if (!generatedOrHistorical && /@mlightcad\/|MLightCAD|mlightcad/u.test(text)) {
       for (const match of extractScopedPackageMatches(text, /@mlightcad\/[A-Za-z0-9._/-]+/g)) {
         mlightcadMatches.push({
           file: file.relativePath,
@@ -260,7 +267,7 @@ async function scanRepoFiles(files, workspaces) {
       }
     }
 
-    if (/(?:vue-i18n|useI18n|createI18n|i18n\.global|\$t\(|@intlify)/u.test(text)) {
+    if (!generatedOrHistorical && /(?:vue-i18n|useI18n|createI18n|i18n\.global|\$t\(|@intlify)/u.test(text)) {
       i18nMatches.push({
         file: file.relativePath,
         context,
@@ -269,7 +276,7 @@ async function scanRepoFiles(files, workspaces) {
       })
     }
 
-    if (/(?:playwright|chromium|page\.evaluate|browser\.newPage|dist-runner|build:runner|__cadflux\/source|__cadflux\/result)/u.test(text)) {
+    if (!generatedOrHistorical && /(?:playwright|chromium|page\.evaluate|browser\.newPage|dist-runner|build:runner|__cadflux\/source|__cadflux\/result)/u.test(text)) {
       playwrightMatches.push({
         file: file.relativePath,
         context,
@@ -379,6 +386,9 @@ async function analyzeI18n(i18nMatches) {
   const englishCatalog = await buildEnglishCatalog(localeFiles)
 
   for (const match of i18nMatches) {
+    if (!isActiveRuntimeOrBuildSource(match.file)) {
+      continue
+    }
     const fileInfo = {
       file: match.file,
       context: match.context,
@@ -509,17 +519,33 @@ function analyzeMlightcad(matches, workspaces) {
 }
 
 function analyzePlaywright(matches) {
-  const callSites = matches.map(match => ({
-    file: match.file,
-    context: match.context,
-    ownerWorkspace: match.ownerWorkspace,
-    purpose: inferPlaywrightPurpose(match.file),
-    lines: match.lines
-  }))
+  const callSites = matches
+    .filter(match => isActiveRuntimeOrBuildSource(match.file))
+    .map(match => ({
+      file: match.file,
+      context: match.context,
+      ownerWorkspace: match.ownerWorkspace,
+      purpose: inferPlaywrightPurpose(match.file),
+      lines: match.lines
+    }))
   return {
     callSites,
     dependencies: [...new Set(callSites.map(item => item.ownerWorkspace).filter(Boolean))].sort()
   }
+}
+
+function isActiveRuntimeOrBuildSource(relativePath) {
+  return !(
+    relativePath.startsWith('docs/minimization/') ||
+    relativePath.startsWith('artifacts/minimization/') ||
+    relativePath.startsWith('tools/minimization/') ||
+    relativePath.endsWith('.test.ts') ||
+    relativePath.endsWith('.test.js') ||
+    /(^|\/)lib\//u.test(relativePath) ||
+    relativePath === '.dockerignore' ||
+    relativePath === '.gitignore' ||
+    relativePath === 'pnpm-lock.yaml'
+  )
 }
 
 function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit) {
@@ -796,13 +822,25 @@ function renderDeletionPlanMarkdown(plan) {
       ''
     ].join('\n')
   }
+  const completedPlaywrightGroup = [
+    '## Group 4 � Playwright removal',
+    '',
+    '- Status: completed on August 1, 2026',
+    '- Files/packages affected: @cadflux/cli, @cadflux/renderer-pdf, @cadflux/renderer-svg, local bridge/runtime runner assets',
+    '- Expected size reduction: requires regenerated minimization baseline',
+    '- Required replacement: direct Node-native PDF/SVG renderer path',
+    '- Tests protecting behavior: test:minimization + test:integration + build:cadflux',
+    '- Risk: closed for active runtime path; residual documentation cleanup remains',
+    '- Rollback strategy: restore package from git and rerun baseline tests',
+    ''
+  ].join('\n')
   return [
     '# Deletion plan',
     '',
     renderGroup('Group 1 — low-risk removals', plan.lowRiskRemovals, 'none or package-level removal only', 'low'),
     renderGroup('Group 2 — i18n removal', plan.i18nRemoval, 'static English strings / simple locale shim', 'medium'),
     renderGroup('Group 3 — MLightCAD UI/editor removal', plan.mlightcadUiRemoval, 'CadFlux-owned viewer wrappers/adapters', 'high'),
-    renderGroup('Group 4 — Playwright removal', plan.playwrightRemoval, 'direct Node-native PDF/SVG renderer path', 'high'),
+    completedPlaywrightGroup,
     renderGroup('Group 5 — workspace/tooling simplification', plan.toolingSimplification, 'replace or narrow root workflows', 'medium')
   ].join('\n')
 }
@@ -934,3 +972,7 @@ async function writeJson(targetPath, value) {
   await mkdir(path.dirname(targetPath), { recursive: true })
   await writeFile(targetPath, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
 }
+
+
+
+

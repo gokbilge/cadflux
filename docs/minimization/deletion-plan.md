@@ -27,7 +27,7 @@
 - Risk: high
 - Rollback strategy: restore package from git and rerun baseline tests
 
-## Group 4 — Playwright removal
+## Group 4 ï¿½ Playwright removal
 
 - Status: completed on August 1, 2026
 - Files/packages affected: @cadflux/cli, @cadflux/renderer-pdf, @cadflux/renderer-svg, local bridge/runtime runner assets
