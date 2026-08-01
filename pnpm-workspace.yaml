@@ -20,8 +20,6 @@ packages:
   - 'packages/renderer-svg'
   - 'packages/renderer-webgl'
   - 'packages/storage'
-  - 'packages/cad-simple-viewer'
-  - 'packages/three-renderer'
 allowBuilds:
   '@parcel/watcher': true
   core-js: true
@@ -29,12 +27,6 @@ allowBuilds:
   unrs-resolver: true
   vue-demi: true
 overrides:
-  '@mlightcad/data-model': '^1.12.1'
-  '@mlightcad/libredwg-converter': '^3.12.1'
-  '@mlightcad/mtext-input-box': '^0.2.22'
-  '@mlightcad/mtext-renderer': '^0.12.1'
   element-plus: '^2.12.0'
   glob: '^13.0.6'
-  lodash-es: '4.17.21'
-  three: '^0.172.0'
   vue: '^3.4.21'

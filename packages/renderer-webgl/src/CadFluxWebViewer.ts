@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
-// @ts-nocheck
 
-import { acdbHostApplicationServices } from '@mlightcad/data-model'
-import { AcApDocManager } from './cadflux-app/AcApDocManager'
-import { AcApI18n } from './cadflux-i18n/AcApI18n'
+import { parseCadInput } from '@cadflux/cad-import'
+import type { DrawingDocument } from '@cadflux/drawing-model'
 import {
+  computed,
   defineComponent,
   h,
   onBeforeUnmount,
@@ -15,73 +14,25 @@ import {
   type PropType
 } from 'vue'
 
-type CadFluxDocManager = InstanceType<typeof AcApDocManager>
-
-interface LayoutOption {
-  name: string
-  tabOrder: number
-  blockTableRecordId: string
-  isActive: boolean
-}
-
-interface LayerOption {
-  name: string
-  cssColor: string
-  isOn: boolean
-  isFrozen: boolean
-  isLocked: boolean
-}
-
-interface LayerStoreChangedEventArgs {
-  currentLayerName: string
-  layers: LayerOption[]
-}
-
-function readLayouts(docManager: CadFluxDocManager): LayoutOption[] {
-  const db = docManager.curDocument.database
-  const layouts: LayoutOption[] = []
-  for (const layout of db.objects.layout.newIterator()) {
-    layouts.push({
-      name: layout.layoutName,
-      tabOrder: layout.tabOrder,
-      blockTableRecordId: layout.blockTableRecordId,
-      isActive: layout.blockTableRecordId === db.currentSpaceId
-    })
-  }
-  layouts.sort((left, right) => left.tabOrder - right.tabOrder)
-  return layouts
-}
-
-function readCurrentLayoutId(layouts: LayoutOption[]): string {
-  return layouts.find(layout => layout.isActive)?.blockTableRecordId ?? ''
-}
-
-function readLayers(docManager: CadFluxDocManager): {
-  currentLayerName: string
-  layers: LayerOption[]
-} {
-  const store = docManager.curDocument.layerStore
-  return {
-    currentLayerName: store.getCurrentLayerName(),
-    layers: store.getLayers().map(layer => ({
-      name: layer.name,
-      cssColor: layer.cssColor,
-      isOn: layer.isOn,
-      isFrozen: layer.isFrozen,
-      isLocked: layer.isLocked
-    }))
-  }
-}
+import { CadFluxViewerCore } from './viewer-core'
 
 export const CadFluxWebViewer = defineComponent({
   name: 'CadFluxWebViewer',
   props: {
+    document: {
+      type: Object as PropType<DrawingDocument | null | undefined>,
+      default: null
+    },
     localFile: {
       type: Object as PropType<File | null | undefined>,
       default: null
     },
+    background: {
+      type: String,
+      default: '#0f1419'
+    },
     mode: {
-      type: Number as PropType<number | undefined>,
+      type: [Number, String] as PropType<number | string | undefined>,
       default: undefined
     },
     baseUrl: {
@@ -92,199 +43,145 @@ export const CadFluxWebViewer = defineComponent({
   emits: ['create', 'document-opened'],
   setup(props, { emit }) {
     const hostRef = ref<HTMLElement | null>(null)
-    const isReady = ref(false)
-    const isOpening = ref(false)
     const errorMessage = ref('')
-    const layouts = ref<LayoutOption[]>([])
+    const isOpening = ref(false)
     const activeLayoutId = ref('')
-    const currentLayerName = ref('')
-    const layers = ref<LayerOption[]>([])
-    let docManager: CadFluxDocManager | null = null
+    const layerVisibility = ref<Record<string, boolean>>({})
+    let viewer: CadFluxViewerCore | null = null
 
-    const syncLayouts = () => {
-      if (!docManager) {
-        layouts.value = []
-        activeLayoutId.value = ''
-        return
-      }
-      const nextLayouts = readLayouts(docManager)
-      layouts.value = nextLayouts
-      activeLayoutId.value = readCurrentLayoutId(nextLayouts)
-    }
-
-    const syncLayers = () => {
-      if (!docManager) {
-        currentLayerName.value = ''
-        layers.value = []
-        return
-      }
-      const snapshot = readLayers(docManager)
-      currentLayerName.value = snapshot.currentLayerName
-      layers.value = snapshot.layers
-    }
-
-    const handleDocumentActivated = () => {
-      errorMessage.value = ''
-      syncLayouts()
-      syncLayers()
-    }
-
-    const handleLayoutSwitched = () => {
-      syncLayouts()
-    }
-
-    const handleLayerStoreChanged = (args: LayerStoreChangedEventArgs) => {
-      currentLayerName.value = args.currentLayerName
-      layers.value = args.layers.map(layer => ({
-        name: layer.name,
-        cssColor: layer.cssColor,
-        isOn: layer.isOn,
-        isFrozen: layer.isFrozen,
-        isLocked: layer.isLocked
+    const activeDocument = computed(() => viewer?.document ?? null)
+    const layouts = computed(() => activeDocument.value?.layouts ?? [])
+    const layers = computed(() => {
+      const document = activeDocument.value
+      if (!document) return []
+      return document.layers.map(layer => ({
+        ...layer,
+        visible:
+          layerVisibility.value[layer.id] ?? layer.visible ?? true
       }))
-    }
+    })
 
-    const bindRuntimeListeners = () => {
-      if (!docManager) {
+    function syncStateFromViewer() {
+      const document = viewer?.document
+      if (!document) {
+        activeLayoutId.value = ''
+        layerVisibility.value = {}
         return
       }
-      docManager.events.documentActivated.addEventListener(handleDocumentActivated)
-      acdbHostApplicationServices().layoutManager.events.layoutSwitched.addEventListener(
-        handleLayoutSwitched
-      )
-      docManager.curDocument.layerStore.events.changed.addEventListener(
-        handleLayerStoreChanged
-      )
-    }
-
-    const unbindRuntimeListeners = () => {
-      if (!docManager) {
-        return
-      }
-      docManager.events.documentActivated.removeEventListener(handleDocumentActivated)
-      acdbHostApplicationServices().layoutManager.events.layoutSwitched.removeEventListener(
-        handleLayoutSwitched
-      )
-      docManager.curDocument.layerStore.events.changed.removeEventListener(
-        handleLayerStoreChanged
+      activeLayoutId.value = viewer?.activeLayoutId ?? document.layouts[0]?.id ?? ''
+      layerVisibility.value = Object.fromEntries(
+        document.layers.map(layer => [
+          layer.id,
+          viewer?.isLayerVisible(layer.id) ?? layer.visible ?? true
+        ])
       )
     }
 
-    const openActiveFile = async () => {
-      if (!docManager || !props.localFile) {
+    async function openDocument(document: DrawingDocument) {
+      if (!viewer) return
+      await viewer.load(document)
+      syncStateFromViewer()
+      errorMessage.value = ''
+      emit('document-opened', {
+        fileName: document.source.fileName,
+        success: true
+      })
+    }
+
+    async function openLocalFile(file: File) {
+      if (!viewer) return
+      const fileName = file.name
+      const extension = fileName.split('.').pop()?.toLowerCase()
+      if (extension !== 'dxf' && extension !== 'dwg') {
+        errorMessage.value = `Unsupported file type for preview: ${fileName}`
+        emit('document-opened', { fileName, success: false })
         return
       }
 
       isOpening.value = true
-      errorMessage.value = ''
       try {
-        const fileBuffer = await props.localFile.arrayBuffer()
-        const success = await docManager.openDocument(props.localFile.name, fileBuffer, {
-          mode: props.mode
+        const bytes = new Uint8Array(await file.arrayBuffer())
+        const result = await parseCadInput({
+          name: file.name,
+          format: extension,
+          bytes,
+          sizeBytes: file.size,
+          lastModifiedMs: file.lastModified,
+          relativePath:
+            'webkitRelativePath' in file && file.webkitRelativePath
+              ? String(file.webkitRelativePath)
+              : file.name
         })
-
-        if (!success) {
-          errorMessage.value = `Failed to open ${props.localFile.name}.`
-          emit('document-opened', {
-            fileName: props.localFile.name,
-            success: false
-          })
-          return
-        }
-
-        syncLayouts()
-        syncLayers()
-        emit('document-opened', {
-          fileName: props.localFile.name,
-          success: true
-        })
+        await openDocument(result.document)
       } catch (error) {
         errorMessage.value =
-          error instanceof Error
-            ? error.message
-            : `Failed to open ${props.localFile.name}.`
-        emit('document-opened', {
-          fileName: props.localFile.name,
-          success: false
-        })
+          error instanceof Error ? error.message : `Failed to open ${fileName}.`
+        emit('document-opened', { fileName, success: false })
       } finally {
         isOpening.value = false
       }
     }
 
-    const initializeViewer = async () => {
-      if (!hostRef.value) {
-        return
-      }
+    function handleLayoutChange(nextLayoutId: string) {
+      viewer?.setActiveLayout(nextLayoutId)
+      syncStateFromViewer()
+    }
 
-      AcApI18n.setCurrentLocale('en')
+    function handleLayerToggle(layerId: string, visible: boolean) {
+      viewer?.setLayerVisibility(layerId, visible)
+      syncStateFromViewer()
+    }
 
-      try {
-        await AcApDocManager.instance.destroy()
-      } catch {
-        // No active singleton to dispose.
-      }
-
-      docManager = AcApDocManager.createInstance({
+    function initialize() {
+      if (!hostRef.value) return
+      viewer = new CadFluxViewerCore({
         container: hostRef.value,
-        autoResize: true,
-        baseUrl: props.baseUrl,
-        builtinOpenFileDialog: false
+        background: props.background
       })
-
-      bindRuntimeListeners()
-      syncLayouts()
-      syncLayers()
-      isReady.value = true
       emit('create')
-      await openActiveFile()
+      syncStateFromViewer()
     }
 
-    const destroyViewer = async () => {
-      if (!docManager) {
+    async function refreshInput() {
+      if (!viewer) return
+      if (props.document) {
+        await openDocument(props.document)
         return
       }
-      unbindRuntimeListeners()
-      const activeManager = docManager
-      docManager = null
-      isReady.value = false
-      layouts.value = []
-      layers.value = []
-      currentLayerName.value = ''
-      activeLayoutId.value = ''
-      await activeManager.destroy()
-    }
-
-    const handleLayoutChange = (event: Event) => {
-      const nextLayoutId = (event.target as HTMLSelectElement).value
-      if (!nextLayoutId) {
-        return
+      if (props.localFile) {
+        await openLocalFile(props.localFile)
       }
-      activeLayoutId.value = nextLayoutId
-      acdbHostApplicationServices().layoutManager.setCurrentLayoutBtrId(nextLayoutId)
     }
 
-    const handleLayerOnToggle = (layerName: string, isOn: boolean) => {
-      docManager?.curDocument.layerStore.setLayerOn(layerName, isOn)
-    }
-
-    const handleLayerFrozenToggle = (layerName: string, frozen: boolean) => {
-      docManager?.curDocument.layerStore.setLayerFrozen(layerName, frozen)
-    }
-
-    onMounted(() => {
-      void initializeViewer()
+    onMounted(async () => {
+      initialize()
+      await refreshInput()
     })
 
     onBeforeUnmount(() => {
-      void destroyViewer()
+      viewer?.destroy()
+      viewer = null
     })
 
     watch(
+      () => props.background,
+      value => {
+        viewer?.setBackground(value)
+      }
+    )
+
+    watch(
+      () => props.document,
+      async () => {
+        await refreshInput()
+      }
+    )
+
+    watch(
       () => props.localFile,
-      () => {
-        if (isReady.value) {
-          void openActiveFile()
+      async () => {
+        if (!props.document) {
+          await refreshInput()
         }
       }
     )
@@ -325,65 +222,64 @@ export const CadFluxWebViewer = defineComponent({
                   }
                 },
                 [
-                  h('label', { style: { display: 'grid', gap: '4px' } }, [
-                    h(
-                      'span',
-                      {
-                        style: {
-                          fontSize: '0.8rem',
-                          color: 'rgba(31, 42, 38, 0.72)'
-                        }
-                      },
-                      'Layout'
-                    ),
-                    h(
-                      'select',
-                      {
-                        value: activeLayoutId.value,
-                        onChange: handleLayoutChange,
-                        style: {
-                          minWidth: '180px',
-                          borderRadius: '12px',
-                          border: '1px solid rgba(31, 42, 38, 0.12)',
-                          padding: '8px 12px',
-                          background: '#fff'
-                        }
-                      },
-                      layouts.value.map(layout =>
-                        h(
-                          'option',
-                          {
-                            key: layout.blockTableRecordId,
-                            value: layout.blockTableRecordId
-                          },
-                          layout.name
-                        )
-                      )
-                    )
-                  ]),
                   h(
-                    'div',
+                    'button',
                     {
-                      style: {
-                        color: 'rgba(31, 42, 38, 0.72)',
-                        fontSize: '0.9rem'
-                      }
+                      type: 'button',
+                      onClick: () => viewer?.fitToView(),
+                      style: buttonStyle()
                     },
-                    currentLayerName.value
-                      ? `Current layer: ${currentLayerName.value}`
-                      : 'No active layer'
+                    'Fit'
                   ),
-                  errorMessage.value
-                    ? h(
-                        'div',
-                        {
-                          style: {
-                            color: '#8b2f2f',
-                            fontSize: '0.9rem'
-                          }
-                        },
-                        errorMessage.value
-                      )
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      onClick: () => viewer?.zoomIn(),
+                      style: buttonStyle()
+                    },
+                    'Zoom in'
+                  ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      onClick: () => viewer?.zoomOut(),
+                      style: buttonStyle()
+                    },
+                    'Zoom out'
+                  ),
+                  layouts.value.length > 1
+                    ? h('label', { style: { display: 'grid', gap: '4px' } }, [
+                        h(
+                          'span',
+                          {
+                            style: {
+                              fontSize: '0.8rem',
+                              color: 'rgba(31, 42, 38, 0.72)'
+                            }
+                          },
+                          'Layout'
+                        ),
+                        h(
+                          'select',
+                          {
+                            value: activeLayoutId.value,
+                            onChange: (event: Event) =>
+                              handleLayoutChange(
+                                (event.target as HTMLSelectElement).value
+                              ),
+                            style: selectStyle()
+                          },
+                          layouts.value.map(layout =>
+                            h(
+                              'option',
+                              { key: layout.id, value: layout.id },
+                              layout.name
+                            )
+                          )
+                        )
+                      ])
                     : null,
                   isOpening.value
                     ? h(
@@ -395,6 +291,18 @@ export const CadFluxWebViewer = defineComponent({
                           }
                         },
                         'Opening drawing…'
+                      )
+                    : null,
+                  errorMessage.value
+                    ? h(
+                        'div',
+                        {
+                          style: {
+                            color: '#8b2f2f',
+                            fontSize: '0.9rem'
+                          }
+                        },
+                        errorMessage.value
                       )
                     : null
                 ]
@@ -414,10 +322,10 @@ export const CadFluxWebViewer = defineComponent({
                   h(
                     'label',
                     {
-                      key: layer.name,
+                      key: layer.id,
                       style: {
                         display: 'grid',
-                        gridTemplateColumns: 'auto auto 1fr auto',
+                        gridTemplateColumns: 'auto 1fr auto',
                         gap: '8px',
                         alignItems: 'center',
                         fontSize: '0.85rem',
@@ -427,21 +335,11 @@ export const CadFluxWebViewer = defineComponent({
                     [
                       h('input', {
                         type: 'checkbox',
-                        checked: layer.isOn,
+                        checked: layer.visible,
                         onChange: (event: Event) =>
-                          handleLayerOnToggle(
-                            layer.name,
+                          handleLayerToggle(
+                            layer.id,
                             (event.target as HTMLInputElement).checked
-                          )
-                      }),
-                      h('input', {
-                        type: 'checkbox',
-                        checked: !layer.isFrozen,
-                        title: 'Visible in thawed state',
-                        onChange: (event: Event) =>
-                          handleLayerFrozenToggle(
-                            layer.name,
-                            !(event.target as HTMLInputElement).checked
                           )
                       }),
                       h(
@@ -460,7 +358,7 @@ export const CadFluxWebViewer = defineComponent({
                               width: '10px',
                               height: '10px',
                               borderRadius: '999px',
-                              background: layer.cssColor,
+                              background: colorToCss(layer.color),
                               border: '1px solid rgba(31, 42, 38, 0.12)',
                               flex: '0 0 auto'
                             }
@@ -485,7 +383,7 @@ export const CadFluxWebViewer = defineComponent({
                             color: 'rgba(31, 42, 38, 0.56)'
                           }
                         },
-                        layer.isLocked ? 'locked' : ''
+                        layer.locked ? 'locked' : ''
                       )
                     ]
                   )
@@ -493,26 +391,43 @@ export const CadFluxWebViewer = defineComponent({
               )
             ]
           ),
-          h(
-            'div',
-            {
-              style: {
-                position: 'relative',
-                minHeight: '0',
-                background: '#d6d0c4'
-              }
-            },
-            [
-              h('div', {
-                ref: hostRef,
-                style: {
-                  width: '100%',
-                  height: '100%'
-                }
-              })
-            ]
-          )
+          h('div', {
+            ref: hostRef,
+            style: {
+              width: '100%',
+              height: '100%',
+              minHeight: '0',
+              position: 'relative',
+              background: props.background
+            }
+          })
         ]
       )
   }
 })
+
+function colorToCss(color: DrawingDocument['layers'][number]['color']): string {
+  if (!color) return '#ffffff'
+  const alpha = color.a == null ? 1 : color.a
+  return `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`
+}
+
+function buttonStyle() {
+  return {
+    borderRadius: '12px',
+    border: '1px solid rgba(31, 42, 38, 0.12)',
+    padding: '8px 12px',
+    background: '#fff',
+    cursor: 'pointer'
+  }
+}
+
+function selectStyle() {
+  return {
+    minWidth: '180px',
+    borderRadius: '12px',
+    border: '1px solid rgba(31, 42, 38, 0.12)',
+    padding: '8px 12px',
+    background: '#fff'
+  }
+}

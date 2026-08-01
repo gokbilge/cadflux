@@ -43,8 +43,7 @@
       "@cadflux/presets": ["packages/presets/src/index.ts"],
       "@cadflux/renderer-webgl": ["packages/renderer-webgl/src/index.ts"],
       "@cadflux/renderer-svg": ["packages/renderer-svg/src/index.ts"],
-      "@cadflux/renderer-pdf": ["packages/renderer-pdf/src/index.ts"],
-      "@mlightcad/cad-simple-viewer": ["packages/cad-simple-viewer/src/index.ts"]
+      "@cadflux/renderer-pdf": ["packages/renderer-pdf/src/index.ts"]
     }
   },
   "ts-node": {

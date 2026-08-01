@@ -16,6 +16,7 @@ const commands = [
       'packages/database/src/index.test.ts',
       'packages/drawing-model/src/index.test.ts',
       'packages/cad-import/src/index.test.ts',
+      'packages/renderer-webgl/src/index.test.ts',
       'packages/renderer-pdf/src/node.test.ts',
       'packages/renderer-svg/src/node.test.ts'
     ]

@@ -20,7 +20,7 @@
 
 ## Group 3 — MLightCAD UI/editor removal
 
-- Files/packages affected: @mlightcad/cad-simple-viewer
+- Files/packages affected: none detected
 - Expected size reduction: baseline measurement required
 - Required replacement: CadFlux-owned viewer wrappers/adapters
 - Tests protecting behavior: test:minimization + existing server/build tests

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import { readdirSync, existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 
@@ -12,28 +12,27 @@ if (!scriptName) {
   throw new Error('Usage: node tools/run-workspace-script.mjs <script-name>')
 }
 
-const workspaceRoots = ['apps', 'packages']
-const workspaces = []
-
-for (const workspaceRoot of workspaceRoots) {
-  const absoluteRoot = path.join(repoRoot, workspaceRoot)
-  for (const entry of readdirSync(absoluteRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory()) {
-      continue
-    }
-    const packageJsonPath = path.join(absoluteRoot, entry.name, 'package.json')
+const workspaceText = readFileSync(
+  path.join(repoRoot, 'pnpm-workspace.yaml'),
+  'utf8'
+)
+const workspaces = [...workspaceText.matchAll(/-\s+'([^']+)'/g)]
+  .map(match => match[1])
+  .map(relativeDir => {
+    const packageJsonPath = path.join(repoRoot, relativeDir, 'package.json')
     if (!existsSync(packageJsonPath)) {
-      continue
+      return null
     }
     const manifest = JSON.parse(readFileSync(packageJsonPath, 'utf8'))
-    if (manifest.scripts?.[scriptName]) {
-      workspaces.push({
-        name: manifest.name ?? `${workspaceRoot}/${entry.name}`,
-        cwd: path.join(absoluteRoot, entry.name)
-      })
+    if (!manifest.scripts?.[scriptName]) {
+      return null
     }
-  }
-}
+    return {
+      name: manifest.name ?? relativeDir,
+      cwd: path.join(repoRoot, relativeDir)
+    }
+  })
+  .filter(Boolean)
 
 for (const workspace of workspaces) {
   console.log(`> ${workspace.name}:${scriptName}`)

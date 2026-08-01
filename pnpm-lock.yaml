@@ -5,14 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@mlightcad/data-model': ^1.12.1
-  '@mlightcad/libredwg-converter': ^3.12.1
-  '@mlightcad/mtext-input-box': ^0.2.22
-  '@mlightcad/mtext-renderer': ^0.12.1
   element-plus: ^2.12.0
   glob: ^13.0.6
-  lodash-es: 4.17.21
-  three: ^0.172.0
   vue: ^3.4.21
 
 importers:
@@ -289,48 +283,6 @@ importers:
         specifier: workspace:*
         version: link:../dxf-adapter
 
-  packages/cad-simple-viewer:
-    devDependencies:
-      '@mlightcad/data-model':
-        specifier: ^1.12.1
-        version: 1.12.1
-      '@mlightcad/libredwg-converter':
-        specifier: ^3.12.1
-        version: 3.12.1(@mlightcad/data-model@1.12.1)
-      '@mlightcad/mtext-input-box':
-        specifier: ^0.2.22
-        version: 0.2.22(@mlightcad/mtext-renderer@0.12.1(three@0.172.0))(three@0.172.0)
-      '@mlightcad/mtext-renderer':
-        specifier: ^0.12.1
-        version: 0.12.1(three@0.172.0)
-      '@mlightcad/three-renderer':
-        specifier: workspace:*
-        version: link:../three-renderer
-      '@mlightcad/three-viewcube':
-        specifier: 0.0.9
-        version: 0.0.9(three@0.172.0)
-      '@types/lodash-es':
-        specifier: ^4.17.12
-        version: 4.17.12
-      '@types/rbush':
-        specifier: ^3.0.4
-        version: 3.0.4
-      '@types/three':
-        specifier: ^0.172.0
-        version: 0.172.0
-      lodash-es:
-        specifier: 4.17.21
-        version: 4.17.21
-      mitt:
-        specifier: ^3.0.1
-        version: 3.0.1
-      rbush:
-        specifier: ^4.0.1
-        version: 4.0.1
-      three:
-        specifier: ^0.172.0
-        version: 0.172.0
-
   packages/config: {}
 
   packages/contracts:
@@ -415,45 +367,17 @@ importers:
 
   packages/renderer-webgl:
     dependencies:
-      '@mlightcad/cad-simple-viewer':
+      '@cadflux/cad-import':
         specifier: workspace:*
-        version: link:../cad-simple-viewer
-      '@mlightcad/data-model':
-        specifier: ^1.12.1
-        version: 1.12.1
-      '@mlightcad/libredwg-converter':
-        specifier: ^3.12.1
-        version: 3.12.1(@mlightcad/data-model@1.12.1)
-      '@mlightcad/mtext-renderer':
-        specifier: ^0.12.1
-        version: 0.12.1(three@0.172.0)
-      '@mlightcad/three-renderer':
+        version: link:../cad-import
+      '@cadflux/drawing-model':
         specifier: workspace:*
-        version: link:../three-renderer
+        version: link:../drawing-model
       vue:
         specifier: ^3.4.21
         version: 3.5.31(typescript@5.9.3)
 
   packages/storage: {}
-
-  packages/three-renderer:
-    dependencies:
-      '@velipso/polybool':
-        specifier: ^1.1.1
-        version: 1.1.1
-    devDependencies:
-      '@mlightcad/data-model':
-        specifier: ^1.12.1
-        version: 1.12.1
-      '@mlightcad/mtext-renderer':
-        specifier: ^0.12.1
-        version: 0.12.1(three@0.172.0)
-      '@types/three':
-        specifier: ^0.172.0
-        version: 0.172.0
-      three:
-        specifier: ^0.172.0
-        version: 0.172.0
 
 packages:
 
@@ -1218,66 +1142,9 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@lukeed/csprng@1.1.0':
-    resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
-    engines: {node: '>=8'}
-
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
-
-  '@mlightcad/common@1.12.1':
-    resolution: {integrity: sha512-Ree6O/WJWm3V+o3HqAg06SqrZMv3e1WDiI8BlMPPz1AODTDsAryDTOKbzBsLaciw2UU8oQyR3RKpRr/OFiESOw==}
-
-  '@mlightcad/data-model@1.12.1':
-    resolution: {integrity: sha512-Q+1B8XXWDhQ5HuWCiuREJVfS1lKme3b2eoi6h733QbUG1n2gROyllYzBH8iZmtRgsth6shcmHOceZhHSTHHsfg==}
-
-  '@mlightcad/geometry-engine@3.12.1':
-    resolution: {integrity: sha512-k5FoZbpRWCXs6UQhdU8+di1jbEI64IKGSq1xQmTeQkrSEhcrkS8Ha0AHXX6evfFhNCfpEo9xx5WDtEGyq6+v2Q==}
-    peerDependencies:
-      '@mlightcad/common': 1.12.1
-
-  '@mlightcad/graphic-interface@3.12.1':
-    resolution: {integrity: sha512-A19FkA6/6/9TxsPI7CoeO38Mze9xo76Op4FYlcM1B+Ob35TCITX3uowjtwsYUa+fqNIQhG+9Spf3egrRTHanjQ==}
-    peerDependencies:
-      '@mlightcad/common': 1.12.1
-      '@mlightcad/geometry-engine': 3.12.1
-
-  '@mlightcad/libredwg-converter@3.12.1':
-    resolution: {integrity: sha512-3C4C3GSxrs5VbPneyFyTcW+5PscMs7uOAU7QZSJKngbDvQBdh0Go5zkQj+q2qyKxKbmMJaMLs+KKId0l8Tykuw==}
-    peerDependencies:
-      '@mlightcad/data-model': ^1.12.1
-
-  '@mlightcad/libredwg-web@0.7.9':
-    resolution: {integrity: sha512-tqjx0eCiR0CNI3TyO3LVYzl4ptuzSFm7asGn/C1YiJaEk7Vneto+lRrVUco85qw+PZDihaFLwWqdYIEse1swbA==}
-    engines: {node: '>=20'}
-
-  '@mlightcad/mtext-input-box@0.2.22':
-    resolution: {integrity: sha512-ouwjc1A45G5boJkBl5g7z77vjJUVcE97UKorFFCWzWP7kKJsUk/t/4O/jxIyrUGqEiqTHAsdjhe9lSVvZo9bZg==}
-    peerDependencies:
-      '@mlightcad/mtext-renderer': ^0.12.1
-      three: ^0.172.0
-
-  '@mlightcad/mtext-parser@1.5.0':
-    resolution: {integrity: sha512-Yl/IQmSIGV1UUl/TyUptoOpNBunywcEE7yh4k9SFDXljHDTTI92VmqkVFxf4eYzhoWF4MNXIl4qgQV1P1Rbn6g==}
-
-  '@mlightcad/mtext-renderer@0.12.1':
-    resolution: {integrity: sha512-LFLERm1vNOKJu1Orv3nNaApjheEwa5mr7MHUE2GB5xSvm048Nsv6BCoe/khbqmZUs+3qrSVHRZm4lGxqFXdkpw==}
-    peerDependencies:
-      three: ^0.172.0
-
-  '@mlightcad/shx-parser@1.4.5':
-    resolution: {integrity: sha512-wFY0X7vnuq1IYdP6JRggb7LHcKho1P8zmcWGtXa6XYthwyKZCUoZCswTXr7J26pbzyhBB7KsiCcCL48iwIevdQ==}
-
-  '@mlightcad/text-box-cursor@0.1.1':
-    resolution: {integrity: sha512-Q3uLz+FXG6mLInq/Q1jUNdyjGFdMWZduWA2WO6d+jUqFbWeh4xsn5M/HY+vy1Rs0bvLWZvdRgJeEFVe6nhIihQ==}
-    peerDependencies:
-      three: ^0.172.0
-
-  '@mlightcad/three-viewcube@0.0.9':
-    resolution: {integrity: sha512-oGWC+NrfgfHyCGtO/3NGC3M91qrj9Y1cOVaRKGALEicqCJYg7M4fKUbuag2rCNZLml1BdhpS9JMTZyfbYeAO7Q==}
-    peerDependencies:
-      three: ^0.172.0
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -1545,9 +1412,6 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@tweenjs/tween.js@23.1.3':
-    resolution: {integrity: sha512-vJmvvwFxYuGnF2axRtPYocag6Clbb5YS7kLL+SO/TeVFzHqDIWrNKYtcsPMibjDx9O+bu+psAy9NKfWklassUA==}
-
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
 
@@ -1602,9 +1466,6 @@ packages:
   '@types/raf@3.4.3':
     resolution: {integrity: sha512-c4YAvMedbPZ5tEyxzQdMoOhhJ4RD3rngZIdwC2/qDN3d7JpEhB6fiBRKVY1lg5B7Wk+uPBjn5f39j1/2MY1oOw==}
 
-  '@types/rbush@3.0.4':
-    resolution: {integrity: sha512-knSt9cCW8jj1ZSFcFeBZaX++OucmfPxxHiRwTahZfJlnQsek7O0bazTJHWD2RVj9LEoejUYF2de3/stf+QXcXw==}
-
   '@types/rollup-plugin-peer-deps-external@2.2.6':
     resolution: {integrity: sha512-rR0p2+VZ5+RTyTA+MemzE7RQs3vkGNsYsEZIl+RahwrJOtEDEg+a5RCnigSwPkBtu4H7dyVHXyUZfiZU2dwjdw==}
     peerDependencies:
@@ -1612,12 +1473,6 @@ packages:
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
-
-  '@types/stats.js@0.17.4':
-    resolution: {integrity: sha512-jIBvWWShCvlBqBNIZt0KAshWpvSjhkwkEu4ZUcASoAvhmrgAUI2t1dXrjSL4xXVLB4FznPrIsX3nKXFl/Dt4vA==}
-
-  '@types/three@0.172.0':
-    resolution: {integrity: sha512-LrUtP3FEG26Zg5WiF0nbg8VoXiKokBLTcqM2iLvM9vzcfEiYmmBAPGdBgV0OYx9fvWlY3R/3ERTZcD9X5sc0NA==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -1627,9 +1482,6 @@ packages:
 
   '@types/web-bluetooth@0.0.20':
     resolution: {integrity: sha512-g9gZnnXVq7gM7v3tJCWV/qw7w+KeOlSHAhgF9RytFyifW6AF61hdT2ucrYhPq9hLs5JIryeupHV3qGk95dH9ow==}
-
-  '@types/webxr@0.5.24':
-    resolution: {integrity: sha512-h8fgEd/DpoS9CBrjEQXR+dIDraopAEfu4wYVNY2tEPwk60stPWhvZMf4Foo5FakuQ7HFZoa8WceaWFervK2Ovg==}
 
   '@types/yargs-parser@21.0.3':
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
@@ -1819,9 +1671,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@velipso/polybool@1.1.1':
-    resolution: {integrity: sha512-HlWrm/wloLkUDHPQ1AgUdXysKL3y+rqV94udU5CVTtEPci5v6WjEfozNJTOOSwCsz50ySIxJK4gABqfbx1sD7A==}
-
   '@vitejs/plugin-vue@6.0.8':
     resolution: {integrity: sha512-0ZjgOg7oO6farnNGup7yvoM/YXZV84OZxHAwtflItNa/6zzQyVb5LNxyea3FEKEX2XlagIKzrlH7wwxkKgtiew==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1886,9 +1735,6 @@ packages:
 
   '@vueuse/shared@12.0.0':
     resolution: {integrity: sha512-3i6qtcq2PIio5i/vVYidkkcgvmTjCqrf26u+Fd4LhnbBmIT6FN8y6q/GJERp8lfcB9zVEfjdV0Br0443qZuJpw==}
-
-  '@webgpu/types@0.1.69':
-    resolution: {integrity: sha512-RPmm6kgRbI8e98zSD3RVACvnuktIja5+yLgDAkTmxLr90BEwdTXRQWNLF3ETTTyH/8mKhznZuN5AveXYFEsMGQ==}
 
   abstract-logging@2.0.1:
     resolution: {integrity: sha512-2BjRTZxTPvheOvGbBslFSYOUkr+SjPtOnrLP33f+VIWLzezQpZcqVg7ja3L4dBXmzzgwT+a029jRx5PCi3JuiA==}
@@ -2605,10 +2451,6 @@ packages:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
-  iconv-lite@0.7.2:
-    resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
-    engines: {node: '>=0.10.0'}
-
   idb@8.0.3:
     resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
 
@@ -2949,15 +2791,15 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash-es@4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+  lodash-es@4.18.1:
+    resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
 
   lodash-unified@1.0.3:
     resolution: {integrity: sha512-WK9qSozxXOD7ZJQlpSqOT+om2ZfcT4yO+03FuzAHD0wF6S0l0090LRPDx3vhTTLZ8cFKpBn+IOcVXK6qOcIlfQ==}
     peerDependencies:
       '@types/lodash-es': '*'
       lodash: '*'
-      lodash-es: 4.17.21
+      lodash-es: '*'
 
   lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
@@ -2971,10 +2813,6 @@ packages:
   log-update@6.1.0:
     resolution: {integrity: sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w==}
     engines: {node: '>=18'}
-
-  loglevel@1.9.2:
-    resolution: {integrity: sha512-HgMmCqIJSAKqo68l0rS2AanEWfkxaZ5wNiEFb5ggm08lDs9Xl2KxBlX3PTcaD2chBM1gXAYf491/M2Rv8Jwayg==}
-    engines: {node: '>= 0.6.0'}
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
@@ -3004,9 +2842,6 @@ packages:
 
   merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
-
-  meshoptimizer@0.18.1:
-    resolution: {integrity: sha512-ZhoIoL7TNV4s5B6+rx5mC//fw8/POGyNxS/DZyCJeiZ12ScLfVwRE/GfsxwiTkMYYD5DmK2/JXnEVXqL4rF+Sw==}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -3046,9 +2881,6 @@ packages:
   minipass@7.1.3:
     resolution: {integrity: sha512-tEBHqDnIoM/1rXME1zgka9g6Q2lcoCkxHLuc7ODJ5BxbP5d4c2Z5cGgtXAku59200Cx7diuHTOYfSBD8n6mm8A==}
     engines: {node: '>=16 || 14 >=14.17'}
-
-  mitt@3.0.1:
-    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -3124,10 +2956,6 @@ packages:
 
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
-
-  opentype.js@2.0.0:
-    resolution: {integrity: sha512-kCyjv6xdDY1W/jLWZ/L3QhhTlKUqDZMQ5+Jdlw12b3dXkKNpYBqqlMMj0YDQPShWFTMwgZI1hG14kN3XUDSg/A==}
-    hasBin: true
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -3271,14 +3099,8 @@ packages:
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
 
-  quickselect@3.0.0:
-    resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
-
   raf@3.4.1:
     resolution: {integrity: sha512-Sq4CW4QhwOHE8ucn6J34MqtZCeWFP2aQSmrlroYgqAV1PjStIhJXxYuTgUIfkEk7zTLjmIjLmU5q+fbD1NnOJA==}
-
-  rbush@4.0.1:
-    resolution: {integrity: sha512-IP0UpfeWQujYC8Jg162rMNc01Rf0gWMMAb2Uxus/Q0qOFw4lCcq6ZnQEZwUoJqWyUGJ9th7JjwI4yIWo+uvoAQ==}
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
@@ -3529,9 +3351,6 @@ packages:
     resolution: {integrity: sha512-e2zZ96wSChazBsbENf/Pcm/4swHt2cEKQ92rhUjkL9GCKiTDJIaTBenjE/m9DXi0QBmTMDkFDdOomUy20A1tDQ==}
     engines: {node: '>=20'}
 
-  three@0.172.0:
-    resolution: {integrity: sha512-6HMgMlzU97MsV7D/tY8Va38b83kz8YJX+BefKjspMNAv0Vx6dxMogHOrnRl/sbMIs3BPUKijPqDqJ/+UwJbIow==}
-
   tinyglobby@0.2.15:
     resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
     engines: {node: '>=12.0.0'}
@@ -3661,10 +3480,6 @@ packages:
     resolution: {integrity: sha512-v3Xu+yuwBXisp6QYTcH4UbH+xYJXqnq2m/LtQVWKWzYc1iehYnLixoQDN9FH6/j9/oybfd6W9Ghwkl8+UMKTKQ==}
     engines: {node: '>=0.8.0'}
     hasBin: true
-
-  uid@2.0.2:
-    resolution: {integrity: sha512-u3xV3X7uzvi5b1MncmZo3i2Aw222Zk1keqLA1YkHldREkAhAqi65wuPfe7lHx8H/Wzy+8CE7S7uS3jekIM5s8g==}
-    engines: {node: '>=8'}
 
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
@@ -4638,64 +4453,7 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
     optional: true
 
-  '@lukeed/csprng@1.1.0': {}
-
   '@lukeed/ms@2.0.2': {}
-
-  '@mlightcad/common@1.12.1':
-    dependencies:
-      loglevel: 1.9.2
-
-  '@mlightcad/data-model@1.12.1':
-    dependencies:
-      '@mlightcad/common': 1.12.1
-      '@mlightcad/geometry-engine': 3.12.1(@mlightcad/common@1.12.1)
-      '@mlightcad/graphic-interface': 3.12.1(@mlightcad/common@1.12.1)(@mlightcad/geometry-engine@3.12.1(@mlightcad/common@1.12.1))
-      iconv-lite: 0.7.2
-      uid: 2.0.2
-
-  '@mlightcad/geometry-engine@3.12.1(@mlightcad/common@1.12.1)':
-    dependencies:
-      '@mlightcad/common': 1.12.1
-
-  '@mlightcad/graphic-interface@3.12.1(@mlightcad/common@1.12.1)(@mlightcad/geometry-engine@3.12.1(@mlightcad/common@1.12.1))':
-    dependencies:
-      '@mlightcad/common': 1.12.1
-      '@mlightcad/geometry-engine': 3.12.1(@mlightcad/common@1.12.1)
-
-  '@mlightcad/libredwg-converter@3.12.1(@mlightcad/data-model@1.12.1)':
-    dependencies:
-      '@mlightcad/data-model': 1.12.1
-      '@mlightcad/libredwg-web': 0.7.9
-
-  '@mlightcad/libredwg-web@0.7.9': {}
-
-  '@mlightcad/mtext-input-box@0.2.22(@mlightcad/mtext-renderer@0.12.1(three@0.172.0))(three@0.172.0)':
-    dependencies:
-      '@mlightcad/mtext-renderer': 0.12.1(three@0.172.0)
-      '@mlightcad/text-box-cursor': 0.1.1(three@0.172.0)
-      three: 0.172.0
-
-  '@mlightcad/mtext-parser@1.5.0': {}
-
-  '@mlightcad/mtext-renderer@0.12.1(three@0.172.0)':
-    dependencies:
-      '@mlightcad/mtext-parser': 1.5.0
-      '@mlightcad/shx-parser': 1.4.5
-      iconv-lite: 0.7.2
-      idb: 8.0.3
-      opentype.js: 2.0.0
-      three: 0.172.0
-
-  '@mlightcad/shx-parser@1.4.5': {}
-
-  '@mlightcad/text-box-cursor@0.1.1(three@0.172.0)':
-    dependencies:
-      three: 0.172.0
-
-  '@mlightcad/three-viewcube@0.0.9(three@0.172.0)':
-    dependencies:
-      three: 0.172.0
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -4870,8 +4628,6 @@ snapshots:
   '@tsconfig/node16@1.0.4':
     optional: true
 
-  '@tweenjs/tween.js@23.1.3': {}
-
   '@tybys/wasm-util@0.10.2':
     dependencies:
       tslib: 2.8.1
@@ -4942,24 +4698,11 @@ snapshots:
   '@types/raf@3.4.3':
     optional: true
 
-  '@types/rbush@3.0.4': {}
-
   '@types/rollup-plugin-peer-deps-external@2.2.6(rollup@4.60.1)':
     dependencies:
       rollup: 4.60.1
 
   '@types/stack-utils@2.0.3': {}
-
-  '@types/stats.js@0.17.4': {}
-
-  '@types/three@0.172.0':
-    dependencies:
-      '@tweenjs/tween.js': 23.1.3
-      '@types/stats.js': 0.17.4
-      '@types/webxr': 0.5.24
-      '@webgpu/types': 0.1.69
-      fflate: 0.8.2
-      meshoptimizer: 0.18.1
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -4967,8 +4710,6 @@ snapshots:
     optional: true
 
   '@types/web-bluetooth@0.0.20': {}
-
-  '@types/webxr@0.5.24': {}
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -5139,10 +4880,6 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@velipso/polybool@1.1.1':
-    dependencies:
-      tslib: 2.8.1
-
   '@vitejs/plugin-vue@6.0.8(vite@6.4.3(@types/node@24.12.4)(sass@1.98.0)(tsx@4.23.1)(yaml@2.8.3))(vue@3.5.31(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
@@ -5249,8 +4986,6 @@ snapshots:
       vue: 3.5.31(typescript@5.9.3)
     transitivePeerDependencies:
       - typescript
-
-  '@webgpu/types@0.1.69': {}
 
   abstract-logging@2.0.1: {}
 
@@ -5605,8 +5340,8 @@ snapshots:
       async-validator: 4.2.5
       dayjs: 1.11.20
       lodash: 4.18.1
-      lodash-es: 4.17.21
-      lodash-unified: 1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.17.21)(lodash@4.18.1)
+      lodash-es: 4.18.1
+      lodash-unified: 1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.18.1)(lodash@4.18.1)
       memoize-one: 6.0.0
       normalize-wheel-es: 1.2.0
       vue: 3.5.31(typescript@5.9.3)
@@ -6037,10 +5772,6 @@ snapshots:
   human-signals@5.0.0: {}
 
   iconv-lite@0.6.3:
-    dependencies:
-      safer-buffer: 2.1.2
-
-  iconv-lite@0.7.2:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -6586,13 +6317,13 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash-es@4.17.21: {}
+  lodash-es@4.18.1: {}
 
-  lodash-unified@1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.17.21)(lodash@4.18.1):
+  lodash-unified@1.0.3(@types/lodash-es@4.17.12)(lodash-es@4.18.1)(lodash@4.18.1):
     dependencies:
       '@types/lodash-es': 4.17.12
       lodash: 4.18.1
-      lodash-es: 4.17.21
+      lodash-es: 4.18.1
 
   lodash.memoize@4.1.2: {}
 
@@ -6607,8 +6338,6 @@ snapshots:
       slice-ansi: 7.1.2
       strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
-
-  loglevel@1.9.2: {}
 
   lru-cache@10.4.3: {}
 
@@ -6635,8 +6364,6 @@ snapshots:
   memoize-one@6.0.0: {}
 
   merge-stream@2.0.0: {}
-
-  meshoptimizer@0.18.1: {}
 
   micromatch@4.0.8:
     dependencies:
@@ -6666,8 +6393,6 @@ snapshots:
   minimist@1.2.8: {}
 
   minipass@7.1.3: {}
-
-  mitt@3.0.1: {}
 
   ms@2.1.3: {}
 
@@ -6723,8 +6448,6 @@ snapshots:
       mimic-function: 5.0.1
 
   openapi-types@12.1.3: {}
-
-  opentype.js@2.0.0: {}
 
   optionator@0.9.4:
     dependencies:
@@ -6860,16 +6583,10 @@ snapshots:
 
   quick-format-unescaped@4.0.4: {}
 
-  quickselect@3.0.0: {}
-
   raf@3.4.1:
     dependencies:
       performance-now: 2.1.0
     optional: true
-
-  rbush@4.0.1:
-    dependencies:
-      quickselect: 3.0.0
 
   react-is@18.3.1: {}
 
@@ -7103,8 +6820,6 @@ snapshots:
     dependencies:
       real-require: 1.0.0
 
-  three@0.172.0: {}
-
   tinyglobby@0.2.15:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
@@ -7182,7 +6897,8 @@ snapshots:
       yn: 3.1.1
     optional: true
 
-  tslib@2.8.1: {}
+  tslib@2.8.1:
+    optional: true
 
   tsx@4.23.1:
     dependencies:
@@ -7218,10 +6934,6 @@ snapshots:
 
   uglify-js@3.19.3:
     optional: true
-
-  uid@2.0.2:
-    dependencies:
-      '@lukeed/csprng': 1.1.0
 
   undici-types@7.16.0: {}
 

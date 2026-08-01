@@ -71,4 +71,4 @@ Remaining high-risk packages:
 
 Next recommended step:
 
-- Extract or rewrite the remaining viewer kernel so `@cadflux/renderer-webgl` no longer depends on the broad MLightCAD viewer/editor surface.
+- Delete the now-inactive `packages/cad-simple-viewer` and `packages/three-renderer` directories or archive them outside the active CadFlux tree once any remaining historical/reference value is no longer needed.

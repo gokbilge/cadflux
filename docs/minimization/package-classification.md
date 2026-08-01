@@ -19,12 +19,10 @@
 | @cadflux/presets | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/renderer-pdf | KEEP_RUNTIME | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/renderer-svg | KEEP_RUNTIME | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @cadflux/renderer-webgl | WRAP_FIRST | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; Web preview depends on wrapped MLightCAD viewer stack |
+| @cadflux/renderer-webgl | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; current viewer package is CadFlux-owned and no longer imports MLightCAD runtime packages |
 | @cadflux/server | KEEP_RUNTIME | Production root |
 | @cadflux/storage | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/web | KEEP_RUNTIME | Production root |
-| @mlightcad/cad-simple-viewer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @mlightcad/three-renderer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | playwright | DELETE_AFTER_TESTS | Removed from current production conversion path; only minimization and regression references remain |
 | vue-i18n | DELETE_AFTER_TESTS | Active runtime/build references detected: 1; Removed from current English-only UI path; historical references may remain in baseline artifacts |
 | fastify | KEEP_RUNTIME | Primary server framework |

@@ -16,7 +16,6 @@
     "packages/auth",
     "packages/batch-engine",
     "packages/cad-import",
-    "packages/cad-simple-viewer",
     "packages/config",
     "packages/contracts",
     "packages/core",
@@ -31,8 +30,7 @@
     "packages/renderer-pdf",
     "packages/renderer-svg",
     "packages/renderer-webgl",
-    "packages/storage",
-    "packages/three-renderer"
+    "packages/storage"
   ],
   "packageManager": "pnpm@10.33.4",
   "scripts": {

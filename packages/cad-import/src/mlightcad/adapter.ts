@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-import { readFile } from 'node:fs/promises'
-
 import type { CadFluxInputSource } from '@cadflux/core'
 import {
   DRAWING_MODEL_SCHEMA_VERSION,
@@ -443,14 +441,11 @@ function computeBounds(entities: DrawingEntity[], blocks: DrawingBlock[]) {
 }
 
 async function parseDxfDocument(input: CadInput, options?: CadParseOptions): Promise<CadParseResult> {
-  if (!input.path) {
-    throw new Error(`DXF parsing requires a filesystem path for ${input.name}.`)
-  }
   if (options?.signal?.aborted) {
     throw new Error('CAD parse aborted.')
   }
 
-  const text = await readFile(input.path, 'utf8')
+  const text = await readDxfText(input)
   const pairs = toPairs(text)
   const header = parseHeader(pairs)
   const layers = parseLayers(pairs)
@@ -507,6 +502,17 @@ async function parseDxfDocument(input: CadInput, options?: CadParseOptions): Pro
   }
 }
 
+async function readDxfText(input: CadInput): Promise<string> {
+  if (input.bytes) {
+    return new TextDecoder('utf8').decode(input.bytes)
+  }
+  if (input.path) {
+    const { readFile } = await import('node:fs/promises')
+    return readFile(input.path, 'utf8')
+  }
+  throw new Error(`DXF parsing requires bytes or a filesystem path for ${input.name}.`)
+}
+
 function createLegacyStubDocument(input: CadInput, diagnostics: DrawingDiagnostic[]): DrawingDocument {
   const format = inferFormat(input)
   return {
@@ -549,7 +555,21 @@ export const mlightcadCadParserAdapter: CadParserAdapter = {
     if (inferFormat(input) === 'dxf') {
       return parseDxfDocument(input, options)
     }
-    const inspected = await this.inspect(input, options)
+    const inspected =
+      input.path != null
+        ? await this.inspect(input, options)
+        : {
+            format: 'dwg' as const,
+            warnings: [
+              {
+                severity: 'warning' as const,
+                code: 'dwg_browser_preview_unavailable',
+                message:
+                  'DWG preview is not available in the lightweight browser viewer without a filesystem-backed parser path.',
+                sourceType: 'dwg'
+              }
+            ]
+          }
     const document = createLegacyStubDocument(input, inspected.warnings)
     return {
       document,

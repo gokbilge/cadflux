@@ -11,7 +11,7 @@ const tempRoot = await mkdtemp(path.join(tmpdir(), 'cadflux-server-test-'))
 const dataDir = path.join(tempRoot, 'data')
 const databasePath = path.join(dataDir, 'database', 'cadflux.sqlite')
 const fixturePath = path.resolve('fixtures/minimization/minimal-line.dxf')
-const port = 18080
+const port = 18080 + Math.floor(Math.random() * 1000)
 const baseUrl = `http://127.0.0.1:${port}`
 
 const server = spawn(
@@ -166,11 +166,17 @@ async function waitForReady(baseUrl) {
 
 async function waitForTerminalJob(baseUrl, jobId, cookieHeader) {
   for (let attempt = 0; attempt < 120; attempt += 1) {
-    const payload = await fetch(`${baseUrl}/api/v1/jobs/${jobId}`, {
-      headers: {
-        Cookie: cookieHeader
-      }
-    }).then(response => response.json())
+    let payload
+    try {
+      payload = await fetch(`${baseUrl}/api/v1/jobs/${jobId}`, {
+        headers: {
+          Cookie: cookieHeader
+        }
+      }).then(response => response.json())
+    } catch {
+      await delay(1000)
+      continue
+    }
     const status = payload.job.status
     if (['completed', 'completed_with_warnings', 'failed', 'cancelled'].includes(status)) {
       return payload.job

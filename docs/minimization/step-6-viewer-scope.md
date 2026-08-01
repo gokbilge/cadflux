@@ -4,82 +4,58 @@ Date: 2026-08-01
 
 Changes completed:
 
-- `@cadflux/renderer-webgl` locale surface is now English-only.
-- `@mlightcad/cad-simple-viewer` root export surface is now narrowed to the symbols still consumed by CadFlux production packages.
-- `@mlightcad/cad-pdf-plugin` and `@mlightcad/cad-svg-plugin` no longer import the `cad-simple-viewer` package root for active code paths; they now import only the specific app/editor/plugin submodules they need.
-- `packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts` was removed because it was not referenced by active CadFlux production code.
-- The unused About dialog chain was removed:
-  - `packages/cad-simple-viewer/src/command/AcApAboutCmd.ts`
-  - `packages/cad-simple-viewer/src/ui/AcUiAboutDialog.ts`
-  - `packages/cad-simple-viewer/src/ui/AcUiDialog.ts`
-  - `packages/cad-simple-viewer/src/ui/index.ts`
-- `packages/cad-simple-viewer/src/i18n` is now English-only:
-  - `AcApLocale` was narrowed to `en`
-  - `cs/*`, `tr/*`, and `zh/*` locale files were removed
-  - locale registration now loads only English command/jig/main messages
-- `packages/renderer-webgl/src/mlightcad-bridge/app.ts` now exports only the symbols required by the active read-only viewer path.
-- `packages/renderer-webgl/src/cadflux-app/index.ts` no longer re-exports the broad MLightCAD bridge surface.
-- `packages/renderer-webgl/src/CadFluxWebViewer.ts` no longer depends on `mlightcad-bridge/service.ts` for layer event typing.
-- The legacy files were removed:
-  - `packages/renderer-webgl/src/cadflux-editor/AcEdCommandLine.ts`
-  - `packages/renderer-webgl/src/cadflux-editor/AcEdGripManager.ts`
-  - `packages/renderer-webgl/src/cadflux-editor/AcEditor.ts`
-  - `packages/renderer-webgl/src/cadflux-editor/AcEdMTextEditor.ts`
-  - `packages/renderer-webgl/src/cadflux-editor/AcEdOsnapResolver.ts`
-  - `packages/renderer-webgl/src/cadflux-editor/AcEdViewKeyHandler.ts`
-  - `packages/renderer-webgl/src/mlightcad-bridge/editor.ts`
-  - `packages/renderer-webgl/src/mlightcad-bridge/service.ts`
+- Replaced the `@cadflux/renderer-webgl` MLightCAD bridge with a CadFlux-owned document-driven viewer core.
+- Removed direct `@mlightcad/*` imports from `packages/renderer-webgl`.
+- Removed the legacy renderer-webgl source surfaces:
+  - `src/cadflux-app/**`
+  - `src/cadflux-i18n/**`
+  - `src/mlightcad-bridge/**`
+- Added a small render-plan pipeline that consumes `@cadflux/drawing-model`.
+- Added a small canvas-based viewer core with:
+  - fit-to-view
+  - zoom in / zoom out
+  - pointer pan
+  - layout switching
+  - layer visibility toggles
+- Added lightweight renderer-webgl tests for:
+  - block-reference expansion
+  - hidden-layer filtering
+  - viewport fit math
+  - world-to-screen transform behavior
+- Enabled DXF browser preview input through `@cadflux/cad-import` by allowing DXF parsing from in-memory bytes.
+- Left DWG browser preview as a documented lightweight limitation; server-side DWG conversion remains unchanged.
 
-Effect:
+Active workspace impact:
 
-- The production viewer build is now centered on a read-only preview flow.
-- Legacy editor, command-line, osnap, grip, and MText editing paths have been removed from `@cadflux/renderer-webgl`.
-- The remaining production viewer path is now the narrower read-only bridge.
-- `cad-simple-viewer` no longer re-exports broad `util`, `service`, `command`, `editor`, `i18n`, `plugin`, `view`, and `ui` wildcard surfaces from its package root.
-- Active package-root imports of `@mlightcad/cad-simple-viewer` are now reduced to README/example text references instead of production code.
-- The plugin surface no longer exports the unused example plugin.
-- `AcApDocManager` no longer registers the `about` command in the active viewer command set.
-- `packages/cad-simple-viewer/src/app/AcApDocManager.ts` command registration was narrowed to the read-only viewer subset still relevant to CadFlux (`open`, `pan`, `regen`, `select`, `switchbg`, `undo`, `redo`, `zoom`).
-- `cad-simple-viewer` locale payload was reduced from multi-language message bundles to English-only runtime data.
-- Legacy draw/edit/measure/layer/sysvar command registration was removed from the default `cad-simple-viewer` bootstrap path.
-- Production-unreachable legacy command source trees were removed from `@mlightcad/cad-simple-viewer`:
-  - `src/command/convert/**`
-  - `src/command/draw/**`
-  - `src/command/layer/**`
-  - `src/command/modify/**`
-  - `src/command/review/**`
-  - unused top-level commands `AcApCacheFontCmd`, `AcApLogCmd`, `AcApQNewCmd`, `AcApSysVarCmd`
-  - unused measurement commands except `measure/AcApClearMeasurementsCmd`
-- Matching legacy command tests were removed with the deleted command families.
+- active workspace count dropped from `23` to `21`
+- production-reachable workspace count dropped from `23` to `21`
+- MLightCAD reference count dropped from `52` to `32`
 
-Observed bundle change in this slice:
+Remaining production viewer dependencies:
 
-- before: `cad-simple-viewer.js` `2,542.02 kB` / gzip `684.77 kB`
-- after: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
+- `@cadflux/cad-import`
+- `@cadflux/drawing-model`
+- `vue`
 
-Observed bundle change in the command-registry narrowing slice:
+Removed from the active production viewer graph:
 
-- before: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
-- after: `cad-simple-viewer.js` `2,227.13 kB` / gzip `617.14 kB`
-
-Observed bundle change in the command root-export narrowing slice:
-
-- before: `cad-simple-viewer.js` `2,227.13 kB` / gzip `617.14 kB`
-- after: `cad-simple-viewer.js` `2,127.62 kB` / gzip `596.67 kB`
-
-Deletion completed in this slice:
-
-- `packages/renderer-webgl/src/cadflux-editor/**`
-- `packages/renderer-webgl/src/mlightcad-bridge/editor.ts`
-- `packages/renderer-webgl/src/mlightcad-bridge/service.ts`
-- `packages/cad-simple-viewer/src/command/convert/**`
-- `packages/cad-simple-viewer/src/command/draw/**`
-- `packages/cad-simple-viewer/src/command/layer/**`
-- `packages/cad-simple-viewer/src/command/modify/**`
-- `packages/cad-simple-viewer/src/command/review/**`
+- `@mlightcad/cad-simple-viewer`
+- `@mlightcad/three-renderer`
+- `@mlightcad/mtext-renderer`
+- `@mlightcad/mtext-input-box`
+- `@mlightcad/data-model`
+- `@mlightcad/libredwg-converter`
 
 Validation:
 
-- `pnpm --filter @cadflux/renderer-webgl build`
-- `pnpm --filter @mlightcad/cad-simple-viewer build`
+- `pnpm install --frozen-lockfile`
+- `pnpm check:mlightcad-boundary`
+- `pnpm check:mlightcad-production`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
 - `pnpm test:minimization`
+- `pnpm build:cadflux`
+- `pnpm test:integration`
+- `pnpm minimize:analyze`
+- `pnpm minimize:measure`

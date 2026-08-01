@@ -52,8 +52,6 @@ const config: Config = {
     '^@cadflux/renderer-svg$': '<rootDir>/packages/renderer-svg/src/index.ts',
     '^@cadflux/renderer-webgl$': '<rootDir>/packages/renderer-webgl/src/index.ts',
     '^@cadflux/storage$': '<rootDir>/packages/storage/src/index.ts',
-    '^@mlightcad/cad-simple-viewer$':
-      '<rootDir>/packages/cad-simple-viewer/src/index.ts',
     '^lodash-es$': 'lodash',
     '^three/examples/jsm/lines/LineMaterial\\.js$':
       '<rootDir>/test/mocks/three/LineMaterial.js',

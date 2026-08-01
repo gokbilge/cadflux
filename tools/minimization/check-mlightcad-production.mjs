@@ -39,9 +39,7 @@ const productionPackageRoots = [
 ]
 const approvedImportRoots = new Set([
   path.resolve(repoRoot, 'packages/cad-import').split(path.sep).join('/'),
-  path.resolve(repoRoot, 'packages/renderer-webgl').split(path.sep).join('/'),
-  path.resolve(repoRoot, 'packages/cad-simple-viewer').split(path.sep).join('/'),
-  path.resolve(repoRoot, 'packages/three-renderer').split(path.sep).join('/')
+  path.resolve(repoRoot, 'packages/renderer-webgl').split(path.sep).join('/')
 ])
 
 const forbiddenWorkspacePackages = new Set([
@@ -161,34 +159,37 @@ function forbidTokens(relativeRoot, tokens) {
 }
 
 function checkManifests() {
-  for (const base of ['apps', 'packages']) {
-    const basePath = path.join(repoRoot, base)
-    if (!statExistsDirectory(basePath)) continue
-    for (const entry of readdirSync(basePath, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue
-      const manifestPath = path.join(basePath, entry.name, 'package.json')
-      if (!existsSync(manifestPath)) continue
-      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-      for (const section of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
-        for (const dependency of Object.keys(manifest[section] ?? {})) {
-          if (!dependency.startsWith('@mlightcad/')) continue
-          if (forbiddenWorkspacePackages.has(dependency)) {
-            violations.push({
-              file: path.relative(repoRoot, manifestPath),
-              importedPackage: dependency,
-              reason: `manifest declares forbidden MLightCAD package in ${section}`,
-              suggestedFacade: '@cadflux/renderer-pdf, @cadflux/renderer-svg, or @cadflux/renderer-webgl'
-            })
-            continue
-          }
-          if (!allowedPackages.has(dependency)) {
-            violations.push({
-              file: path.relative(repoRoot, manifestPath),
-              importedPackage: dependency,
-              reason: `manifest declares non-allowlisted MLightCAD package in ${section}`,
-              suggestedFacade: '@cadflux/cad-import or @cadflux/renderer-webgl'
-            })
-          }
+  const workspaceText = readFileSync(
+    path.join(repoRoot, 'pnpm-workspace.yaml'),
+    'utf8'
+  )
+  const activeWorkspaceDirs = [...workspaceText.matchAll(/-\s+'([^']+)'/g)].map(
+    match => match[1]
+  )
+
+  for (const relativeDir of activeWorkspaceDirs) {
+    const manifestPath = path.join(repoRoot, relativeDir, 'package.json')
+    if (!existsSync(manifestPath)) continue
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    for (const section of ['dependencies', 'peerDependencies', 'optionalDependencies']) {
+      for (const dependency of Object.keys(manifest[section] ?? {})) {
+        if (!dependency.startsWith('@mlightcad/')) continue
+        if (forbiddenWorkspacePackages.has(dependency)) {
+          violations.push({
+            file: path.relative(repoRoot, manifestPath),
+            importedPackage: dependency,
+            reason: `manifest declares forbidden MLightCAD package in ${section}`,
+            suggestedFacade: '@cadflux/renderer-pdf, @cadflux/renderer-svg, or @cadflux/renderer-webgl'
+          })
+          continue
+        }
+        if (!allowedPackages.has(dependency)) {
+          violations.push({
+            file: path.relative(repoRoot, manifestPath),
+            importedPackage: dependency,
+            reason: `manifest declares non-allowlisted MLightCAD package in ${section}`,
+            suggestedFacade: '@cadflux/cad-import or @cadflux/renderer-webgl'
+          })
         }
       }
     }
