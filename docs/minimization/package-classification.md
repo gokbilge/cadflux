@@ -24,7 +24,7 @@
 | @cadflux/storage | KEEP_RUNTIME | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/web | KEEP_RUNTIME | Production root |
 | @mlightcad/cad-pdf-plugin | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @mlightcad/cad-simple-viewer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; active CadFlux usage is now narrowed toward a read-only viewer bridge |
+| @mlightcad/cad-simple-viewer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; active CadFlux usage is now narrowed toward a read-only viewer bridge and a minimal package-root export surface |
 | @mlightcad/cad-svg-plugin | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @mlightcad/three-renderer | WRAP_FIRST | Direct MLightCAD runtime integration; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | playwright | DELETE_AFTER_TESTS | Removed from current production conversion path; only historical baseline references remain |
