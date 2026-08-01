@@ -16,10 +16,10 @@
   "packageManager": "pnpm@10.33.4",
   "scripts": {
     "analyze": "pnpm minimize:bundle",
-    "build": "pnpm build:cadflux:full",
+    "build": "pnpm build:cadflux",
     "build:cadflux": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/drawing-model build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/cad-import build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build:lib && pnpm --filter @cadflux/renderer-pdf build:lib && pnpm --filter @cadflux/cli build && pnpm --filter @cadflux/server build && pnpm --filter @cadflux/web build",
-    "build:cadflux:full": "pnpm run build:cadflux && pnpm run build:conversion-runners",
-    "build:conversion-runners": "pnpm --filter @cadflux/renderer-svg build:runner && pnpm --filter @cadflux/renderer-pdf build:runner",
+    "build:cadflux:full": "pnpm run build:cadflux",
+    "build:conversion-runners": "node -e \"console.log('conversion runners removed')\"",
     "build:server": "pnpm --filter @cadflux/core build && pnpm --filter @cadflux/drawing-model build && pnpm --filter @cadflux/dwg-adapter build && pnpm --filter @cadflux/dxf-adapter build && pnpm --filter @cadflux/cad-import build && pnpm --filter @cadflux/plot-engine build && pnpm --filter @cadflux/contracts build && pnpm --filter @cadflux/auth build && pnpm --filter @cadflux/database build && pnpm --filter @cadflux/storage build && pnpm --filter @cadflux/batch-engine build && pnpm --filter @cadflux/renderer-svg build && pnpm --filter @cadflux/renderer-pdf build && pnpm --filter @cadflux/server build",
     "clean": "node tools/run-workspace-script.mjs clean",
     "copy:workers": "pnpm -r --filter \"./packages/**\" run copy:workers",

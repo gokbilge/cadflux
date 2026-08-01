@@ -27,7 +27,6 @@
     "@cadflux/presets": "workspace:*",
     "@cadflux/renderer-pdf": "workspace:*",
     "@cadflux/renderer-svg": "workspace:*",
-    "commander": "^12.1.0",
-    "playwright": "^1.49.1"
+    "commander": "^12.1.0"
   }
 }

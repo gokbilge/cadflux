@@ -12,27 +12,19 @@
     }
   },
   "files": [
-    "dist",
-    "dist-runner"
+    "dist"
   ],
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
   "scripts": {
-    "build": "pnpm run build:lib && pnpm run build:runner",
+    "build": "pnpm run build:lib",
     "build:lib": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
-    "build:runner": "rimraf dist-runner && vite build --config vite.runner.config.ts && node scripts/copy-runner-assets.mjs",
-    "clean": "rimraf dist dist-runner tsconfig.tsbuildinfo"
+    "clean": "rimraf dist tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@cadflux/core": "workspace:*",
-    "@mlightcad/cad-simple-viewer": "workspace:*",
-    "@mlightcad/cad-svg-plugin": "workspace:*",
-    "@mlightcad/data-model": "^1.12.1",
-    "playwright": "^1.49.1"
-  },
-  "devDependencies": {
-    "vite": "^6.4.3"
+    "@cadflux/drawing-model": "workspace:*"
   }
 }

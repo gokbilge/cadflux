@@ -9,7 +9,7 @@ const commands = [
   [nodeExecutable, ['./tools/minimization/check-mlightcad-boundary.mjs']],
   [nodeExecutable, ['./tools/minimization/check-public-api-boundary.mjs']],
   [nodeExecutable, ['./tools/test-cadflux-server.mjs']],
-  [nodeExecutable, ['--experimental-vm-modules', './node_modules/jest/bin/jest.js', '--runInBand', 'apps/server/src/server.test.ts', 'apps/server/src/conversion-transport-regression.test.ts', 'packages/core/src/browserBridge.test.ts', 'packages/database/src/index.test.ts', 'packages/drawing-model/src/index.test.ts', 'packages/cad-import/src/index.test.ts']]
+  [nodeExecutable, ['--experimental-vm-modules', './node_modules/jest/bin/jest.js', '--runInBand', 'apps/server/src/server.test.ts', 'apps/server/src/conversion-transport-regression.test.ts', 'packages/database/src/index.test.ts', 'packages/drawing-model/src/index.test.ts', 'packages/cad-import/src/index.test.ts']]
 ]
 
 for (const [command, args] of commands) {

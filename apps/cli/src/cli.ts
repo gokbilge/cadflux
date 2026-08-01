@@ -23,7 +23,7 @@ import {
   createBatchReportArtifacts,
   createBatchReportFromResults
 } from '@cadflux/batch-engine'
-import { inspectCadInput } from '@cadflux/cad-import'
+import { inspectCadInput, parseCadInput } from '@cadflux/cad-import'
 import { CADFLUX_DEFAULT_FLAGS } from '@cadflux/config'
 import {
   createCadFluxRuntime,
@@ -41,7 +41,6 @@ import { CADFLUX_PRESETS, getCadFluxPreset, validateCadFluxProfile } from '@cadf
 import { exportPdfFile } from '@cadflux/renderer-pdf'
 import { exportSvgFile } from '@cadflux/renderer-svg'
 import { Command } from 'commander'
-import { chromium } from 'playwright'
 
 const CADFLUX_CLI_VERSION = '0.1.0'
 const EXIT_SUCCESS = 0
@@ -172,10 +171,19 @@ class NodeCadFluxConverter implements CadFluxConverter {
           continue
         }
 
+        const parsed = await parseCadInput({
+          name: request.input.name,
+          format: request.input.extension === '.dwg' ? 'dwg' : 'dxf',
+          path: inputPath,
+          relativePath: request.input.relativePath,
+          sizeBytes: request.input.sizeBytes,
+          lastModifiedMs: request.input.lastModifiedMs
+        })
+
         if (format === 'pdf') {
-          await exportPdfFile(inputPath, outputPath)
+          await exportPdfFile(parsed.document, outputPath, undefined, request.profile)
         } else {
-          await exportSvgFile(inputPath, outputPath)
+          await exportSvgFile(parsed.document, outputPath, undefined, request.profile)
         }
         artifacts.push({ format, outputPath })
       }
@@ -459,7 +467,7 @@ program.command('doctor').action(async () => {
     node: process.version,
     platform: process.platform,
     arch: process.arch,
-    chromiumExecutable: chromium.executablePath(),
+    rendererBackend: 'direct-node-vector',
     featureFlags: CADFLUX_DEFAULT_FLAGS
   }
   console.log(JSON.stringify(info, null, 2))

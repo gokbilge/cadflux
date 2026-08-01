@@ -4,7 +4,7 @@
 import { mkdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 
-import { inspectCadInput } from '@cadflux/cad-import'
+import { parseCadInput } from '@cadflux/cad-import'
 import type { CadFluxFormat, CadFluxProfile } from '@cadflux/core'
 import { checksumFile } from '@cadflux/core/checksum'
 import { resolveArtifactOutputPath } from '@cadflux/plot-engine'
@@ -54,14 +54,14 @@ async function main(): Promise<void> {
 
   try {
     send({ type: 'stage', stage: 'parsing', progressPercent: 10 })
-    const inspection = await inspectCadInput({
+    const parsed = await parseCadInput({
       name: payload.originalName,
       format: payload.format === 'dwg' ? 'dwg' : 'dxf',
       path: payload.storedPath,
       relativePath: payload.relativePath,
       sizeBytes: payload.sizeBytes
     })
-    const warnings = inspection.warnings.map(item => item.message)
+    const warnings = parsed.diagnostics.map(item => item.message)
 
     send({ type: 'stage', stage: 'rendering', progressPercent: 35 })
     const artifacts: ChildArtifactPayload[] = []
@@ -84,9 +84,9 @@ async function main(): Promise<void> {
       )
       await mkdir(path.dirname(outputPath), { recursive: true })
       if (format === 'pdf') {
-        await exportPdfFile(payload.storedPath, outputPath)
+        await exportPdfFile(parsed.document, outputPath, undefined, payload.profile)
       } else {
-        await exportSvgFile(payload.storedPath, outputPath)
+        await exportSvgFile(parsed.document, outputPath, undefined, payload.profile)
       }
       const details = await stat(outputPath)
       artifacts.push({
@@ -96,7 +96,7 @@ async function main(): Promise<void> {
         sizeBytes: details.size,
         checksum: await checksumFile(outputPath),
         mimeType: format === 'pdf' ? 'application/pdf' : 'image/svg+xml',
-        fidelity: format === 'pdf' ? 'unknown' : 'vector'
+        fidelity: 'vector'
       })
     }
 

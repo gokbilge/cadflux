@@ -25,11 +25,24 @@ describe('@cadflux/cad-import', () => {
       path: filePath
     })
 
-    expect(parsed.adapterId).toBe('mlightcad-legacy-inspection')
+    expect(parsed.adapterId).toBe('cadflux-direct-dxf-parser')
     expect(parsed.document.schemaVersion).toBe(1)
     expect(parsed.document.source.format).toBe('dxf')
-    expect(parsed.document.entities[0]?.kind).toBe('unsupported')
+    expect(parsed.document.entities[0]?.kind).toBe('line')
+    expect(parsed.document.layers.map(layer => layer.name)).toContain('0')
     expect(() => JSON.stringify(parsed.document)).not.toThrow()
     expect(structuredClone(parsed.document)).toEqual(parsed.document)
+  })
+
+  test('parses nested block DXF with block reference entities', async () => {
+    const filePath = path.resolve('fixtures/minimization/nested-block.dxf')
+    const parsed = await parseCadInput({
+      name: 'nested-block.dxf',
+      format: 'dxf',
+      path: filePath
+    })
+
+    expect(parsed.document.blocks.length).toBeGreaterThanOrEqual(2)
+    expect(parsed.document.entities.some(entity => entity.kind === 'block-reference')).toBe(true)
   })
 })

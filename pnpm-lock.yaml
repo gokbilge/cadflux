@@ -157,9 +157,6 @@ importers:
       commander:
         specifier: ^12.1.0
         version: 12.1.0
-      playwright:
-        specifier: ^1.49.1
-        version: 1.59.1
 
   apps/server:
     dependencies:
@@ -444,53 +441,21 @@ importers:
       '@cadflux/core':
         specifier: workspace:*
         version: link:../core
-      '@mlightcad/cad-pdf-plugin':
+      '@cadflux/drawing-model':
         specifier: workspace:*
-        version: link:../cad-pdf-plugin
-      '@mlightcad/cad-simple-viewer':
-        specifier: workspace:*
-        version: link:../cad-simple-viewer
-      '@mlightcad/cad-svg-plugin':
-        specifier: workspace:*
-        version: link:../cad-svg-plugin
-      '@mlightcad/data-model':
-        specifier: ^1.12.1
-        version: 1.12.1
+        version: link:../drawing-model
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
-      playwright:
-        specifier: ^1.49.1
-        version: 1.59.1
-    devDependencies:
-      svg2pdf.js:
-        specifier: ^2.7.0
-        version: 2.7.0(jspdf@4.2.1)
-      vite:
-        specifier: ^6.4.3
-        version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(tsx@4.23.1)(yaml@2.8.3)
 
   packages/renderer-svg:
     dependencies:
       '@cadflux/core':
         specifier: workspace:*
         version: link:../core
-      '@mlightcad/cad-simple-viewer':
+      '@cadflux/drawing-model':
         specifier: workspace:*
-        version: link:../cad-simple-viewer
-      '@mlightcad/cad-svg-plugin':
-        specifier: workspace:*
-        version: link:../cad-svg-plugin
-      '@mlightcad/data-model':
-        specifier: ^1.12.1
-        version: 1.12.1
-      playwright:
-        specifier: ^1.49.1
-        version: 1.59.1
-    devDependencies:
-      vite:
-        specifier: ^6.4.3
-        version: 6.4.3(@types/node@24.12.4)(sass@1.98.0)(tsx@4.23.1)(yaml@2.8.3)
+        version: link:../drawing-model
 
   packages/renderer-webgl:
     dependencies:
@@ -2667,11 +2632,6 @@ packages:
   font-family-papandreou@0.2.0-patch2:
     resolution: {integrity: sha512-l/YiRdBSH/eWv6OF3sLGkwErL+n0MqCICi9mppTZBOCL5vixWGDqCYvRcuxB2h7RGCTzaTKOHT2caHvCXQPRlw==}
 
-  fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -3404,16 +3364,6 @@ packages:
   pkg-dir@4.2.0:
     resolution: {integrity: sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==}
     engines: {node: '>=8'}
-
-  playwright-core@1.59.1:
-    resolution: {integrity: sha512-HBV/RJg81z5BiiZ9yPzIiClYV/QMsDCKUyogwH9p3MCP6IYjUFu/MActgYAvK0oWyV9NlwM3GLBjADyWgydVyg==}
-    engines: {node: '>=18'}
-    hasBin: true
-
-  playwright@1.59.1:
-    resolution: {integrity: sha512-C8oWjPR3F81yljW9o5OxcWzfh6avkVwDD2VYdwIGqTkl+OGFISgypqzfu7dOe4QNLL2aqcWBmI3PMtLIK233lw==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   postcss-selector-parser@6.1.2:
     resolution: {integrity: sha512-Q8qQfPiZ+THO/3ZrOrO0cJJKfpYCagtMUkXbnEfmgUjwXg6z/WBeOyS9APBBPCTSiDV+s4SwQGu8yFsiMRIudg==}
@@ -6195,9 +6145,6 @@ snapshots:
 
   font-family-papandreou@0.2.0-patch2: {}
 
-  fsevents@2.3.2:
-    optional: true
-
   fsevents@2.3.3:
     optional: true
 
@@ -7079,14 +7026,6 @@ snapshots:
   pkg-dir@4.2.0:
     dependencies:
       find-up: 4.1.0
-
-  playwright-core@1.59.1: {}
-
-  playwright@1.59.1:
-    dependencies:
-      playwright-core: 1.59.1
-    optionalDependencies:
-      fsevents: 2.3.2
 
   postcss-selector-parser@6.1.2:
     dependencies:

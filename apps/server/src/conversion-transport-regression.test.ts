@@ -9,13 +9,23 @@ const PROJECT_ROOT = path.resolve(__dirname, '../../..')
 describe('conversion transport regression guards', () => {
   test.each([
     'packages/renderer-pdf/src/node.ts',
-    'packages/renderer-svg/src/node.ts',
-    'packages/renderer-pdf/runner/main.ts',
-    'packages/renderer-svg/runner/main.ts'
+    'packages/renderer-svg/src/node.ts'
   ])('%s does not expand file bytes into number arrays', relativePath => {
     const source = readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8')
 
     expect(source).not.toContain('[...fileBytes]')
     expect(source).not.toContain('Array.from(fileBytes)')
+  })
+
+  test.each([
+    'packages/renderer-pdf/src/node.ts',
+    'packages/renderer-svg/src/node.ts',
+    'apps/cli/src/cli.ts'
+  ])('%s no longer depends on playwright', relativePath => {
+    const source = readFileSync(path.join(PROJECT_ROOT, relativePath), 'utf8')
+    expect(source).not.toContain('playwright')
+    expect(source).not.toContain('chromium')
+    expect(source).not.toContain('browser.newPage')
+    expect(source).not.toContain('page.evaluate')
   })
 })
