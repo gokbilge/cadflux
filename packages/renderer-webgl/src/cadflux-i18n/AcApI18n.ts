@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 CadFlux contributors
 
-export type AcApLocale = 'en' | 'zh' | 'tr' | 'cs'
+export type AcApLocale = 'en'
 
 export interface AcApLocaleMessage {
   [key: string]: string | AcApLocaleMessage
@@ -38,10 +38,7 @@ class SimpleEvent<T> {
 
 export class AcApI18n {
   private static _messages: AcApLocaleMessages = {
-    en: {},
-    zh: {},
-    tr: {},
-    cs: {}
+    en: {}
   }
 
   private static _currentLocale: AcApLocale = 'en'
@@ -76,7 +73,7 @@ export class AcApI18n {
 
   public static setCurrentLocale(locale: AcApLocale): void {
     const old = this._currentLocale
-    this._currentLocale = locale === 'en' ? 'en' : 'en'
+    this._currentLocale = locale
     this.events.localeChanged.dispatch({ old, new: this._currentLocale })
   }
 

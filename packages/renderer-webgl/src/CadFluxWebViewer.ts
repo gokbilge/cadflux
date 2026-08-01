@@ -83,10 +83,6 @@ export const CadFluxWebViewer = defineComponent({
     baseUrl: {
       type: String,
       default: ''
-    },
-    locale: {
-      type: String,
-      default: 'en'
     }
   },
   emits: ['create', 'document-opened'],
@@ -217,7 +213,7 @@ export const CadFluxWebViewer = defineComponent({
         return
       }
 
-      AcApI18n.setCurrentLocale(props.locale as 'en' | 'zh' | 'tr' | 'cs')
+      AcApI18n.setCurrentLocale('en')
 
       try {
         await AcApDocManager.instance.destroy()
@@ -279,13 +275,6 @@ export const CadFluxWebViewer = defineComponent({
     onBeforeUnmount(() => {
       void destroyViewer()
     })
-
-    watch(
-      () => props.locale,
-      locale => {
-        AcApI18n.setCurrentLocale(locale as 'en' | 'zh' | 'tr' | 'cs')
-      }
-    )
 
     watch(
       () => props.localFile,
