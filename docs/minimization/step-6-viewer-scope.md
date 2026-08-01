@@ -7,6 +7,7 @@ Changes completed:
 - `@cadflux/renderer-webgl` locale surface is now English-only.
 - `@mlightcad/cad-simple-viewer` root export surface is now narrowed to the symbols still consumed by CadFlux production packages.
 - `@mlightcad/cad-pdf-plugin` and `@mlightcad/cad-svg-plugin` no longer import the `cad-simple-viewer` package root for active code paths; they now import only the specific app/editor/plugin submodules they need.
+- `packages/cad-simple-viewer/src/plugin/AcApPluginExample.ts` was removed because it was not referenced by active CadFlux production code.
 - `packages/renderer-webgl/src/mlightcad-bridge/app.ts` now exports only the symbols required by the active read-only viewer path.
 - `packages/renderer-webgl/src/cadflux-app/index.ts` no longer re-exports the broad MLightCAD bridge surface.
 - `packages/renderer-webgl/src/CadFluxWebViewer.ts` no longer depends on `mlightcad-bridge/service.ts` for layer event typing.
@@ -27,6 +28,7 @@ Effect:
 - The remaining production viewer path is now the narrower read-only bridge.
 - `cad-simple-viewer` no longer re-exports broad `util`, `service`, `command`, `editor`, `i18n`, `plugin`, `view`, and `ui` wildcard surfaces from its package root.
 - Active package-root imports of `@mlightcad/cad-simple-viewer` are now reduced to README/example text references instead of production code.
+- The plugin surface no longer exports the unused example plugin.
 
 Deletion completed in this slice:
 
