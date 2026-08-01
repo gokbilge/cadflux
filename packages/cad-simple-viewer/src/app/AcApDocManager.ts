@@ -21,12 +21,10 @@ import { AcApSelectCmd } from '../command/AcApSelectCmd'
 import { AcApSwitchBgCmd } from '../command/AcApSwitchBgCmd'
 import { AcApUndoCmd } from '../command/AcApUndoCmd'
 import { AcApZoomCmd } from '../command/AcApZoomCmd'
-import {
-  AcEdCalculateSizeCallback,
-  AcEdCommand,
-  AcEdCommandStack,
-  AcEdOpenMode
-} from '../editor'
+import { AcEdCommand } from '../editor/command/AcEdCommand'
+import { AcEdCommandStack } from '../editor/command/AcEdCommandStack'
+import type { AcEdCalculateSizeCallback } from '../editor/view/AcEdBaseView'
+import { AcEdOpenMode } from '../editor/view/AcEdOpenMode'
 import { AcApPluginManager } from '../plugin/AcApPluginManager'
 import { acapWithSecondaryDatabase } from '../util/AcApSecondaryDatabase'
 import { AcTrView2d } from '../view/AcTrView2d'

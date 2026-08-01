@@ -1,4 +1,4 @@
-import { AcEdCommandStack } from '../editor'
+import { AcEdCommandStack } from '../editor/command/AcEdCommandStack'
 import { AcApI18n, AcApLocale } from './AcApI18n'
 import enCommand from './en/command'
 import enJig from './en/jig'

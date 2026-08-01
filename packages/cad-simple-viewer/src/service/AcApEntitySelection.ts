@@ -1,11 +1,9 @@
 import { AcDbEntity, AcDbObjectId } from '@mlightcad/data-model'
 
 import { AcApAnnotation, AcApContext, AcApDocManager } from '../app'
-import {
-  AcEdOpenMode,
-  AcEdPromptSelectionOptions,
-  AcEdPromptStatus
-} from '../editor'
+import { AcEdPromptSelectionOptions } from '../editor/input/prompt/AcEdPromptSelectionOptions'
+import { AcEdPromptStatus } from '../editor/input/prompt/AcEdPromptStatus'
+import { AcEdOpenMode } from '../editor/view/AcEdOpenMode'
 import { AcApI18n } from '../i18n'
 
 /**

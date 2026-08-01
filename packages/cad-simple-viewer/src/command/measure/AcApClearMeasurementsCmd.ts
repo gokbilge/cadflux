@@ -1,5 +1,6 @@
 import { AcApContext } from '../../app'
-import { AcEdCommand, AcEdOpenMode } from '../../editor'
+import { AcEdCommand } from '../../editor/command/AcEdCommand'
+import { AcEdOpenMode } from '../../editor/view/AcEdOpenMode'
 import { AcTrView2d } from '../../view/AcTrView2d'
 
 /** Cleanup callbacks registered by measurement commands. */

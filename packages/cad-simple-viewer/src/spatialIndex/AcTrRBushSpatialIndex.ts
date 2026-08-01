@@ -1,7 +1,7 @@
 import { AcDbObjectId } from '@mlightcad/data-model'
 import RBush from 'rbush'
 
-import { AcEdSpatialQueryResultItem } from '../editor/view'
+import { AcEdSpatialQueryResultItem } from '../editor/view/AcEdSpatialQueryResult'
 import {
   AcTrSpatialIndex,
   AcTrSpatialIndexBBox,
