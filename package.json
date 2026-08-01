@@ -66,8 +66,7 @@
     "minimize:bundle": "pnpm --filter @cadflux/web analyze",
     "minimize:baseline": "pnpm minimize:analyze && pnpm minimize:measure",
     "minimize:baseline:full": "set CADFLUX_MINIMIZE_FULL=1&& pnpm minimize:analyze && pnpm minimize:measure:full",
-    "doctor:server": "node apps/server/dist/apps/server/src/index.js doctor",
-    "use:dwg-converter": "node tools/use-dwg-converter.mjs"
+    "doctor:server": "node apps/server/dist/apps/server/src/index.js doctor"
   },
   "engines": {
     "node": ">=22",

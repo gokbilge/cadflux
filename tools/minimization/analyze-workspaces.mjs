@@ -503,9 +503,7 @@ function analyzeMlightcad(matches, workspaces) {
   const essential = packages.filter(item =>
     item.packageName.includes('data-model') ||
     item.packageName.includes('libredwg-converter') ||
-    item.packageName.includes('mtext-renderer') ||
-    item.packageName.includes('cad-simple-viewer') ||
-    item.packageName.includes('three-renderer')
+    item.packageName.includes('mtext-renderer')
   )
   const replaceable = packages.filter(item =>
     item.packageName.includes('cad-pdf-plugin') ||
@@ -588,14 +586,7 @@ function classifyPackages(workspaces, mlightcadAudit, playwrightAudit, i18nAudit
       classification = 'WRAP_FIRST'
       evidence.push('Web preview depends on wrapped MLightCAD viewer stack')
     }
-    if (
-      [
-        '@mlightcad/cad-simple-viewer',
-        '@mlightcad/cad-pdf-plugin',
-        '@mlightcad/cad-svg-plugin',
-        '@mlightcad/three-renderer'
-      ].includes(workspace.name)
-    ) {
+    if (['@mlightcad/cad-pdf-plugin', '@mlightcad/cad-svg-plugin'].includes(workspace.name)) {
       classification = 'WRAP_FIRST'
       evidence.push('Direct MLightCAD runtime integration')
     }
@@ -655,7 +646,7 @@ function buildDeletionPlan(workspaces, classification) {
     lowRiskRemovals: group(value => value === 'REFERENCE_ONLY' || value === 'DELETE_AFTER_TESTS'),
     i18nRemoval: ['vue-i18n', '@intlify/eslint-plugin-vue-i18n'],
     mlightcadUiRemoval: workspaces.filter(workspace =>
-      ['@mlightcad/cad-viewer', '@mlightcad/cad-simple-viewer', '@mlightcad/cad-simple-ui-plugin', '@mlightcad/cad-agent-plugin'].includes(workspace.name)
+      ['@mlightcad/cad-viewer', '@mlightcad/cad-simple-ui-plugin', '@mlightcad/cad-agent-plugin'].includes(workspace.name)
     ),
     playwrightRemoval: workspaces.filter(workspace =>
       ['@cadflux/renderer-pdf', '@cadflux/renderer-svg', '@cadflux/cli'].includes(workspace.name)
@@ -721,7 +712,7 @@ function renderMlightcadMarkdown(audit) {
     '| --- | --- | --- | --- | --- | --- | --- | --- | --- |'
   ]
   for (const item of audit.packages) {
-    const canWrap = /(cad-simple-viewer|cad-pdf-plugin|cad-svg-plugin|three-renderer|data-model)/u.test(item.packageName)
+    const canWrap = /(cad-pdf-plugin|cad-svg-plugin|data-model)/u.test(item.packageName)
     const canRewrite = /(cad-pdf-plugin|cad-svg-plugin|mtext-renderer|ui-components|ribbon)/u.test(item.packageName)
     const canDelete = /(cad-agent-plugin|cad-html-plugin)/u.test(item.packageName)
     lines.push(

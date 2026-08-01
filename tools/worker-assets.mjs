@@ -2,8 +2,7 @@
  * Canonical filenames for Web Worker JS bundles shipped with the viewer.
  *
  * Keep these in one place so rename/migration is a single-file change.
- * Runtime TypeScript mirrors these in:
- *   packages/cad-simple-viewer/src/app/AcApWorkerAssets.ts
+ * Runtime TypeScript mirrors these in the active CadFlux viewer/import stack.
  */
 
 /** LibreDWG (GPL) DWG parser worker from `@mlightcad/libredwg-converter`. */

@@ -1,6 +1,6 @@
 # Workspace inventory
 
-Generated: 2026-08-01T20:36:14.479Z
+Generated: 2026-08-01T20:50:32.327Z
 
 | Package | Path | Type | Direct dependents | Runtime use | Build use | Test use | Current classification | Removal candidate | Replacement required | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -21,7 +21,7 @@ Generated: 2026-08-01T20:36:14.479Z
 | @cadflux/presets | packages/presets | package | @cadflux/cli<br>@cadflux/server<br>@cadflux/web | yes | yes | yes | KEEP_RUNTIME | no | no | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/renderer-pdf | packages/renderer-pdf | package | @cadflux/cli<br>@cadflux/server | yes | yes | no | KEEP_RUNTIME | no | no | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/renderer-svg | packages/renderer-svg | package | @cadflux/cli<br>@cadflux/server | yes | yes | no | KEEP_RUNTIME | no | no | Current production conversion uses direct Node-native rendering; Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
-| @cadflux/renderer-webgl | packages/renderer-webgl | package | @cadflux/web | yes | yes | yes | KEEP_RUNTIME | no | no | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; current viewer package is CadFlux-owned and document-driven |
+| @cadflux/renderer-webgl | packages/renderer-webgl | package | @cadflux/web | yes | yes | no | WRAP_FIRST | no | yes | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli; Web preview depends on wrapped MLightCAD viewer stack |
 | @cadflux/server | apps/server | app |  | yes | yes | no | KEEP_RUNTIME | no | no | Production root |
 | @cadflux/storage | packages/storage | package | @cadflux/server | yes | yes | no | KEEP_RUNTIME | no | no | Reachable from @cadflux/web, @cadflux/server, or @cadflux/cli |
 | @cadflux/web | apps/web | app |  | yes | yes | no | KEEP_RUNTIME | no | no | Production root |

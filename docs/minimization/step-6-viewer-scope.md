@@ -6,6 +6,7 @@ Changes completed:
 
 - Replaced the `@cadflux/renderer-webgl` MLightCAD bridge with a CadFlux-owned document-driven viewer core.
 - Removed direct `@mlightcad/*` imports from `packages/renderer-webgl`.
+- Deleted the now-inactive `packages/cad-simple-viewer` and `packages/three-renderer` directories.
 - Removed the legacy renderer-webgl source surfaces:
   - `src/cadflux-app/**`
   - `src/cadflux-i18n/**`

@@ -14,6 +14,8 @@ Completed removals:
 - `packages/cad-viewer-example`
 - `packages/examples`
 - `packages/vite-config`
+- `packages/cad-simple-viewer`
+- `packages/three-renderer`
 - obsolete web shim files under `apps/web/src/shims`
 
 Result:
@@ -30,8 +32,6 @@ Validation used:
 
 Known remaining legacy surface:
 
-- `packages/cad-simple-viewer`
-- `packages/three-renderer`
 - `@mlightcad/mtext-renderer`
 - `@mlightcad/mtext-input-box`
 - `@mlightcad/libredwg-converter`
