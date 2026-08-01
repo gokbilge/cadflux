@@ -53,6 +53,11 @@ Observed bundle change in the command-registry narrowing slice:
 - before: `cad-simple-viewer.js` `2,437.65 kB` / gzip `660.79 kB`
 - after: `cad-simple-viewer.js` `2,227.13 kB` / gzip `617.14 kB`
 
+Observed bundle change in the command root-export narrowing slice:
+
+- before: `cad-simple-viewer.js` `2,227.13 kB` / gzip `617.14 kB`
+- after: `cad-simple-viewer.js` `2,127.62 kB` / gzip `596.67 kB`
+
 Deletion completed in this slice:
 
 - `packages/renderer-webgl/src/cadflux-editor/**`
