@@ -42,6 +42,15 @@ Effect:
 - `packages/cad-simple-viewer/src/app/AcApDocManager.ts` command registration was narrowed to the read-only viewer subset still relevant to CadFlux (`open`, `pan`, `regen`, `select`, `switchbg`, `undo`, `redo`, `zoom`).
 - `cad-simple-viewer` locale payload was reduced from multi-language message bundles to English-only runtime data.
 - Legacy draw/edit/measure/layer/sysvar command registration was removed from the default `cad-simple-viewer` bootstrap path.
+- Production-unreachable legacy command source trees were removed from `@mlightcad/cad-simple-viewer`:
+  - `src/command/convert/**`
+  - `src/command/draw/**`
+  - `src/command/layer/**`
+  - `src/command/modify/**`
+  - `src/command/review/**`
+  - unused top-level commands `AcApCacheFontCmd`, `AcApLogCmd`, `AcApQNewCmd`, `AcApSysVarCmd`
+  - unused measurement commands except `measure/AcApClearMeasurementsCmd`
+- Matching legacy command tests were removed with the deleted command families.
 
 Observed bundle change in this slice:
 
@@ -63,6 +72,11 @@ Deletion completed in this slice:
 - `packages/renderer-webgl/src/cadflux-editor/**`
 - `packages/renderer-webgl/src/mlightcad-bridge/editor.ts`
 - `packages/renderer-webgl/src/mlightcad-bridge/service.ts`
+- `packages/cad-simple-viewer/src/command/convert/**`
+- `packages/cad-simple-viewer/src/command/draw/**`
+- `packages/cad-simple-viewer/src/command/layer/**`
+- `packages/cad-simple-viewer/src/command/modify/**`
+- `packages/cad-simple-viewer/src/command/review/**`
 
 Validation:
 
