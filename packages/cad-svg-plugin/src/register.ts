@@ -1,4 +1,4 @@
-import type { AcApPluginManager } from '@mlightcad/cad-simple-viewer'
+import type { AcApPluginManager } from '@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager'
 
 /** Lazy plugin name for SVG export. */
 export const SVG_PLUGIN_NAME = 'SvgPlugin'

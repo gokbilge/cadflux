@@ -1,8 +1,6 @@
-import {
-  AcApContext,
-  AcApPlugin,
-  AcEdCommandStack
-} from '@mlightcad/cad-simple-viewer'
+import type { AcApContext } from '@mlightcad/cad-simple-viewer/src/app/AcApContext'
+import type { AcApPlugin } from '@mlightcad/cad-simple-viewer/src/plugin/AcApPlugin'
+import { AcEdCommandStack } from '@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommandStack'
 
 import packageJson from '../package.json'
 import { AcApConvertToPdfCmd } from './AcApConvertToPdfCmd'

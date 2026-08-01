@@ -1,4 +1,5 @@
-import { AcApContext, AcEdCommand } from '@mlightcad/cad-simple-viewer'
+import type { AcApContext } from '@mlightcad/cad-simple-viewer/src/app/AcApContext'
+import { AcEdCommand } from '@mlightcad/cad-simple-viewer/src/editor/command/AcEdCommand'
 
 import { AcApPdfConvertor } from './AcApPdfConvertor'
 

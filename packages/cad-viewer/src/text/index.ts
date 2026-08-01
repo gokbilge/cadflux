@@ -1,4 +1,4 @@
-import { AcApLocale } from '@mlightcad/cad-simple-viewer'
+import type { AcApLocale } from '@mlightcad/cad-simple-viewer/src/i18n/AcApI18n'
 import { AcDbEntity } from '@mlightcad/data-model'
 
 import enCommand from '../locale/en/command'

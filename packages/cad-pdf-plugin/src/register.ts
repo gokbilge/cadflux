@@ -1,4 +1,4 @@
-import type { AcApPluginManager } from '@mlightcad/cad-simple-viewer'
+import type { AcApPluginManager } from '@mlightcad/cad-simple-viewer/src/plugin/AcApPluginManager'
 
 /** Lazy plugin name for PDF export/import. */
 export const PDF_PLUGIN_NAME = 'PdfPlugin'

@@ -1,4 +1,4 @@
-import type { AcApContext } from '@mlightcad/cad-simple-viewer'
+import type { AcApContext } from '@mlightcad/cad-simple-viewer/src/app/AcApContext'
 import {
   AcDbLine,
   AcDbPolyline,

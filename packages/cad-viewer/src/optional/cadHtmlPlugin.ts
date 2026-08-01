@@ -1,4 +1,4 @@
-import type { AcTrView2d } from '@mlightcad/cad-simple-viewer'
+import type { AcTrView2d } from '@mlightcad/cad-simple-viewer/src/view/AcTrView2d'
 
 export type AcExInitialViewMode = 'fit' | 'current'
 export type AcExViewerMode = 'view' | 'measure'
