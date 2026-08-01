@@ -15,6 +15,7 @@ import type {
   DrawingLayer,
   LineEntity,
   Matrix2D,
+  MTextEntity,
   Point2D,
   PolylineEntity,
   TextEntity
@@ -150,7 +151,7 @@ function renderEntities(
       continue
     }
     if (entity.kind === 'text' || entity.kind === 'mtext') {
-      drawText(pdf, entity as TextEntity, layerMap, transform, profile, entityMatrix)
+      drawText(pdf, entity, layerMap, transform, profile, entityMatrix)
       continue
     }
     if (entity.kind === 'block-reference') {
@@ -213,7 +214,7 @@ function drawCircle(
 
 function drawText(
   pdf: jsPDF,
-  entity: TextEntity,
+  entity: TextEntity | MTextEntity,
   layerMap: Map<string, DrawingLayer>,
   transform: ReturnType<typeof createPageTransform>,
   profile: CadFluxProfile,
@@ -223,7 +224,7 @@ function drawText(
   const color = resolveColor(entity, layerMap, profile)
   pdf.setTextColor(color.r, color.g, color.b)
   pdf.setFontSize(Math.max(4, (entity.style?.height ?? 2.5) * transform.scale * 2.2))
-  pdf.text(entity.text, point.x, point.y)
+  pdf.text(entity.kind === 'mtext' ? entity.plainText : entity.text, point.x, point.y)
 }
 
 function applyStroke(

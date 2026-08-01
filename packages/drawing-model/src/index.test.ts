@@ -6,6 +6,7 @@ import {
   applyMatrixToPoint,
   identityMatrix,
   multiplyMatrices,
+  parseMText,
   rotateMatrix,
   scaleMatrix,
   translateMatrix,
@@ -48,5 +49,24 @@ describe('@cadflux/drawing-model', () => {
 
     expect(JSON.parse(JSON.stringify(document))).toEqual(document)
     expect(structuredClone(document)).toEqual(document)
+  })
+
+  test('parseMText normalizes plain text and runs deterministically', () => {
+    const parsed = parseMText('CadFlux\\P\\LViewer\\l \\C1;Red \\H2x;Big \\S1/2;', {
+      defaultStyle: {
+        height: 5,
+        widthFactor: 1
+      }
+    })
+
+    expect(parsed.plainText).toContain('CadFlux')
+    expect(parsed.plainText).toContain('\n')
+    expect(parsed.plainText).toContain('Viewer')
+    expect(parsed.plainText).toContain('Red')
+    expect(parsed.plainText).toContain('Big')
+    expect(parsed.plainText).toContain('1/2')
+    expect(parsed.runs.length).toBeGreaterThan(1)
+    expect(JSON.parse(JSON.stringify(parsed))).toEqual(parsed)
+    expect(structuredClone(parsed)).toEqual(parsed)
   })
 })

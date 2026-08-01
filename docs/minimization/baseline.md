@@ -1,11 +1,11 @@
 # CadFlux minimization baseline
 
-Generated: 2026-08-01T20:50:31.236Z
+Generated: 2026-08-01T21:53:30.054Z
 Mode: fast
 
 - Repository working tree size: 689 MB
 - node_modules size: 571 MB (cached)
-- Web bundle size: 430 KB
+- Web bundle size: 0 B
 - Docker image size: docker unavailable
 - Playwright runtime status: removed
 - Residual Playwright bytes on disk: 7.0 MB

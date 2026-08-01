@@ -16,6 +16,7 @@ import {
   type DrawingLayer,
   type LineEntity,
   type Matrix2D,
+  type MTextEntity,
   type Point2D,
   type PolylineEntity,
   type TextEntity
@@ -129,7 +130,7 @@ function renderEntities(
       continue
     }
     if (entity.kind === 'text' || entity.kind === 'mtext') {
-      lines.push(renderText(entity as TextEntity, layerMap, transform, profile, entityMatrix))
+      lines.push(renderText(entity, layerMap, transform, profile, entityMatrix))
       continue
     }
     if (entity.kind === 'block-reference') {
@@ -198,7 +199,7 @@ function renderCircle(
 }
 
 function renderText(
-  entity: TextEntity,
+  entity: TextEntity | MTextEntity,
   layerMap: Map<string, DrawingLayer>,
   transform: ReturnType<typeof createPageTransform>,
   profile: CadFluxProfile,
@@ -207,7 +208,8 @@ function renderText(
   const point = transformPoint(transform, applyMatrixToPoint(entityMatrix, entity.insertionPoint))
   const height = Math.max(2, (entity.style?.height ?? 2.5) * transform.scale)
   const color = resolveStrokeColor(entity, layerMap, profile)
-  return `<text x="${point.x}" y="${point.y}" font-size="${height}" fill="${color}" stroke="none">${escapeXml(entity.text)}</text>`
+  const text = entity.kind === 'mtext' ? entity.plainText : entity.text
+  return `<text x="${point.x}" y="${point.y}" font-size="${height}" fill="${color}" stroke="none">${escapeXml(text)}</text>`
 }
 
 function createPageTransform(

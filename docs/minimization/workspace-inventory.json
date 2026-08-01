@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T20:50:32.325Z",
+  "generatedAt": "2026-08-01T21:53:31.806Z",
   "workspaceCount": 21,
   "activeWorkspaceCount": 21,
   "workspaces": [
@@ -821,10 +821,10 @@
         }
       ],
       "scripts": {
-        "build": "tsc -p tsconfig.json",
+        "build": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
         "clean": "rimraf dist tsconfig.tsbuildinfo"
       },
-      "buildScript": "tsc -p tsconfig.json",
+      "buildScript": "rimraf dist tsconfig.tsbuildinfo && tsc -p tsconfig.json && node ../../tools/fix-esm-specifiers.mjs dist",
       "testScript": null,
       "runtimeEntryPoint": "./dist/index.js",
       "sourceImporters": [

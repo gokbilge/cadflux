@@ -45,4 +45,26 @@ describe('@cadflux/cad-import', () => {
     expect(parsed.document.blocks.length).toBeGreaterThanOrEqual(2)
     expect(parsed.document.entities.some(entity => entity.kind === 'block-reference')).toBe(true)
   })
+
+  test('parses MTEXT into CadFlux-owned runs and plain text', async () => {
+    const filePath = path.resolve('fixtures/minimization/mtext.dxf')
+    const parsed = await parseCadInput({
+      name: 'mtext.dxf',
+      format: 'dxf',
+      path: filePath
+    })
+
+    const entity = parsed.document.entities.find(candidate => candidate.kind === 'mtext')
+    expect(entity).toBeDefined()
+    if (!entity || entity.kind !== 'mtext') {
+      throw new Error('Expected MTEXT entity.')
+    }
+
+    expect(entity.rawText).toContain('\\P')
+    expect(entity.plainText).toContain('CadFlux')
+    expect(entity.plainText).toContain('Viewer')
+    expect(entity.plainText).toContain('1/2')
+    expect(entity.runs.length).toBeGreaterThan(1)
+    expect(parsed.diagnostics.every(diagnostic => diagnostic.code !== 'MTEXT_UNSUPPORTED_CONTROL_SEQUENCE')).toBe(true)
+  })
 })

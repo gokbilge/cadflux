@@ -29,6 +29,12 @@
     "expectedLayoutCount": 0,
     "pdfPageCount": 1
   },
+  "mtext.dxf": {
+    "expectedEntityTypes": ["MTEXT"],
+    "expectedLayerNames": ["0"],
+    "expectedLayoutCount": 0,
+    "pdfPageCount": 1
+  },
   "nested-block.dxf": {
     "expectedEntityTypes": ["INSERT", "LINE"],
     "expectedLayerNames": ["0"],

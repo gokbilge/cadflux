@@ -3,6 +3,16 @@
 
 export const DRAWING_MODEL_SCHEMA_VERSION = 1 as const
 
+export {
+  parseMText,
+  type DrawingTextRun,
+  type DrawingTextStyle,
+  type ParseMTextOptions,
+  type ParsedMText,
+  type TextHorizontalAlignment,
+  type TextVerticalAlignment
+} from './text'
+
 export type DrawingFormat = 'dwg' | 'dxf'
 export type DrawingUnits = 'unitless' | 'inch' | 'foot' | 'mile' | 'mm' | 'cm' | 'm' | 'km'
 
@@ -80,16 +90,8 @@ export interface DrawingLayout {
   entities?: string[]
 }
 
-export interface TextStyle {
-  fontFamily?: string
-  fontFile?: string
-  height: number
-  widthFactor?: number
-  rotation?: number
-  horizontalAlignment?: string
-  verticalAlignment?: string
-  color?: DrawingColor
-}
+export type TextStyle = import('./text').DrawingTextStyle
+export type MTextFormattingRun = import('./text').DrawingTextRun
 
 export interface BaseDrawingEntity {
   id: string
@@ -148,18 +150,16 @@ export interface TextEntity extends BaseDrawingEntity {
   style: TextStyle
 }
 
-export interface MTextFormattingRun {
-  text: string
-  style?: Partial<TextStyle>
-}
-
 export interface MTextEntity extends BaseDrawingEntity {
   kind: 'mtext'
-  text: string
+  rawText: string
+  plainText: string
+  runs: MTextFormattingRun[]
   insertionPoint: Point2D
   width?: number
+  height?: number
+  direction?: Point2D
   style: TextStyle
-  formatting?: MTextFormattingRun[]
 }
 
 export interface BlockReferenceEntity extends BaseDrawingEntity {

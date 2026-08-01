@@ -14,7 +14,9 @@ import {
   type DrawingEntity,
   type DrawingLayer,
   type DrawingLayout,
+  parseMText,
   type LineEntity,
+  type MTextEntity,
   type Point2D,
   type PolylineEntity,
   type TextEntity,
@@ -280,6 +282,53 @@ function parseText(record: DxfRecord, index: number): TextEntity {
   }
 }
 
+function parseMTextEntity(
+  record: DxfRecord,
+  index: number,
+  diagnostics: DrawingDiagnostic[]
+): MTextEntity {
+  const chunks = record.pairs
+    .filter(pair => pair.code === '3')
+    .map(pair => pair.value)
+  const tail = pairValue(record, '1')
+  const rawText = [...chunks, ...(tail ? [tail] : [])].join('')
+  const style = {
+    height: pairNumber(record, '40', 2.5),
+    rotation: pairNumber(record, '50', 0),
+    color: toAciColor(pairInt(record, '62', 7)),
+    widthFactor: 1
+  }
+  const parsed = parseMText(rawText, {
+    defaultStyle: style
+  })
+  diagnostics.push(...parsed.diagnostics.map(diagnostic => ({
+    ...diagnostic,
+    entityId: toEntityId('mtext', pairValue(record, '5'), index),
+    sourceType: 'MTEXT'
+  })))
+
+  const directionX = pairNumber(record, '11', 0)
+  const directionY = pairNumber(record, '21', 0)
+
+  return {
+    id: toEntityId('mtext', pairValue(record, '5'), index),
+    kind: 'mtext',
+    sourceType: 'MTEXT',
+    layerId: toLayerId(pairValue(record, '8')?.trim() || '0'),
+    rawText,
+    plainText: parsed.plainText,
+    runs: parsed.runs,
+    insertionPoint: { x: pairNumber(record, '10'), y: pairNumber(record, '20') },
+    width: pairNumber(record, '41', 0) || undefined,
+    height: pairNumber(record, '43', 0) || undefined,
+    direction:
+      directionX !== 0 || directionY !== 0
+        ? { x: directionX, y: directionY }
+        : undefined,
+    style
+  }
+}
+
 function parseInsert(record: DxfRecord, index: number): BlockReferenceEntity {
   const scaleX = pairNumber(record, '41', 1)
   const scaleY = pairNumber(record, '42', 1)
@@ -319,7 +368,11 @@ function parseUnsupported(record: DxfRecord, index: number): UnsupportedEntity {
   }
 }
 
-function parseEntityRecord(record: DxfRecord, index: number): DrawingEntity {
+function parseEntityRecord(
+  record: DxfRecord,
+  index: number,
+  diagnostics: DrawingDiagnostic[]
+): DrawingEntity {
   switch (record.type) {
     case 'LINE':
       return parseLine(record, index)
@@ -329,6 +382,8 @@ function parseEntityRecord(record: DxfRecord, index: number): DrawingEntity {
       return parseLwPolyline(record, index)
     case 'TEXT':
       return parseText(record, index)
+    case 'MTEXT':
+      return parseMTextEntity(record, index, diagnostics)
     case 'INSERT':
       return parseInsert(record, index)
     default:
@@ -373,7 +428,7 @@ function parseBlocks(records: DxfRecord[], diagnostics: DrawingDiagnostic[]): Dr
       return
     }
     if (open) {
-      const entity = parseEntityRecord(record, currentEntities.length)
+      const entity = parseEntityRecord(record, currentEntities.length, diagnostics)
       currentEntities.push(entity)
       if (entity.kind === 'unsupported') {
         diagnostics.push({
@@ -452,7 +507,7 @@ async function parseDxfDocument(input: CadInput, options?: CadParseOptions): Pro
   const diagnostics: DrawingDiagnostic[] = []
   const blocks = parseBlocks(parseSectionRecords(pairs, 'BLOCKS'), diagnostics)
   const entities = parseSectionRecords(pairs, 'ENTITIES').map((record, index) => {
-    const entity = parseEntityRecord(record, index)
+    const entity = parseEntityRecord(record, index, diagnostics)
     if (entity.kind === 'unsupported') {
       diagnostics.push({
         severity: 'warning',

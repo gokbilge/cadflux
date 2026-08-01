@@ -174,7 +174,7 @@ function appendEntityPrimitives(
         id: entity.id,
         layerId: entity.layerId,
         color,
-        text: entity.text,
+        text: entity.plainText,
         position: applyMatrixToPoint(transform, entity.insertionPoint),
         rotation: entity.style.rotation ?? 0,
         fontSize: Math.max(10, entity.style.height || 10)
